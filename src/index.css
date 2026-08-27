@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+@theme {
+  /* 🎨 Daftarkan Warna Kustom Kita */
+  --color-custom-yellow: #FFD758;
+  --color-custom-yellow-light: #FCE59A;
+  --color-custom-blue: #218DAE;
+  --color-custom-cyan: #2BBBD7;
+
+  /* ✍️ Daftarkan Font Kustom Kita */
+  --font-poppins: 'Poppins', sans-serif;
+  --font-readex: 'Readex Pro', sans-serif;
+}
