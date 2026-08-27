@@ -1,30 +1,41 @@
 import { Link } from 'react-router-dom';
-
+import Navbar from '../components/Navbar'; // <--- Import Navbar buatan kita
+import Footer from '../components/Footer';
 const Home = () => {
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col items-center justify-center p-6 font-sans text-center">
-      <h1 className="text-4xl md:text-5xl font-extrabold text-blue-600 mb-4">
-        🏠 Halaman Home Technopark
-      </h1>
-      <p className="text-lg text-slate-600 mb-8">
-        Yeay! Routing sukses. Coba tes klik tombol di bawah buat pindah halaman.
-      </p>
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       
-      {/* Tombol buat ngetes fitur Link dari React Router */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <Link 
-          to="/inovasi" 
-          className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-all"
-        >
-          🚀 Ke Halaman Inovasi
-        </Link>
-        <Link 
-          to="/login" 
-          className="px-6 py-3 bg-slate-800 text-white font-semibold rounded-lg shadow-md hover:bg-slate-900 transition-all"
-        >
-          🔐 Tes Halaman Login
-        </Link>
-      </div>
+      {/* 🧭 Panggil Navbar di sini */}
+      <Navbar />
+
+      {/* 🚀 Hero Section (Isi Utama Halaman Home) */}
+      <main className="flex-grow flex items-center justify-center text-center px-6 py-20">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight">
+            Selamat Datang di <span className="text-blue-600">Technopark IT-PLN</span>
+          </h1>
+          <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+            Pusat inovasi, inkubasi startup, dan pengelolaan Hak Kekayaan Intelektual (HKI) berbasis digital.
+          </p>
+          
+          {/* Tombol Aksi Cepat */}
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link 
+              to="/inovasi" 
+              className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-all"
+            >
+              Jelajahi Inovasi
+            </Link>
+            <Link 
+              to="/inkubasi" 
+              className="px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg shadow-sm border border-slate-200 hover:bg-slate-100 transition-all"
+            >
+              Daftar Inkubasi
+            </Link>
+          </div>
+        </div>
+      </main>
+      <Footer/>
     </div>
   );
 };

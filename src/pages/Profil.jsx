@@ -6,4 +6,4 @@ const Profil = () => {
   );
 };
 
-export default Profil; // <--- Baris ini yang dicari sama App.jsx!
+export default Profil;
