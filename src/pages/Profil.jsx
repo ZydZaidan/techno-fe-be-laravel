@@ -128,7 +128,7 @@ const Profil = () => {
 
       {/* ================= JUDUL / BREADCRUMB ================= */}
       <section className="border-b border-gray-100 bg-white">
-        <div className="mx-auto max-w-[1180px] px-8 py-6">
+        <div className="mx-auto max-w-295 px-8 py-6">
           <div className="mb-1 flex items-center gap-1 text-[10px] text-gray-500">
             <span>Beranda</span>
             <span>&gt;</span>
@@ -143,7 +143,7 @@ const Profil = () => {
 
       {/* ================= PROFIL TECHNOPARK ================= */}
       <section className="bg-white px-8 py-10">
-        <div className="mx-auto grid max-w-[1180px] items-center gap-12 lg:grid-cols-2">
+        <div className="mx-auto grid max-w-295 items-center gap-12 lg:grid-cols-2">
           {/* GAMBAR */}
           <div className="mx-auto w-full max-w-[470px] overflow-hidden rounded-xl shadow-sm">
             <img
@@ -182,7 +182,7 @@ const Profil = () => {
 
       {/* ================= FOKUS PENGEMBANGAN ================= */}
       <section className="bg-[#EEF3FF] px-8 py-12">
-        <div className="mx-auto max-w-[1180px]">
+        <div className="mx-auto max-w-295">
           <div className="mb-9 text-center">
             <h2 className="font-poppins text-[20px] font-bold text-[#092B52]">
               Fokus Pengembangan
@@ -216,7 +216,7 @@ const Profil = () => {
 
       {/* ================= FASILITAS UNGGULAN ================= */}
       <section className="bg-white px-8 py-14">
-        <div className="mx-auto max-w-[1180px]">
+        <div className="mx-auto max-w-295">
           <div className="mb-9 text-center">
             <h2 className="font-poppins text-[20px] font-bold text-[#092B52]">
               Produk Inovasi Unggulan
@@ -250,7 +250,7 @@ const Profil = () => {
 
       {/* ================= TIM PENGGERAK INOVASI ================= */}
       <section className="bg-[#EEF3FF] px-8 py-14">
-        <div className="mx-auto max-w-[1180px]">
+        <div className="mx-auto max-w-295">
           <div className="mb-9 text-center">
             <h2 className="font-poppins text-[20px] font-bold text-[#092B52]">
               Tim Penggerak Inovasi
@@ -278,13 +278,13 @@ const Profil = () => {
                     href={`mailto:${member.email}`}
                     className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue transition hover:bg-custom-blue hover:text-white"
                   >
-                    <MailIcon className="h-[14px] w-[14px]" />
+                    <MailIcon className="h-3.5 w-[14px]" />
                   </a>
                   <a
                     href="#"
                     className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue transition hover:bg-custom-blue hover:text-white"
                   >
-                    <LinkIcon className="h-[14px] w-[14px]" />
+                    <LinkIcon className="h-3.5 w-[14px]" />
                   </a>
                 </div>
               </div>
