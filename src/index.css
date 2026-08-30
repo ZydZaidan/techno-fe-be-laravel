@@ -10,4 +10,22 @@
   /* ✍️ Daftarkan Font Kustom Kita */
   --font-poppins: 'Poppins', sans-serif;
   --font-readex: 'Readex Pro', sans-serif;
+
+
+}
+
+/* 🚀 Class Wrapper Global buat Atur Lebar Layout */
+@utility layout-container {
+  max-width: 1440px; /* Atur batas lebar maksimal di sini */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;  /* px-6 (di HP) */
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .layout-container {
+    padding-left: 3rem;  /* px-12 (di Laptop/Desktop biar lebih lega) */
+    padding-right: 3rem;
+  }
 }

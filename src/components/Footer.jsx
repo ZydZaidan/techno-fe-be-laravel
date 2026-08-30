@@ -2,9 +2,9 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer className="bg-custom-blue text-white font-poppins border-t-2 border-custom-yellow">
+    <footer className="bg-custom-blue text-white font-poppins border-t-2 border-custom-yellow ">
       {/* Container Utama */}
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="layout-container mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
           
           {/* Kolom 1: Brand & Deskripsi (Lebar: 5 grid) */}
