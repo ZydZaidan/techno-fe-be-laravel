@@ -8,38 +8,6 @@ import lpgSafeSense from "../assets/img/lpg.jpeg";
 import smartMcbGuardian from "../assets/img/smartmcb.jpeg";
 import hematin from "../assets/img/hematin.jpeg";
 
-// ================= IKON CUSTOM (SVG polos, tanpa library tambahan) =================
-const WindTurbineIcon = ({ className }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <line x1="12" y1="10" x2="12" y2="22" />
-    <circle cx="12" cy="9" r="1" fill="currentColor" stroke="none" />
-    <path d="M12 9c0 0 4.5-3 7-1" />
-    <path d="M12 9c0 0-4-5-7-2" />
-    <path d="M12 9c0 0 2-5 0-8" />
-  </svg>
-);
-
-const CpuIcon = ({ className }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <rect x="6" y="6" width="12" height="12" rx="1.5" />
-    <rect x="9.5" y="9.5" width="5" height="5" rx="0.5" />
-    <line x1="12" y1="1" x2="12" y2="4" />
-    <line x1="12" y1="20" x2="12" y2="23" />
-    <line x1="1" y1="12" x2="4" y2="12" />
-    <line x1="20" y1="12" x2="23" y2="12" />
-    <line x1="4" y1="7" x2="6" y2="7" />
-    <line x1="4" y1="17" x2="6" y2="17" />
-    <line x1="18" y1="7" x2="20" y2="7" />
-    <line x1="18" y1="17" x2="20" y2="17" />
-  </svg>
-);
-
-const TrendingUpIcon = ({ className }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <polyline points="3,17 9,11 13,15 21,6" />
-    <polyline points="15,6 21,6 21,12" />
-  </svg>
-);
 
 const MailIcon = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>

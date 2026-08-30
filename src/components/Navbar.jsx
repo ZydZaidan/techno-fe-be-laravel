@@ -1,9 +1,36 @@
-import { Link } from "react-router-dom";
-
+import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from 'react';
 const Navbar = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation(); // Buat ngecek posisi halaman sekarang
+
+  // Ngecek apakah user lagi buka halaman utama (Home)
+  const isHome = location.pathname === '/';
+
+  // Logika buat mantau scroll mouse
+  useEffect(() => {
+    const handleScroll = () => {
+      // Kalau di-scroll lebih dari 50px ke bawah, trigger warna solid
+      if (window.scrollY > 50) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Penentuan style Navbar:
+  // Kalo di halaman Home DAN belom scroll -> Transparan tanpa border
+  // Kalo selain Home ATAU udah scroll -> Warna Biru Default + Border Kuning
+  const navBg = isHome && !isScrolled
+    ? 'bg-transparent border-transparent text-white shadow-none'
+    : 'bg-custom-blue border-b-2 border-custom-yellow text-white shadow-md';
   return (
-    <nav className="bg-custom-blue shadow-md sticky top-0 z-50 font-poppins border-b-2 border-custom-yellow">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+<nav className={`fixed w-full top-0 z-50 font-poppins transition-all duration-500 ${navBg}`}>
+        <div className="layout-container mx-auto px-6 py-4 flex justify-between items-center">
         
         {/* Logo / Judul Brand */}
         <Link to="/">
