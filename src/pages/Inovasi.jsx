@@ -1,79 +1,44 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import API from "../services/api";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-// Dummy Data Inovasi (Sesuaikan foto & data dengan aset lokalmu)
-const initialInovasiData = [
-  {
-    id: 1,
-    tag: "Smart Energy",
-    title: "Sistem Grid Surya Cerdas",
-    desc: "Optimasi distribusi energi surya menggunakan algoritma AI untuk efisiensi maksimal pada skala mikro-grid.",
-    author: "Tim Alpha PLN",
-    img: "/src/assets/img/showcase-1.jpg",
-    buttonBg: "bg-custom-yellow text-slate-900 hover:bg-custom-yellow-light",
-  },
-  {
-    id: 2,
-    tag: "IoT",
-    title: "Sensor Pemantauan Pipa IoT",
-    desc: "Sistem peringatan dini kebocoran gas berbasis IoT dengan dashboard real-time.",
-    author: "Lab Elektro IT-PLN",
-    img: "/src/assets/img/showcase-4.jpg",
-    buttonBg: "bg-custom-cyan text-white hover:bg-custom-blue",
-  },
-  {
-    id: 3,
-    tag: "Aplikasi",
-    title: "Aplikasi Pantau Energi",
-    desc: "Aplikasi mobile untuk memantau dan mengelola konsumsi daya rumah tangga secara interaktif dan gamifikasi.",
-    author: "Startup SyncEnergy",
-    img: "/src/assets/img/showcase-2.jpg",
-    buttonBg: "bg-custom-yellow text-slate-900 hover:bg-custom-yellow-light",
-  },
-  {
-    id: 4,
-    tag: "Aplikasi",
-    title: "Aplikasi Pantau Energi",
-    desc: "Aplikasi mobile untuk memantau dan mengelola konsumsi daya rumah tangga secara interaktif dan gamifikasi.",
-    author: "Startup SyncEnergy",
-    img: "/src/assets/img/showcase-2.jpg",
-    buttonBg: "bg-custom-yellow text-slate-900 hover:bg-custom-yellow-light",
-  },
-  {
-    id: 5,
-    tag: "Aplikasi",
-    title: "Aplikasi Pantau Energi",
-    desc: "Aplikasi mobile untuk memantau dan mengelola konsumsi daya rumah tangga secara interaktif dan gamifikasi.",
-    author: "Startup SyncEnergy",
-    img: "/src/assets/img/showcase-2.jpg",
-    buttonBg: "bg-custom-yellow text-slate-900 hover:bg-custom-yellow-light",
-  },
-  {
-    id: 6,
-    tag: "Aplikasi",
-    title: "Aplikasi Pantau Energi",
-    desc: "Aplikasi mobile untuk memantau dan mengelola konsumsi daya rumah tangga secara interaktif dan gamifikasi.",
-    author: "Startup SyncEnergy",
-    img: "/src/assets/img/showcase-2.jpg",
-    buttonBg: "bg-custom-yellow text-slate-900 hover:bg-custom-yellow-light",
-  },
-];
-
-const categories = ["Semua", "Smart Energy", "IoT", "Aplikasi"];
+// Definisi Kategori
+const categories = ["Semua", "Software", "Energi", "Manufaktur", "Pertanian", "Lainnya"];
 
 const Inovasi = () => {
+  const [inovasiData, setInovasiData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("Semua");
 
-  // Filter Dummy Sederhana di FE
-  const filteredInovasi = initialInovasiData.filter((item) => {
+  // Fetch Data dari API Backend
+  useEffect(() => {
+    const fetchInovasi = async () => {
+      try {
+        const response = await API.get("/inovasi");
+        if (response.data.success) {
+          setInovasiData(response.data.data);
+        }
+      } catch (error) {
+        console.error("Gagal mengambil data inovasi:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInovasi();
+  }, []);
+
+  // Filter berdasarkan data dari DB
+  const filteredInovasi = inovasiData.filter((item) => {
     const matchesCategory =
-      activeCategory === "Semua" || item.tag.toLowerCase() === activeCategory.toLowerCase();
+      activeCategory === "Semua" ||
+      item.kategori?.toLowerCase() === activeCategory.toLowerCase();
     const matchesSearch =
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.desc.toLowerCase().includes(searchQuery.toLowerCase());
+      item.judul?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.deskripsi?.toLowerCase().includes(searchQuery.toLowerCase());
 
     return matchesCategory && matchesSearch;
   });
@@ -81,7 +46,6 @@ const Inovasi = () => {
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col font-poppins text-[#092B52] pt-28 md:pt-32">
       <Navbar />
-
 
       {/* ================= SEARCH & FILTER BAR ================= */}
       <section className="relative z-10 layout-container mx-auto px-6 w-full pt-4 mb-10">
@@ -94,7 +58,7 @@ const Inovasi = () => {
               placeholder="Cari inovasi..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-xs md:text-sm text-slate-800 focus:outline-none focus:border-custom-cyan transition-colors"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-xs md:text-sm text-slate-800 focus:outline-none focus:border-cyan-500 transition-colors"
             />
             <svg
               className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"
@@ -114,7 +78,7 @@ const Inovasi = () => {
                 onClick={() => setActiveCategory(cat)}
                 className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
                   activeCategory === cat
-                    ? "bg-custom-yellow text-slate-900 shadow-sm"
+                    ? "bg-[#FFC82C] text-slate-900 shadow-sm"
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 }`}
               >
@@ -128,7 +92,11 @@ const Inovasi = () => {
 
       {/* ================= GRID CARDS INOVASI ================= */}
       <section className="layout-container pb-24">
-        {filteredInovasi.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-16">
+            <p className="text-slate-500 text-sm font-medium animate-pulse">Memuat data inovasi...</p>
+          </div>
+        ) : filteredInovasi.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
             {filteredInovasi.map((item) => (
               <div
@@ -138,8 +106,8 @@ const Inovasi = () => {
                 {/* Image */}
                 <div className="relative w-full h-48 bg-slate-100 overflow-hidden">
                   <img
-                    src={item.img}
-                    alt={item.title}
+                    src={item.gambar_url || "https://placehold.co/600x400?text=No+Image"}
+                    alt={item.judul}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -148,18 +116,18 @@ const Inovasi = () => {
                 <div className="p-6 flex flex-col grow justify-between">
                   <div>
                     {/* Badge Category */}
-                    <span className="inline-block text-[11px] font-semibold text-custom-cyan bg-cyan-50 px-3 py-1 rounded-full mb-3">
-                      {item.tag}
+                    <span className="inline-block text-[11px] font-semibold text-cyan-700 bg-cyan-50 px-3 py-1 rounded-full mb-3">
+                      {item.kategori || "Umum"}
                     </span>
 
                     {/* Title */}
                     <h3 className="font-readex text-lg font-bold text-[#1c3250] mb-2 leading-snug">
-                      {item.title}
+                      {item.judul}
                     </h3>
 
                     {/* Desc */}
                     <p className="text-slate-500 text-xs leading-relaxed mb-4 line-clamp-3">
-                      {item.desc}
+                      {item.deskripsi}
                     </p>
 
                     {/* Author / Tim */}
@@ -167,7 +135,7 @@ const Inovasi = () => {
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
-                      <span>{item.author}</span>
+                      <span>{item.pengembang || "Tim Inovator"}</span>
                     </div>
                   </div>
 
@@ -175,7 +143,7 @@ const Inovasi = () => {
                   <div className="flex items-center justify-between pt-2">
                     <Link
                       to={`/inovasi/${item.id}`}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[#1c3250] hover:text-custom-cyan transition-colors group"
+                      className="inline-flex items-center gap-1 text-xs font-bold text-[#1c3250] hover:text-cyan-600 transition-colors group"
                     >
                       Detail
                       <svg
@@ -188,7 +156,7 @@ const Inovasi = () => {
                       </svg>
                     </Link>
 
-                    <button className={`px-4 py-2 text-xs font-bold rounded-xl transition-colors ${item.buttonBg}`}>
+                    <button className="px-4 py-2 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors">
                       Kolaborasi
                     </button>
                   </div>
