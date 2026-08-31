@@ -1,88 +1,48 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import API from "../services/api";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-// Dummy Data Statistik HKI
+// Data Statis untuk Counter & Cards Fasilitasi
 const statsData = [
-  { id: 1, count: "42", label: "Total Paten", color: "border-cyan-400", iconBg: "bg-cyan-100 text-cyan-500" },
-  { id: 2, count: "156", label: "Hak Cipta Terdaftar", color: "border-amber-400", iconBg: "bg-amber-100 text-amber-500" },
-  { id: 3, count: "28", label: "Merek Dagang", color: "border-teal-400", iconBg: "bg-teal-100 text-teal-500" },
-  { id: 4, count: "15", label: "Desain Industri", color: "border-amber-300", iconBg: "bg-amber-100 text-amber-500" },
+  { id: 1, count: "120+", label: "HKI Terdaftar", color: "border-teal-400", iconBg: "bg-teal-50 text-teal-600" },
+  { id: 2, count: "45+", label: "Paten Granted", color: "border-sky-400", iconBg: "bg-sky-50 text-sky-600" },
+  { id: 3, count: "75+", label: "Hak Cipta", color: "border-indigo-400", iconBg: "bg-indigo-50 text-indigo-600" },
+  { id: 4, count: "15+", label: "Merek Dagang", color: "border-amber-400", iconBg: "bg-amber-50 text-amber-600" },
 ];
 
-// Dummy Data Fasilitasi HKI
 const fasilitasiData = [
-  {
-    id: 1,
-    title: "Hak Cipta",
-    desc: "Perlindungan karya tulis, seni, dan perangkat lunak.",
-    iconBg: "bg-blue-100 text-blue-600",
-  },
-  {
-    id: 2,
-    title: "Paten",
-    desc: "Fasilitasi drafting dan pendaftaran invensi teknologi.",
-    iconBg: "bg-blue-100 text-blue-600",
-  },
-  {
-    id: 3,
-    title: "Merek",
-    desc: "Pendaftaran nama produk, logo, dan identitas usaha.",
-    iconBg: "bg-blue-100 text-blue-600",
-  },
-  {
-    id: 4,
-    title: "Desain Industri",
-    desc: "Perlindungan estetika bentuk dan konfigurasi produk.",
-    iconBg: "bg-blue-100 text-blue-600",
-  },
-];
-
-// Dummy Data Direktori HKI
-const initialDirektoriData = [
-  {
-    id: 1,
-    judul: "Sistem Monitoring Emisi Karbon Berbasis IoT",
-    jenis: "PATEN",
-    jenisBg: "bg-cyan-400 text-white",
-    tahun: "2023",
-    status: "Granted",
-    statusColor: "bg-teal-500",
-  },
-  {
-    id: 2,
-    judul: "Modul Pembelajaran Interaktif Dasar Pemrograman Python",
-    jenis: "HAK CIPTA",
-    jenisBg: "bg-amber-400 text-white",
-    tahun: "2023",
-    status: "Terdaftar",
-    statusColor: "bg-teal-500",
-  },
-  {
-    id: 3,
-    judul: "EcoCharge: Stasiun Pengisian Daya Tenaga Surya Portabel",
-    jenis: "DESAIN",
-    jenisBg: "bg-slate-700 text-white",
-    tahun: "2024",
-    status: "Proses",
-    statusColor: "bg-amber-400",
-  },
-  {
-    id: 4,
-    judul: "Logo 'EnergiKu' Aplikasi Manajemen Listrik Pintar",
-    jenis: "MEREK",
-    jenisBg: "bg-slate-800 text-white",
-    tahun: "2024",
-    status: "Terdaftar",
-    statusColor: "bg-teal-500",
-  },
+  { id: 1, title: "Konsultasi HKI", desc: "Layanan pendampingan dan konsultasi draf dokumen Kekayaan Intelektual.", iconBg: "bg-sky-50 text-sky-600" },
+  { id: 2, title: "Pendaftaran Paten", desc: "Bantuan proses pendaftaran paten invensi hingga status granted.", iconBg: "bg-teal-50 text-teal-600" },
+  { id: 3, title: "Hak Cipta & Merek", desc: "Perlindungan karya cipta, desain industri, serta merek komersial.", iconBg: "bg-indigo-50 text-indigo-600" },
+  { id: 4, title: "Valuasi & Komersialisasi", desc: "Pendampingan penilaian aset KI dan akselerasi ke pasar komersial.", iconBg: "bg-amber-50 text-amber-600" },
 ];
 
 const HKI = () => {
+  const [direktoriData, setDirektoriData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredDirektori = initialDirektoriData.filter((item) =>
-    item.judul.toLowerCase().includes(searchQuery.toLowerCase())
+  useEffect(() => {
+    const fetchHKI = async () => {
+      try {
+        const response = await API.get("/hki");
+        if (response.data.success) {
+          setDirektoriData(response.data.data);
+        }
+      } catch (error) {
+        console.error("Gagal mengambil data HKI:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHKI();
+  }, []);
+
+  // Filter berdasarkan judul dari DB
+  const filteredDirektori = direktoriData.filter((item) =>
+    item.judul?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -91,7 +51,7 @@ const HKI = () => {
 
       {/* ================= TOP BANNER CTA CARD ================= */}
       <section className="layout-container mx-auto px-6 w-full mb-12">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-cyan-100 via-sky-200 to-teal-100 p-8 md:p-12 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div className="relative overflow-hidden rounded-3xl bg-linear-to-r from-cyan-100 via-sky-200 to-teal-100 p-8 md:p-12 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="max-w-xl">
             <h1 className="font-readex text-2xl md:text-3xl font-extrabold text-[#092B52] mb-3">
               Fasilitasi Kekayaan Intelektual
@@ -121,7 +81,7 @@ const HKI = () => {
           {statsData.map((stat) => (
             <div
               key={stat.id}
-              className={`bg-white rounded-2xl p-6 shadow-sm border-t-4 ${stat.color} border-x border-b border-slate-100 text-center flex flex-col items-center justify-center`}
+              className={`bg-white rounded-2xl p-6 shadow-sm border-t-4  border-x border-b border-slate-100 text-center flex flex-col items-center justify-center`}
             >
               <div className={`w-10 h-10 rounded-xl ${stat.iconBg} flex items-center justify-center mb-3`}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,21 +184,27 @@ const HKI = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">
-                {filteredDirektori.length > 0 ? (
+                {loading ? (
+                  <tr>
+                    <td colSpan="5" className="py-8 text-center text-slate-500 font-medium animate-pulse">
+                      Memuat data direktori...
+                    </td>
+                  </tr>
+                ) : filteredDirektori.length > 0 ? (
                   filteredDirektori.map((row, index) => (
                     <tr key={row.id} className="hover:bg-slate-50/50 transition-colors">
                       <td className="py-4 px-6 text-center font-medium text-slate-400">{index + 1}</td>
                       <td className="py-4 px-6 font-semibold text-[#092B52]">{row.judul}</td>
                       <td className="py-4 px-6 text-center">
-                        <span className={`inline-block text-[10px] font-bold px-3 py-1 rounded-full ${row.jenisBg}`}>
-                          {row.jenis}
+                        <span className="inline-block text-[10px] font-bold px-3 py-1 rounded-full bg-cyan-50 text-cyan-700">
+                          {row.jenis_hki || "HKI"}
                         </span>
                       </td>
-                      <td className="py-4 px-6 text-center text-slate-500 font-medium">{row.tahun}</td>
+                      <td className="py-4 px-6 text-center text-slate-500 font-medium">{row.tahun || "-"}</td>
                       <td className="py-4 px-6 text-center">
                         <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700">
-                          <span className={`w-2 h-2 rounded-full ${row.statusColor}`}></span>
-                          {row.status}
+                          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                          {row.status || "Terdaftar"}
                         </span>
                       </td>
                     </tr>

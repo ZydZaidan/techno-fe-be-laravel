@@ -127,7 +127,7 @@ const Home = () => {
     <div className="min-h-screen bg-slate-50 flex flex-col font-poppins">
       <Navbar />
 
-      <section className="relative w-full min-h-[90vh] flex items-center pt-32 pb-20">
+      <section className="relative w-full min-h-screen flex items-center pt-32 pb-20">
         {/* Background Image & Gradient Overlay */}
         <div
           className="absolute inset-0 bg-cover bg-center"
