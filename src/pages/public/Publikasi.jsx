@@ -71,7 +71,7 @@ const Publikasi = () => {
 
       {/* ================= JUDUL / BREADCRUMB ================= */}
       <section className="border-b border-gray-100 bg-white">
-        <div className="mx-auto max-w-[1180px] px-8 py-6">
+        <div className="mx-auto max-w-295 px-8 py-6">
           <div className="mb-1 flex items-center gap-1 text-[10px] text-gray-500">
             <span>Beranda</span>
             <span>&gt;</span>
@@ -86,9 +86,9 @@ const Publikasi = () => {
 
       {/* ================= ARTIKEL UNGGULAN ================= */}
       <section className="bg-[#F7F9FC] px-8 py-10">
-        <div className="mx-auto max-w-[1180px]">
+        <div className="mx-auto max-w-295">
           <div className="grid overflow-hidden rounded-xl bg-white shadow-sm md:grid-cols-2">
-            <div className="h-[220px] w-full overflow-hidden md:h-full">
+            <div className="h-55 w-full overflow-hidden md:h-full">
               <img
                 src={featuredArticle.image}
                 alt={featuredArticle.title}

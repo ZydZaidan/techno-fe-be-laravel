@@ -49,8 +49,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* 3. HALAMAN DASHBOARD ADMIN (DIPROTEKSI) */}
-        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+        {/* 3. HALAMAN DASHBOARD ADMIN (Izinkan 'admin' dan 'administrator') */}
+        <Route element={<ProtectedRoute allowedRoles={['admin', 'administrator']} />}>
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="users" element={<ManajemenUser />} />
@@ -58,6 +58,12 @@ function App() {
             <Route path="hki" element={<ApprovalHKI />} />
             <Route path="audit-log" element={<AuditLog />} />
           </Route>
+        </Route>
+
+        {/* 4. HALAMAN DASHBOARD TENANT (DIPROTEKSI) */}
+        <Route element={<ProtectedRoute allowedRoles={['tenant']} />}>
+          {/* Nanti bisa disesuaikan dengan Layout Tenant kamu */}
+          <Route path="/tenant/dashboard" element={<div>Dashboard Tenant (Dalam Pengembangan)</div>} />
         </Route>
 
       </Routes>

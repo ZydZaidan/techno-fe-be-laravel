@@ -99,7 +99,7 @@ const Contact = () => {
     <div className="min-h-screen bg-white font-readex text-[#092B52]">
       {/* ================= JUDUL / BREADCRUMB ================= */}
       <section className="border-b border-gray-100 bg-white">
-        <div className="mx-auto max-w-[1180px] px-8 py-6">
+        <div className="mx-auto max-w-295 px-8 py-6">
           <div className="mb-1 flex items-center gap-1 text-[10px] text-gray-500">
             <span>Beranda</span>
             <span>&gt;</span>
@@ -114,7 +114,7 @@ const Contact = () => {
 
       {/* ================= KONTEN ================= */}
       <section className="bg-[#F7F9FC] px-8 py-10">
-        <div className="mx-auto grid max-w-[1180px] items-start gap-6 lg:grid-cols-2">
+        <div className="mx-auto grid max-w-295 items-start gap-6 lg:grid-cols-2">
           {/* ================= INFORMASI KONTAK + MAPS ================= */}
           <div className="rounded-xl bg-white p-6 shadow-sm">
             <h2 className="font-poppins mb-5 text-[15px] font-bold text-[#092B52]">
@@ -124,7 +124,7 @@ const Contact = () => {
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue">
-                  <MapPinIcon className="h-[14px] w-[14px]" />
+                  <MapPinIcon className="h-3.5 w-3.5" />
                 </span>
                 <div>
                   <p className="text-[10px] font-semibold text-[#092B52]">Alamat</p>
@@ -136,7 +136,7 @@ const Contact = () => {
 
               <div className="flex items-start gap-3">
                 <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue">
-                  <MailIcon className="h-[14px] w-[14px]" />
+                  <MailIcon className="h-3.5 w-3.5" />
                 </span>
                 <div>
                   <p className="text-[10px] font-semibold text-[#092B52]">Email</p>
@@ -151,7 +151,7 @@ const Contact = () => {
 
               <div className="flex items-start gap-3">
                 <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue">
-                  <PhoneIcon className="h-[14px] w-[14px]" />
+                  <PhoneIcon className="h-3.5 w-3.5" />
                 </span>
                 <div>
                   <p className="text-[10px] font-semibold text-[#092B52]">Telepon</p>
@@ -174,21 +174,21 @@ const Contact = () => {
                   aria-label="Bagikan"
                   className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue transition hover:bg-custom-blue hover:text-white"
                 >
-                  <ShareIcon className="h-[14px] w-[14px]" />
+                  <ShareIcon className="h-3.5 w-3.5" />
                 </a>
                 <a
                   href="#"
                   aria-label="Instagram"
                   className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue transition hover:bg-custom-blue hover:text-white"
                 >
-                  <InstagramIcon className="h-[14px] w-[14px]" />
+                  <InstagramIcon className="h-3.5 w-3.5" />
                 </a>
                 <a
                   href="#"
                   aria-label="YouTube"
                   className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue transition hover:bg-custom-blue hover:text-white"
                 >
-                  <YoutubeIcon className="h-[14px] w-[14px]" />
+                  <YoutubeIcon className="h-3.5 w-3.5" />
                 </a>
               </div>
             </div>
@@ -198,7 +198,7 @@ const Contact = () => {
                 link "Open in Maps" bawaan di pojok kiri atas — kita pakai
                 tombol "Lihat di Google Maps" kita sendiri di bawah, jadi
                 yang bawaan disembunyikan supaya tidak dobel. */}
-            <div className="relative mt-6 h-[220px] w-full overflow-hidden rounded-xl">
+            <div className="relative mt-6 h-55 w-full overflow-hidden rounded-xl">
               <iframe
                 title="Lokasi Technopark IT-PLN"
                 src={mapsEmbedSrc}
@@ -214,7 +214,7 @@ const Contact = () => {
                 rel="noopener noreferrer"
                 className="absolute bottom-3 left-3 flex items-center gap-1 rounded-md bg-white px-3 py-1.5 text-[10px] font-semibold text-[#092B52] shadow-sm transition hover:bg-gray-50"
               >
-                <MapPinIcon className="h-[12px] w-[12px] text-custom-blue" />
+                <MapPinIcon className="h-3 w-3 text-custom-blue" />
                 Lihat di Google Maps
               </a>
             </div>
@@ -300,7 +300,7 @@ const Contact = () => {
                 disabled={status === "sending"}
                 className="flex w-full items-center justify-center gap-2 rounded-lg bg-custom-yellow px-4 py-2.5 text-[11px] font-semibold text-[#092B52] transition hover:opacity-90 disabled:opacity-60"
               >
-                <SendIcon className="h-[14px] w-[14px]" />
+                <SendIcon className="h-3.5 w-3.5" />
                 {status === "sending" ? "Mengirim..." : "Kirim Pesan"}
               </button>
 

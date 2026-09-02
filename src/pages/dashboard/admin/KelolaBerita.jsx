@@ -36,7 +36,7 @@ const KelolaBerita = () => {
             <tbody className="divide-y divide-slate-100 text-slate-700">
               {news.map((item) => (
                 <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                  <td className="p-4 font-semibold text-[#092B52] min-w-[240px]">{item.judul}</td>
+                  <td className="p-4 font-semibold text-[#092B52] min-w-60">{item.judul}</td>
                   <td className="p-4 text-slate-500">{item.kategori}</td>
                   <td className="p-4 text-slate-400">{item.tanggal}</td>
                   <td className="p-4">

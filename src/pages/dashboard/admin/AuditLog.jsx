@@ -112,7 +112,7 @@ const AuditLog = () => {
                       {log.role}
                     </span>
                   </td>
-                  <td className="p-4 min-w-[240px] text-slate-600">{log.aktivitas}</td>
+                  <td className="p-4 min-w-60 text-slate-600">{log.aktivitas}</td>
                   <td className="p-4 whitespace-nowrap font-mono text-slate-400">{log.ip}</td>
                 </tr>
               ))}

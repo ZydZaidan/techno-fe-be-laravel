@@ -6,11 +6,12 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
-  // State Login diambil dari LocalStorage jika ada
+  // State User dari LocalStorage
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
+
   const dropdownRef = useRef(null);
   const location = useLocation();
 
@@ -21,7 +22,19 @@ const Navbar = () => {
     setIsProfileDropdownOpen(false);
   };
 
-  // Cek status login dari LocalStorage saat dimuat & tiap kali lokasi berubah
+  // Sync state user saat perpindahan halaman atau event storage trigger
+  useEffect(() => {
+    const checkUserStorage = () => {
+      const savedUser = localStorage.getItem("user");
+      setUser(savedUser ? JSON.parse(savedUser) : null);
+    };
+
+    checkUserStorage();
+
+    // Listen event storage (berguna saat baru selesai login)
+    window.addEventListener("storage", checkUserStorage);
+    return () => window.removeEventListener("storage", checkUserStorage);
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -68,13 +81,17 @@ const Navbar = () => {
     { name: "Publikasi", path: "/publikasi" },
     { name: "Contact", path: "/contact" },
   ];
+
+  // Penentuan Navigasi Dashboard Berdasarkan Role DB
   const getDashboardPath = () => {
     if (!user) return "/login";
     const role = user.role?.toLowerCase();
-    if (role === "admin") return "/admin/dashboard";
+    
+    if (role === "admin" || role === "administrator") return "/admin/dashboard";
     if (role === "verifikator") return "/verifikator/dashboard";
     if (role === "reviewer") return "/reviewer/dashboard";
-    return "/user/dashboard";
+    if (role === "tenant") return "/tenant/dashboard";
+    return "/";
   };
 
   return (
@@ -119,7 +136,7 @@ const Navbar = () => {
 
           <div className="relative" ref={dropdownRef}>
             {!user ? (
-              /* BUTTON LOGIN DESKTOP (Garish & Tanpa Panah) */
+              /* BUTTON LOGIN DESKTOP */
               <Link
                 to="/login"
                 className="relative inline-flex items-center justify-center px-7 py-2 text-sm font-semibold text-custom-blue bg-custom-yellow rounded-xl shadow-md overflow-hidden transition-all duration-300 ease-out hover:scale-105 hover:shadow-custom-yellow/20 hover:shadow-lg active:scale-95 group focus:outline-none"
@@ -139,9 +156,9 @@ const Navbar = () => {
                     <img
                       src={
                         user.avatar ||
-                        `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`
+                        `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.nama || user.name}`
                       }
-                      alt={user.name}
+                      alt={user.nama || user.name}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -151,7 +168,7 @@ const Navbar = () => {
                   <div className="absolute right-0 mt-3 w-56 bg-white text-slate-800 rounded-2xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="px-4 py-3 border-b border-slate-100">
                       <p className="text-sm font-bold text-[#092B52] truncate">
-                        {user.name}
+                        {user.nama || user.name}
                       </p>
                       <p className="text-[11px] text-slate-400 font-medium capitalize">
                         {user.role}
@@ -237,7 +254,6 @@ const Navbar = () => {
         {/* ================= MOBILE CONTROLS (HP) ================= */}
         <div className="flex md:hidden items-center gap-3">
           {!user && (
-            /* BUTTON LOGIN MOBILE */
             <Link
               to="/login"
               className="px-4 py-1.5 bg-custom-yellow text-custom-blue text-xs font-bold rounded-lg shadow-sm active:scale-95 transition-transform"
@@ -251,32 +267,12 @@ const Navbar = () => {
             className="p-2 rounded-lg text-white hover:bg-white/10 focus:outline-none transition-colors"
           >
             {isMobileMenuOpen ? (
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             ) : (
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             )}
           </button>
@@ -313,15 +309,15 @@ const Navbar = () => {
                   <img
                     src={
                       user.avatar ||
-                      `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`
+                      `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.nama || user.name}`
                     }
-                    alt={user.name}
+                    alt={user.nama || user.name}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="overflow-hidden">
                   <p className="text-xs font-bold text-white truncate">
-                    {user.name}
+                    {user.nama || user.name}
                   </p>
                   <p className="text-[10px] text-custom-yellow font-medium capitalize">
                     {user.role}
@@ -335,65 +331,18 @@ const Navbar = () => {
                   onClick={closeAllMenus}
                   className="flex items-center gap-2.5 text-xs font-medium text-slate-200 hover:text-custom-yellow py-1.5 transition-colors"
                 >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 00-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 00-1 1m-6 0h6"
-                    />
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 00-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 00-1 1m-6 0h6" />
                   </svg>
                   Dashboard
-                </Link>
-
-                <Link
-                  to="/settings"
-                  onClick={closeAllMenus}
-                  className="flex items-center gap-2.5 text-xs font-medium text-slate-200 hover:text-custom-yellow py-1.5 transition-colors"
-                >
-                  <svg
-                    className="w-4 h-4 "
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                  Settings
                 </Link>
 
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-2.5 text-xs font-semibold text-rose-400 hover:text-rose-300 pt-2 transition-colors text-left"
                 >
-                  <svg
-                    className="w-4 h-4 text-rose-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M17 16l4-4m0 0l-4-4m4-4H7m6 4v1m0 16v-1"
-                    />
+                  <svg className="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4-4H7m6 4v1m0 16v-1" />
                   </svg>
                   Logout
                 </button>

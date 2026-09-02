@@ -38,7 +38,7 @@ const ApprovalHKI = () => {
               {hkiList.map((item) => (
                 <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
                   <td className="p-4 font-mono font-bold text-[#188B9E]">{item.id}</td>
-                  <td className="p-4 font-semibold text-[#092B52] min-w-[200px]">{item.judul}</td>
+                  <td className="p-4 font-semibold text-[#092B52] min-w-50">{item.judul}</td>
                   <td className="p-4">{item.pengusul}</td>
                   <td className="p-4 text-slate-500">{item.tipe}</td>
                   <td className="p-4 text-slate-400">{item.tanggal}</td>
