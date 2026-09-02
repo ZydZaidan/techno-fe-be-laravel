@@ -6,17 +6,13 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   
-  // State simulasi Login
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  // State Login diambil dari LocalStorage jika ada
+const [user, setUser] = useState(() => {
+  const savedUser = localStorage.getItem("user");
+  return savedUser ? JSON.parse(savedUser) : null;
+});
   const dropdownRef = useRef(null);
   const location = useLocation();
-
-  const user = {
-    name: "Muhammad Yazid Zaidan",
-    role: "Admin",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Zaid",
-  };
 
   const isHome = location.pathname === "/";
 
@@ -24,6 +20,9 @@ const Navbar = () => {
     setIsMobileMenuOpen(false);
     setIsProfileDropdownOpen(false);
   };
+
+  // Cek status login dari LocalStorage saat dimuat & tiap kali lokasi berubah
+  
 
   useEffect(() => {
     const handleScroll = () => {
@@ -47,6 +46,13 @@ const Navbar = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    closeAllMenus();
+  };
 
   const navBg = isMobileMenuOpen
     ? "bg-[#092B52] text-white shadow-none"
@@ -73,42 +79,53 @@ const Navbar = () => {
           <img
             src="/src/assets/img/logo-white.svg"
             alt="Logo Technopark"
-            className="h-12 md:h-14"
+            className="h-12 md:h-14 transition-transform hover:scale-105 duration-200"
           />
         </Link>
 
         {/* ================= DESKTOP MENU (MD to UP) ================= */}
         <div className="hidden md:flex items-center gap-8">
           <div className="flex gap-6 items-center font-normal text-white">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.path}
-                className="relative py-1 group transition-all hover:font-semibold"
-              >
-                <span>{link.name}</span>
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-custom-yellow transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = location.pathname === link.path;
+              return (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className={`relative py-1 group transition-all duration-200 ${
+                    isActive ? "font-semibold text-custom-yellow" : "hover:font-semibold"
+                  }`}
+                >
+                  <span>{link.name}</span>
+                  <span
+                    className={`absolute bottom-0 left-0 h-0.5 bg-custom-yellow transition-all duration-300 ${
+                      isActive ? "w-full" : "w-0 group-hover:w-full"
+                    }`}
+                  ></span>
+                </Link>
+              );
+            })}
           </div>
 
           <div className="relative" ref={dropdownRef}>
-            {!isLoggedIn ? (
-              <button
-                onClick={() => setIsLoggedIn(true)}
-                className="px-7 py-2 bg-custom-yellow text-custom-blue font-semibold rounded-lg shadow-sm border-2 border-custom-yellow hover:bg-transparent hover:text-custom-yellow transition-all duration-300"
+            {!user ? (
+              /* BUTTON LOGIN DESKTOP (Garish & Tanpa Panah) */
+              <Link
+                to="/login"
+                className="relative inline-flex items-center justify-center px-7 py-2 text-sm font-semibold text-custom-blue bg-custom-yellow rounded-xl shadow-md overflow-hidden transition-all duration-300 ease-out hover:scale-105 hover:shadow-custom-yellow/20 hover:shadow-lg active:scale-95 group focus:outline-none"
               >
-                Login
-              </button>
+                <span>Login</span>
+              </Link>
             ) : (
+              /* AVATAR & DROPDOWN USER */
               <div className="relative">
                 <button
                   onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                   className="flex items-center gap-2 focus:outline-none group"
                 >
-                  <div className="w-10 h-10 rounded-full border-2 border-custom-yellow overflow-hidden bg-slate-200 transition-transform group-hover:scale-105">
+                  <div className="w-10 h-10 rounded-full border-2 border-custom-yellow overflow-hidden bg-slate-200 transition-transform group-hover:scale-105 shadow-sm">
                     <img
-                      src={user.avatar}
+                      src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`}
                       alt={user.name}
                       className="w-full h-full object-cover"
                     />
@@ -119,7 +136,7 @@ const Navbar = () => {
                   <div className="absolute right-0 mt-3 w-56 bg-white text-slate-800 rounded-2xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="px-4 py-3 border-b border-slate-100">
                       <p className="text-sm font-bold text-[#092B52] truncate">{user.name}</p>
-                      <p className="text-[11px] text-slate-400 font-medium">{user.role}</p>
+                      <p className="text-[11px] text-slate-400 font-medium capitalize">{user.role}</p>
                     </div>
 
                     <Link
@@ -148,10 +165,7 @@ const Navbar = () => {
                     <div className="border-t border-slate-100 my-1"></div>
 
                     <button
-                      onClick={() => {
-                        setIsLoggedIn(false);
-                        closeAllMenus();
-                      }}
+                      onClick={handleLogout}
                       className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors text-left"
                     >
                       <svg className="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,13 +182,14 @@ const Navbar = () => {
 
         {/* ================= MOBILE CONTROLS (HP) ================= */}
         <div className="flex md:hidden items-center gap-3">
-          {!isLoggedIn && (
-            <button
-              onClick={() => setIsLoggedIn(true)}
-              className="px-4 py-1.5 bg-custom-yellow text-custom-blue text-xs font-semibold rounded-lg shadow-sm border border-custom-yellow"
+          {!user && (
+            /* BUTTON LOGIN MOBILE */
+            <Link
+              to="/login"
+              className="px-4 py-1.5 bg-custom-yellow text-custom-blue text-xs font-bold rounded-lg shadow-sm active:scale-95 transition-transform"
             >
               Login
-            </button>
+            </Link>
           )}
 
           <button
@@ -200,27 +215,36 @@ const Navbar = () => {
         <div className="md:hidden bg-[#092B52] border-b-2 border-custom-yellow px-6 pt-2 pb-6 space-y-4 shadow-2xl animate-in slide-in-from-top-2 duration-200">
           
           <div className="flex flex-col space-y-2 pt-2 border-b border-white/10 pb-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.path}
-                onClick={closeAllMenus}
-                className="text-sm font-medium text-slate-200 hover:text-custom-yellow py-1.5 transition-colors"
-              >
-                {link.name}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = location.pathname === link.path;
+              return (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  onClick={closeAllMenus}
+                  className={`text-sm font-medium py-1.5 transition-colors ${
+                    isActive ? "text-custom-yellow font-semibold" : "text-slate-200 hover:text-custom-yellow"
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
           </div>
 
-          {isLoggedIn && (
+          {user && (
             <div className="pt-1 space-y-4">
               <div className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10">
                 <div className="w-10 h-10 rounded-full border border-custom-yellow overflow-hidden bg-slate-200 shrink-0">
-                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                  <img 
+                    src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`} 
+                    alt={user.name} 
+                    className="w-full h-full object-cover" 
+                  />
                 </div>
                 <div className="overflow-hidden">
                   <p className="text-xs font-bold text-white truncate">{user.name}</p>
-                  <p className="text-[10px] text-custom-yellow font-medium">{user.role}</p>
+                  <p className="text-[10px] text-custom-yellow font-medium capitalize">{user.role}</p>
                 </div>
               </div>
 
@@ -249,10 +273,7 @@ const Navbar = () => {
                 </Link>
 
                 <button
-                  onClick={() => {
-                    setIsLoggedIn(false);
-                    closeAllMenus();
-                  }}
+                  onClick={handleLogout}
                   className="flex items-center gap-2.5 text-xs font-semibold text-rose-400 hover:text-rose-300 pt-2 transition-colors text-left"
                 >
                   <svg className="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
