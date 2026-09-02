@@ -1,8 +1,21 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 const Inkubasi = () => {
+  const navigate = useNavigate();
+
+  // Handler saat tombol "Daftar Sekarang" diklik
+  const handleDaftarClick = () => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      navigate("/pengajuan-inkubasi");
+    } else {
+      // Jika belum login, redirect ke login
+      navigate("/login");
+    }
+  };
+
   // 📦 Data Dummy Tahapan Inkubasi
   const incubationSteps = [
     {
@@ -120,7 +133,6 @@ const Inkubasi = () => {
       {/* 🚀 1. SECTION TAHAPAN INKUBASI */}
       <section className="w-full bg-[#f8fafc] py-20">
         <div className="layout-container">
-          {/* Header Section */}
           <div className="text-center max-w-2xl mx-auto mb-16">
             <h2 className="font-readex text-3xl md:text-4xl font-extrabold text-[#1c3250] mb-3">
               Tahapan Inkubasi
@@ -128,23 +140,18 @@ const Inkubasi = () => {
             <div className="w-16 h-1 bg-custom-cyan mx-auto rounded-full"></div>
           </div>
 
-          {/* Grid 3 Step Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {incubationSteps.map((step) => (
               <div
                 key={step.id}
                 className="relative bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-all duration-300 flex flex-col justify-between items-start text-left group overflow-hidden"
               >
-                {/* Number Background Subtle */}
                 <span className="absolute top-2 right-6 font-readex text-7xl font-extrabold text-slate-100 select-none group-hover:text-slate-200 transition-colors">
                   {step.number}
                 </span>
 
                 <div className="relative z-10 w-full">
-                  {/* Icon Container */}
-                  <div
-                    className={`w-14 h-14 rounded-full flex items-center justify-center mb-6 shadow-sm ${step.iconBg}`}
-                  >
+                  <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-6 shadow-sm ${step.iconBg}`}>
                     {step.icon}
                   </div>
 
@@ -164,7 +171,6 @@ const Inkubasi = () => {
       {/* 🚀 2. SECTION STARTUP & TENANT KAMI */}
       <section className="w-full bg-[#f8fafc] py-20">
         <div className="layout-container">
-          {/* Header Section */}
           <div className="flex justify-between items-end mb-12">
             <div>
               <h2 className="font-readex text-3xl md:text-4xl font-extrabold text-[#1c3250] mb-2">
@@ -196,14 +202,12 @@ const Inkubasi = () => {
             </Link>
           </div>
 
-          {/* Grid 4 Tenant Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {tenants.map((item) => (
               <div
                 key={item.id}
                 className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-md transition-shadow duration-300 flex flex-col group"
               >
-                {/* Image Banner & Batch Badge */}
                 <div className="relative w-full h-48 overflow-hidden">
                   <img
                     src={item.img}
@@ -215,7 +219,6 @@ const Inkubasi = () => {
                   </span>
                 </div>
 
-                {/* Content */}
                 <div className="p-6 flex flex-col grow justify-between text-left">
                   <div>
                     <h3 className="font-readex text-lg font-bold text-[#1c3250] mb-2 group-hover:text-custom-cyan transition-colors line-clamp-1">
@@ -239,7 +242,6 @@ const Inkubasi = () => {
       <section className="w-full bg-[#f8fafc] py-16">
         <div className="layout-container">
           <div className="bg-linear-to-b from-[#eef7ff] to-[#e4f0fc] rounded-3xl p-10 md:p-14 border border-blue-100/60 shadow-sm text-center">
-            {/* Header */}
             <div className="max-w-xl mx-auto mb-12">
               <h2 className="font-readex text-2xl md:text-3xl font-extrabold text-[#1c3250] mb-2">
                 Jaringan Mentor Expert
@@ -249,7 +251,6 @@ const Inkubasi = () => {
               </p>
             </div>
 
-            {/* List Avatar Mentor */}
             <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
               {mentors.map((mentor) => (
                 <div key={mentor.id} className="flex flex-col items-center group">
@@ -277,7 +278,6 @@ const Inkubasi = () => {
       <section className="w-full bg-[#f8fafc] py-16 mb-12">
         <div className="layout-container">
           <div className="relative overflow-hidden rounded-3xl bg-linear-to-r from-cyan-200 via-blue-100 to-teal-100 p-10 md:p-16 border border-cyan-100/50 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8">
-            {/* Text Kiri */}
             <div className="max-w-xl text-left">
               <h2 className="font-readex text-3xl md:text-4xl font-black text-[#0b2447] leading-tight mb-4">
                 Punya Ide Bisnis Brilian? Mari Wujudkan Bersama Kami.
@@ -288,11 +288,10 @@ const Inkubasi = () => {
               </p>
             </div>
 
-            {/* Button Kanan */}
             <div className="shrink-0">
-              <Link
-                to="/pengajuan-inkubasi"
-                className="inline-flex items-center gap-3 px-8 py-4 bg-[#0b2447] text-white font-bold rounded-full hover:bg-custom-blue transition-all duration-300 shadow-md hover:shadow-lg text-sm md:text-base"
+              <button
+                onClick={handleDaftarClick}
+                className="inline-flex items-center gap-3 px-8 py-4 bg-[#0b2447] text-white font-bold rounded-full hover:bg-custom-blue transition-all duration-300 shadow-md hover:shadow-lg text-sm md:text-base cursor-pointer"
               >
                 Daftar Sekarang
                 <svg
@@ -308,7 +307,7 @@ const Inkubasi = () => {
                     d="M14 5l7 7m0 0l-7 7m7-7H3"
                   />
                 </svg>
-              </Link>
+              </button>
             </div>
           </div>
         </div>

@@ -7,13 +7,17 @@ import Inovasi from './pages/Inovasi';
 import HKI from './pages/HKI';
 import Publikasi from './pages/Publikasi';
 import Contact from './pages/Contact';
-import Login from './pages/Login';
+import PengajuanInkubasi from './pages/PengajuanInkubasi';
+
+// Import Login & Register dari folder auth
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* 2. Daftarin rute untuk masing-masing halaman */}
+        {/* Rute Utama Public Pages */}
         <Route path="/" element={<Home />} />
         <Route path="/profil" element={<Profil />} />
         <Route path="/inkubasi" element={<Inkubasi />} />
@@ -21,7 +25,11 @@ function App() {
         <Route path="/hki" element={<HKI />} />
         <Route path="/publikasi" element={<Publikasi />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/pengajuan-inkubasi" element={<PengajuanInkubasi />} />
+
+        {/* Rute Auth Pages */}
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </BrowserRouter>
   );
