@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { useRef, useState } from "react";
-import Navbar from "../components/Navbar"; 
-import Footer from "../components/Footer";
+
 
 const Home = () => {
   const scrollRef = useRef(null);
@@ -125,7 +124,6 @@ const Home = () => {
   ];
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-poppins">
-      <Navbar />
 
       <section className="relative w-full min-h-screen flex items-center pt-32 pb-20">
         {/* Background Image & Gradient Overlay */}
@@ -577,7 +575,6 @@ const Home = () => {
 
         </div>
       </section>
-      <Footer />
     </div>
   );
 };

@@ -1,9 +1,7 @@
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import itpln1 from "../assets/img/itpln.jpeg";
-import itpln2 from "../assets/img/itpln2.jpeg";
-import itpln3 from "../assets/img/itpln3.jpeg";
-import itpln4 from "../assets/img/itpln4.jpeg";
+import itpln1 from "../../assets/img/itpln.jpeg";
+import itpln2 from "../../assets/img/itpln2.jpeg";
+import itpln3 from "../../assets/img/itpln3.jpeg";
+import itpln4 from "../../assets/img/itpln4.jpeg";
 
 // ================= IKON CUSTOM (SVG polos, tanpa library tambahan) =================
 const ArrowRightIcon = ({ className }) => (
@@ -69,8 +67,7 @@ const articles = [
 const Publikasi = () => {
   return (
     <div className="min-h-screen bg-white font-readex text-[#092B52]">
-      {/* ================= NAVBAR ================= */}
-      <Navbar />
+  
 
       {/* ================= JUDUL / BREADCRUMB ================= */}
       <section className="border-b border-gray-100 bg-white">
@@ -184,8 +181,6 @@ const Publikasi = () => {
         </div>
       </section>
 
-      {/* ================= FOOTER ================= */}
-      <Footer />
     </div>
   );
 };

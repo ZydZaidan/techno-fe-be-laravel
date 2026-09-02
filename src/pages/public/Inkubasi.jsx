@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+
 
 const Inkubasi = () => {
   const navigate = useNavigate();
@@ -128,7 +127,6 @@ const Inkubasi = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-poppins pt-24">
-      <Navbar />
 
       {/* 🚀 1. SECTION TAHAPAN INKUBASI */}
       <section className="w-full bg-[#f8fafc] py-20">
@@ -313,7 +311,6 @@ const Inkubasi = () => {
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 };

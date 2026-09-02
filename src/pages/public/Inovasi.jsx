@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import API from "../services/api";
+import API from "../../services/api";
 import { Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+
 
 // Definisi Kategori
 const categories = ["Semua", "Software", "Energi", "Manufaktur", "Pertanian", "Lainnya"];
@@ -45,7 +44,6 @@ const Inovasi = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col font-poppins text-[#092B52] pt-28 md:pt-32">
-      <Navbar />
 
       {/* ================= SEARCH & FILTER BAR ================= */}
       <section className="relative z-10 layout-container mx-auto px-6 w-full pt-4 mb-10">
@@ -178,7 +176,6 @@ const Inovasi = () => {
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 };

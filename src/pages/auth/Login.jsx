@@ -24,7 +24,7 @@ const handleSubmit = (e) => {
     const mockUser = {
       name: "Muhammad Yazid Zaidan",
       email: formData.email || "zaid@technopark.ac.id",
-      role: "Admin",
+      role: "admin",
       avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Zaid",
     };
 

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+
 
 const PengajuanInkubasi = () => {
   const navigate = useNavigate();
@@ -55,7 +54,6 @@ const PengajuanInkubasi = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-poppins pt-24">
-      <Navbar />
 
       <main className="grow py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-6">
@@ -244,7 +242,6 @@ const PengajuanInkubasi = () => {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 };

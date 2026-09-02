@@ -1,12 +1,11 @@
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import demoday2 from "../assets/img/demoday-2.jpeg";
-import pakHaris from "../assets/img/pak-haris.jpeg";
-import pakHengki from "../assets/img/pak-hengki.jpeg";
-import kakChacha from "../assets/img/kak-chacha.jpeg";
-import lpgSafeSense from "../assets/img/lpg.jpeg";
-import smartMcbGuardian from "../assets/img/smartmcb.jpeg";
-import hematin from "../assets/img/hematin.jpeg";
+
+import demoday2 from "../../assets/img/demoday-2.jpeg";
+import pakHaris from "../../assets/img/pak-haris.jpeg";
+import pakHengki from "../../assets/img/pak-hengki.jpeg";
+import kakChacha from "../../assets/img/kak-chacha.jpeg";
+import lpgSafeSense from "../../assets/img/lpg.jpeg";
+import smartMcbGuardian from "../../assets/img/smartmcb.jpeg";
+import hematin from "../../assets/img/hematin.jpeg";
 
 
 const MailIcon = ({ className }) => (
@@ -124,7 +123,6 @@ const Profil = () => {
   return (
     <div className="min-h-screen bg-white font-readex text-[#092B52]">
       {/* ================= NAVBAR ================= */}
-      <Navbar />
 
       {/* ================= JUDUL / BREADCRUMB ================= */}
       <section className="border-b border-gray-100 bg-white">
@@ -293,8 +291,6 @@ const Profil = () => {
         </div>
       </section>
 
-      {/* ================= FOOTER ================= */}
-      <Footer />
     </div>
   );
 };

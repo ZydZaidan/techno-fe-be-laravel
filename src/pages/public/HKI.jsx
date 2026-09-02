@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import API from "../services/api";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import API from "../../services/api";
+
 
 // Data Statis untuk Counter & Cards Fasilitasi
 const statsData = [
@@ -47,7 +46,6 @@ const HKI = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col font-poppins text-[#092B52] pt-28 md:pt-32">
-      <Navbar />
 
       {/* ================= TOP BANNER CTA CARD ================= */}
       <section className="layout-container mx-auto px-6 w-full mb-12">
@@ -229,7 +227,6 @@ const HKI = () => {
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 };

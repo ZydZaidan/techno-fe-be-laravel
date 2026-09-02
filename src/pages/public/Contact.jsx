@@ -1,6 +1,5 @@
 import { useState } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+
 
 // ================= IKON CUSTOM (SVG polos, tanpa library tambahan) =================
 const MapPinIcon = ({ className }) => (
@@ -98,9 +97,6 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-white font-readex text-[#092B52]">
-      {/* ================= NAVBAR ================= */}
-      <Navbar />
-
       {/* ================= JUDUL / BREADCRUMB ================= */}
       <section className="border-b border-gray-100 bg-white">
         <div className="mx-auto max-w-[1180px] px-8 py-6">
@@ -318,8 +314,6 @@ const Contact = () => {
         </div>
       </section>
 
-      {/* ================= FOOTER ================= */}
-      <Footer />
     </div>
   );
 };
