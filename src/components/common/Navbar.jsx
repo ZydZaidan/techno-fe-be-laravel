@@ -82,7 +82,7 @@ const Navbar = () => {
     { name: "Contact", path: "/contact" },
   ];
 
-  // Penentuan Navigasi Dashboard Berdasarkan Role DB
+ // Penentuan Navigasi Dashboard Berdasarkan Role DB
   const getDashboardPath = () => {
     if (!user) return "/login";
     const role = user.role?.toLowerCase();
@@ -90,8 +90,9 @@ const Navbar = () => {
     if (role === "admin" || role === "administrator") return "/admin/dashboard";
     if (role === "verifikator") return "/verifikator/dashboard";
     if (role === "reviewer") return "/reviewer/dashboard";
-    if (role === "tenant") return "/tenant/dashboard";
-    return "/";
+    if (role === "tenant" || role === "user" || role === "pengusul") return "/user/dashboard";
+    
+    return "/user/dashboard"; // Default fallback jika user sudah login
   };
 
   return (

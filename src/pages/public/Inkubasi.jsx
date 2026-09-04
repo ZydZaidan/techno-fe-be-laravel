@@ -5,15 +5,34 @@ const Inkubasi = () => {
   const navigate = useNavigate();
 
   // Handler saat tombol "Daftar Sekarang" diklik
-  const handleDaftarClick = () => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      navigate("/pengajuan-inkubasi");
-    } else {
-      // Jika belum login, redirect ke login
-      navigate("/login");
-    }
-  };
+const handleDaftarClick = () => {
+  const userStr = localStorage.getItem("user");
+  
+  if (!userStr) {
+    // Belum login -> arahkan ke login dengan intent form pengajuan
+    navigate("/login", { state: { redirectTo: "/user/inkubasi/pengajuan" } });
+    return;
+  }
+
+  const user = JSON.parse(userStr);
+  const role = user.role;
+
+  // Cek apakah rolenya adalah user/tenant
+  if (role === "user" || role === "tenant") {
+    navigate("/user/inkubasi/pengajuan");
+  } else if (role === "admin" || role === "administrator") {
+    alert("Akun Admin tidak dapat mendaftarkan inkubasi tenant. Silakan gunakan akun tenant/user.");
+    navigate("/admin/dashboard");
+  } else if (role === "verifikator") {
+    alert("Akun Verifikator memiliki akses evaluasi, bukan untuk pendaftaran tenant.");
+    navigate("/verifikator/dashboard");
+  } else if (role === "reviewer") {
+    alert("Akun Reviewer bertugas mereview proposal, bukan mendaftar.");
+    navigate("/reviewer/dashboard");
+  } else {
+    alert("Role Anda tidak diizinkan mengakses pendaftaran inkubasi.");
+  }
+};
 
   // 📦 Data Dummy Tahapan Inkubasi
   const incubationSteps = [

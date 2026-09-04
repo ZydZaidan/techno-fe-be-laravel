@@ -1,22 +1,26 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom"; // Tambahkan useLocation
 import API from "../../services/api";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // Hook untuk membaca state redirect
+
+  // Ambil path tujuan dari state (jika ada)
+  const from = location.state?.redirectTo;
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    rememberMe: false,
   });
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+ const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
   };
 
@@ -34,15 +38,53 @@ const Login = () => {
       if (response.data.success) {
         const { token, user } = response.data;
 
-        // 1. Simpan token dan data user ke LocalStorage
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
-
-        // 2. Trigger event biar Navbar langsung tau user udah login
         window.dispatchEvent(new Event("storage"));
+        window.dispatchEvent(new Event("authChange"));
 
-        // 3. Arahkan SEMUA role ke Home terlebih dahulu
-        navigate("/");
+        // Cek role user yang sedang login
+        const userRole = user.role;
+        const isAdminOrStaff = [
+          "administrator",
+          "admin",
+          "verifikator",
+          "reviewer",
+        ].includes(userRole);
+
+        // Jika tujuan awalnya adalah form user (inkubasi), tapi yang login malah Admin/Staff:
+        if (from && from.includes("/user") && isAdminOrStaff) {
+          alert(
+            "Login berhasil! Namun akun Admin/Staff tidak dapat mengakses form pengajuan tenant. Anda dialihkan ke Dashboard Admin.",
+          );
+
+          // Redirect paksa ke dashboard sesuai rolenya masing-masing
+          if (userRole === "admin" || userRole === "administrator") {
+            navigate("/admin/dashboard");
+          } else if (userRole === "verifikator") {
+            navigate("/verifikator/dashboard");
+          } else if (userRole === "reviewer") {
+            navigate("/reviewer/dashboard");
+          }
+          return;
+        }
+
+        // Jika aman (role user/tenant mengakses form user, atau admin login normal)
+        if (from) {
+          navigate(from);
+        } else {
+          // Default redirect berdasarkan role jika tidak ada 'from'
+          if (isAdminOrStaff) {
+            if (userRole === "admin" || userRole === "administrator")
+              navigate("/admin/dashboard");
+            else if (userRole === "verifikator")
+              navigate("/verifikator/dashboard");
+            else if (userRole === "reviewer") 
+              navigate("/reviewer/dashboard");
+          } else {
+            navigate("/"); // Atau ke /user/dashboard untuk user biasa
+          }
+        }
       }
     } catch (err) {
       setErrorMsg(

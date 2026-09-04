@@ -1,0 +1,223 @@
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const ApprovalLogbook = () => {
+  const [logbooks, setLogbooks] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedLogbook, setSelectedLogbook] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [approvalData, setApprovalData] = useState({
+    status_approval: 'Approved',
+    catatan_mentor: '',
+  });
+
+  const loadLogbooks = async () => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:5000/api/reviewer/logbooks', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.data.success) {
+        setLogbooks(response.data.data);
+      }
+    } catch (error) {
+      console.error('Gagal mengambil daftar logbook:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchInitialLogbooks = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:5000/api/reviewer/logbooks', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (isMounted && response.data.success) {
+          setLogbooks(response.data.data);
+        }
+      } catch (error) {
+        console.error('Gagal mengambil daftar logbook:', error);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+
+    fetchInitialLogbooks();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const handleOpenModal = (logbook) => {
+    setSelectedLogbook(logbook);
+    setApprovalData({
+      status_approval: logbook.status_approval || 'Approved',
+      catatan_mentor: logbook.catatan_mentor || '',
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleSubmitApproval = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.put(
+        `http://localhost:5000/api/reviewer/logbooks/${selectedLogbook.id}`,
+        approvalData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        alert('Status logbook berhasil diperbarui!');
+        setIsModalOpen(false);
+        loadLogbooks();
+      }
+    } catch (error) {
+      alert(error.response?.data?.message || 'Gagal memperbarui logbook');
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-lg font-bold text-[#092B52]">Logbook Mentoring Tenant</h2>
+        <p className="text-xs text-slate-400">
+          Tinjau catatan konsultasi harian/mingguan tenant dan berikan masukan atau persetujuan.
+        </p>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm overflow-x-auto">
+        {isLoading ? (
+          <p className="text-xs text-slate-400 text-center py-6">Memuat logbook...</p>
+        ) : logbooks.length === 0 ? (
+          <p className="text-xs text-slate-400 text-center py-6">Belum ada logbook tenant yang dikirim.</p>
+        ) : (
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-slate-100 text-[11px] font-semibold text-slate-400 uppercase">
+                <th className="py-3 px-2">Tanggal</th>
+                <th className="py-3 px-2">Nama Tenant</th>
+                <th className="py-3 px-2">Aktivitas Mentoring</th>
+                <th className="py-3 px-2">Status</th>
+                <th className="py-3 px-2 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50 text-xs">
+              {logbooks.map((item) => (
+                <tr key={item.id} className="hover:bg-slate-50">
+                  <td className="py-3 px-2 text-slate-500">{item.tanggal_konsultasi}</td>
+                  <td className="py-3 px-2 font-medium text-[#092B52]">{item.nama_tenant}</td>
+                  <td className="py-3 px-2 text-slate-600 max-w-xs truncate">{item.aktivitas_mentoring}</td>
+                  <td className="py-3 px-2">
+                    <span
+                      className={`px-2.5 py-1 rounded-full text-[10px] font-semibold ${
+                        item.status_approval === 'Approved'
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : item.status_approval === 'Rejected'
+                          ? 'bg-rose-100 text-rose-700'
+                          : 'bg-amber-100 text-amber-700'
+                      }`}
+                    >
+                      {item.status_approval || 'Pending'}
+                    </span>
+                  </td>
+                  <td className="py-3 px-2 text-right">
+                    <button
+                      onClick={() => handleOpenModal(item)}
+                      className="px-3 py-1.5 bg-[#188B9E] text-white rounded-full text-[11px] font-medium hover:bg-[#147484] transition"
+                    >
+                      Review
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Modal Review Logbook */}
+      {isModalOpen && selectedLogbook && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md p-6 space-y-4 shadow-xl">
+            <div className="flex justify-between items-center border-b pb-3">
+              <h3 className="text-sm font-bold text-[#092B52]">Review Logbook Mentoring</h3>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 text-sm font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-2 text-xs text-slate-600">
+              <p><strong className="text-[#092B52]">Tenant:</strong> {selectedLogbook.nama_tenant}</p>
+              <p><strong className="text-[#092B52]">Tanggal:</strong> {selectedLogbook.tanggal_konsultasi}</p>
+              <div className="bg-slate-50 p-3 rounded-xl">
+                <strong className="text-[#092B52] block mb-1">Aktivitas Mentoring:</strong>
+                <p>{selectedLogbook.aktivitas_mentoring}</p>
+              </div>
+              <div className="bg-slate-50 p-3 rounded-xl">
+                <strong className="text-[#092B52] block mb-1">Progres Bisnis:</strong>
+                <p>{selectedLogbook.progres_bisnis || '-'}</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmitApproval} className="space-y-4 text-xs pt-2 border-t">
+              <div>
+                <label className="block text-slate-600 font-medium mb-1">Status Persetujuan</label>
+                <select
+                  value={approvalData.status_approval}
+                  onChange={(e) => setApprovalData({ ...approvalData, status_approval: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-xl focus:ring-1 focus:ring-[#188B9E] outline-none bg-white"
+                >
+                  <option value="Approved">Approved (Disetujui)</option>
+                  <option value="Rejected">Rejected (Perlu Perbaikan)</option>
+                  <option value="Pending">Pending</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-600 font-medium mb-1">Catatan / Masukan Mentor</label>
+                <textarea
+                  rows="3"
+                  value={approvalData.catatan_mentor}
+                  onChange={(e) => setApprovalData({ ...approvalData, catatan_mentor: e.target.value })}
+                  placeholder="Tuliskan arahan atau umpan balik untuk tenant..."
+                  className="w-full px-3 py-2 border rounded-xl focus:ring-1 focus:ring-[#188B9E] outline-none"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 border border-slate-200 text-slate-600 rounded-full font-medium hover:bg-slate-50"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-[#188B9E] text-white rounded-full font-medium hover:bg-[#147484]"
+                >
+                  Simpan Persetujuan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ApprovalLogbook;
