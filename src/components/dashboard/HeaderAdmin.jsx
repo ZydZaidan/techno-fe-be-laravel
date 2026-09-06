@@ -7,7 +7,7 @@ const HeaderAdmin = ({ onToggleSidebar }) => {
   });
 
   return (
-    <header className="bg-white px-4 sm:px-8 py-4 sm:py-6 flex justify-between items-center font-poppins border-b border-slate-100 md:border-none">
+    <header className="md:ml-64 bg-white px-4 sm:px-8 py-4 sm:py-6 flex justify-between items-center font-poppins border-b border-slate-100 md:border-none">
       
       {/* KIRI: Tombol Toggle Mobile & Title */}
       <div className="flex items-center gap-3">

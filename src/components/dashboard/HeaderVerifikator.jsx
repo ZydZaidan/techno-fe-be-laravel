@@ -19,7 +19,7 @@ const HeaderVerifikator = ({ onToggleSidebar }) => {
   const displayName = user?.nama || user?.name || "Verifikator Techno";
 
   return (
-    <header className="bg-white px-4 sm:px-8 py-4 sm:py-6 flex justify-between items-center font-poppins border-b border-slate-100 md:border-none">
+    <header className="bg-white px-4 sm:px-8 py-4 sm:py-6 flex justify-between items-center font-poppins md:ml-64 border-b border-slate-100 md:border-none">
       <div className="flex items-center gap-3">
         <button
           onClick={onToggleSidebar}

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/techno';
+
 const ReviewerDashboard = () => {
   const [stats, setStats] = useState({
     totalAssigned: 0,
@@ -18,7 +20,7 @@ const ReviewerDashboard = () => {
     const fetchDashboardData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/api/reviewer/dashboard', {
+        const response = await axios.get(`${API_BASE_URL}/reviewer/dashboard`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -41,7 +43,7 @@ const ReviewerDashboard = () => {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 md:ml-64 font-poppins">
 
       {/* Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

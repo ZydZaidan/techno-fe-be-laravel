@@ -20,7 +20,7 @@ const HeaderUser = ({ onToggleSidebar }) => {
   const displayName = user?.nama || user?.name || "Pengusul Inovasi";
 
   return (
-    <header className="bg-white px-4 sm:px-8 py-4 sm:py-6 flex justify-between items-center font-poppins border-b border-slate-100 md:border-none">
+    <header className="bg-white px-4 sm:px-8 py-4 sm:py-6 flex justify-between items-center font-poppins border-b border-slate-100 md:border-none md:ml-64">
       {/* KIRI: Tombol Toggle Mobile & Title */}
       <div className="flex items-center gap-3">
         <button

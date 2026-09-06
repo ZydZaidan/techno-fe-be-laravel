@@ -1,22 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/techno';
+const FILE_BASE_URL = import.meta.env.VITE_FILE_BASE_URL || 'http://localhost:5000/uploads';
 
 const ApprovalLogbook = () => {
   const [logbooks, setLogbooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedLogbook, setSelectedLogbook] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [approvalData, setApprovalData] = useState({
     status_approval: 'Approved',
     catatan_mentor: '',
   });
 
-  const loadLogbooks = async () => {
+  const fetchLogbooks = useCallback(async () => {
     try {
       setIsLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/reviewer/logbooks', {
+      const response = await axios.get(`${API_BASE_URL}/reviewer/logbook`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -28,34 +32,15 @@ const ApprovalLogbook = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    let isMounted = true;
+    const timeoutId = setTimeout(() => {
+      void fetchLogbooks();
+    }, 0);
 
-    const fetchInitialLogbooks = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/api/reviewer/logbooks', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (isMounted && response.data.success) {
-          setLogbooks(response.data.data);
-        }
-      } catch (error) {
-        console.error('Gagal mengambil daftar logbook:', error);
-      } finally {
-        if (isMounted) setIsLoading(false);
-      }
-    };
-
-    fetchInitialLogbooks();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+    return () => clearTimeout(timeoutId);
+  }, [fetchLogbooks]);
 
   const handleOpenModal = (logbook) => {
     setSelectedLogbook(logbook);
@@ -69,9 +54,10 @@ const ApprovalLogbook = () => {
   const handleSubmitApproval = async (e) => {
     e.preventDefault();
     try {
+      setIsSubmitting(true);
       const token = localStorage.getItem('token');
       const response = await axios.put(
-        `http://localhost:5000/api/reviewer/logbooks/${selectedLogbook.id}`,
+        `${API_BASE_URL}/reviewer/logbook/${selectedLogbook.id}`,
         approvalData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -79,15 +65,17 @@ const ApprovalLogbook = () => {
       if (response.data.success) {
         alert('Status logbook berhasil diperbarui!');
         setIsModalOpen(false);
-        loadLogbooks();
+        fetchLogbooks();
       }
     } catch (error) {
       alert(error.response?.data?.message || 'Gagal memperbarui logbook');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 md:ml-64 font-poppins">
       <div>
         <h2 className="text-lg font-bold text-[#092B52]">Logbook Mentoring Tenant</h2>
         <p className="text-xs text-slate-400">
@@ -148,7 +136,7 @@ const ApprovalLogbook = () => {
       {/* Modal Review Logbook */}
       {isModalOpen && selectedLogbook && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6 space-y-4 shadow-xl">
+          <div className="bg-white rounded-2xl w-full max-w-lg p-6 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b pb-3">
               <h3 className="text-sm font-bold text-[#092B52]">Review Logbook Mentoring</h3>
               <button
@@ -159,30 +147,65 @@ const ApprovalLogbook = () => {
               </button>
             </div>
 
-            <div className="space-y-2 text-xs text-slate-600">
-              <p><strong className="text-[#092B52]">Tenant:</strong> {selectedLogbook.nama_tenant}</p>
-              <p><strong className="text-[#092B52]">Tanggal:</strong> {selectedLogbook.tanggal_konsultasi}</p>
+            {/* Detail Logbook dari Tenant */}
+            <div className="space-y-3 text-xs text-slate-600">
+              <div className="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl">
+                <p><strong className="text-[#092B52]">Tenant:</strong> {selectedLogbook.nama_tenant}</p>
+                <p><strong className="text-[#092B52]">Tanggal:</strong> {selectedLogbook.tanggal_konsultasi}</p>
+              </div>
+
               <div className="bg-slate-50 p-3 rounded-xl">
                 <strong className="text-[#092B52] block mb-1">Aktivitas Mentoring:</strong>
-                <p>{selectedLogbook.aktivitas_mentoring}</p>
+                <p className="whitespace-pre-line">{selectedLogbook.aktivitas_mentoring}</p>
               </div>
+
               <div className="bg-slate-50 p-3 rounded-xl">
                 <strong className="text-[#092B52] block mb-1">Progres Bisnis:</strong>
-                <p>{selectedLogbook.progres_bisnis || '-'}</p>
+                <p className="whitespace-pre-line">{selectedLogbook.progres_bisnis || '-'}</p>
               </div>
+
+              {/* Tampilan Kendala & Solusi bila ada */}
+              {(selectedLogbook.kendala || selectedLogbook.solusi) && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <div className="bg-rose-50/50 border border-rose-100 p-3 rounded-xl">
+                    <strong className="text-rose-800 block mb-1">Kendala:</strong>
+                    <p>{selectedLogbook.kendala || '-'}</p>
+                  </div>
+                  <div className="bg-emerald-50/50 border border-emerald-100 p-3 rounded-xl">
+                    <strong className="text-emerald-800 block mb-1">Rencana Solusi:</strong>
+                    <p>{selectedLogbook.solusi || '-'}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Tautan Berkas / Lampiran Dokumentasi */}
+              {selectedLogbook.file_dokumentasi && (
+                <div className="bg-slate-50 p-3 rounded-xl flex items-center justify-between">
+                  <span className="font-semibold text-[#092B52]">Dokumentasi / Lampiran:</span>
+                  <a
+                    href={`${FILE_BASE_URL}/logbook/${selectedLogbook.file_dokumentasi}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3 py-1 bg-[#092B52] text-white text-[11px] rounded-lg hover:bg-slate-800 transition"
+                  >
+                    Lihat Lampiran
+                  </a>
+                </div>
+              )}
             </div>
 
+            {/* Form Input Reviewer */}
             <form onSubmit={handleSubmitApproval} className="space-y-4 text-xs pt-2 border-t">
               <div>
                 <label className="block text-slate-600 font-medium mb-1">Status Persetujuan</label>
                 <select
                   value={approvalData.status_approval}
                   onChange={(e) => setApprovalData({ ...approvalData, status_approval: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-xl focus:ring-1 focus:ring-[#188B9E] outline-none bg-white"
+                  className="w-full px-3 py-2 border rounded-xl focus:ring-1 focus:ring-[#188B9E] outline-none bg-white font-medium"
                 >
                   <option value="Approved">Approved (Disetujui)</option>
-                  <option value="Rejected">Rejected (Perlu Perbaikan)</option>
-                  <option value="Pending">Pending</option>
+                  <option value="Rejected">Rejected (Perlu Perbaikan / Ditolak)</option>
+                  <option value="Pending">Pending (Menunggu)</option>
                 </select>
               </div>
 
@@ -207,9 +230,10 @@ const ApprovalLogbook = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#188B9E] text-white rounded-full font-medium hover:bg-[#147484]"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 bg-[#188B9E] text-white rounded-full font-medium hover:bg-[#147484] disabled:opacity-50"
                 >
-                  Simpan Persetujuan
+                  {isSubmitting ? 'Menyimpan...' : 'Simpan Persetujuan'}
                 </button>
               </div>
             </form>

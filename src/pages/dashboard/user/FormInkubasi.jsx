@@ -1,15 +1,53 @@
-import { useState } from "react";
-import API from "../../../services/api"; // Path import disesuaikan (naik 3 level)
+import { useState, useEffect } from "react";
+import API from "../../../services/api";
 
 const FormInkubasi = () => {
   const [loading, setLoading] = useState(false);
+  const [checkingActive, setCheckingActive] = useState(true);
+  const [activeInkubasi, setActiveInkubasi] = useState(null);
+
+  // Form utama
   const [formData, setFormData] = useState({
     nama_tim: "",
     kategori_bisnis: "IoT & Smart Grid",
     deskripsi: "",
   });
+
+  // State Ketua Tim
+  const [ketua, setKetua] = useState({
+    nama: "",
+    user_code: "",
+    id_user: null,
+    status: null, // 'loading' | 'success' | 'error'
+  });
+
+  // State Anggota Tim
+  const [anggotaList, setAnggotaList] = useState([]);
   const [fileDokumen, setFileDokumen] = useState(null);
 
+  // --- CEK STATUS INKUBASI AKTIF SAAT LOAD ---
+  useEffect(() => {
+    const checkActiveInkubasi = async () => {
+      try {
+        const res = await API.get("/pengajuan-inkubasi/dashboard");
+        if (res.data.success && res.data.data.pengajuanTerbaru) {
+          const pengajuan = res.data.data.pengajuanTerbaru;
+          // Jika status BUKAN 'Selesai', simpan data pengajuan untuk mengunci form
+          if (pengajuan.status_inkubasi !== "Selesai") {
+            setActiveInkubasi(pengajuan);
+          }
+        }
+      } catch (error) {
+        console.error("Gagal mengecek status inkubasi aktif:", error);
+      } finally {
+        setCheckingActive(false);
+      }
+    };
+
+    checkActiveInkubasi();
+  }, []);
+
+  // --- HANDLER INPUT UTAMA ---
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -19,12 +57,106 @@ const FormInkubasi = () => {
   };
 
   const handleDownloadTemplate = () => {
-    // Simulasi download template atau isi lokasi static file (contoh: /templates/Template_Proposal.docx)
     alert("Mengunduh Template Dokumen Administrasi...");
   };
 
+  // --- OTOMATISASI KETUA TIM (Auto-Check via User Code) ---
+  useEffect(() => {
+    if (!ketua.user_code.trim()) {
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setKetua((prev) => ({ ...prev, status: "loading" }));
+      try {
+        const res = await API.get(`/auth/check-code/${ketua.user_code}`);
+        setKetua((prev) => ({
+          ...prev,
+          nama: res.data.data.nama,
+          id_user: res.data.data.id,
+          status: "success",
+        }));
+      } catch {
+        setKetua((prev) => ({ ...prev, status: "error", id_user: null }));
+      }
+    }, 500); // Debounce 500ms
+
+    return () => clearTimeout(timer);
+  }, [ketua.user_code]);
+
+  // --- OTOMATISASI ANGGOTA TIM ---
+  const handleAddAnggota = () => {
+    setAnggotaList([
+      ...anggotaList,
+      { nama_anggota: "", user_code: "", id_user: null, status: null },
+    ]);
+  };
+
+  const handleRemoveAnggota = (index) => {
+    const list = [...anggotaList];
+    list.splice(index, 1);
+    setAnggotaList(list);
+  };
+
+  const handleAnggotaChange = (index, field, value) => {
+    const list = [...anggotaList];
+    list[index][field] = value;
+    if (field === "user_code") {
+      list[index].status = value ? "loading" : null;
+    }
+    setAnggotaList(list);
+  };
+
+  // Auto-Check User Code Anggota
+  const checkAnggotaCode = async (index, code) => {
+    if (!code.trim()) return;
+
+    try {
+      const res = await API.get(`/auth/check-code/${code}`);
+      setAnggotaList((prev) => {
+        const list = [...prev];
+        if (list[index]) {
+          list[index].nama_anggota = res.data.data.nama;
+          list[index].id_user = res.data.data.id;
+          list[index].status = "success";
+        }
+        return list;
+      });
+    } catch {
+      setAnggotaList((prev) => {
+        const list = [...prev];
+        if (list[index]) {
+          list[index].status = "error";
+          list[index].id_user = null;
+        }
+        return list;
+      });
+    }
+  };
+
+  // Effect Debounce untuk setiap Anggota
+  useEffect(() => {
+    const timers = anggotaList.map((item, index) => {
+      if (item.user_code && item.status === "loading") {
+        return setTimeout(() => {
+          checkAnggotaCode(index, item.user_code);
+        }, 500);
+      }
+      return null;
+    });
+
+    return () => timers.forEach((t) => t && clearTimeout(t));
+  }, [anggotaList]);
+
+  // --- SUBMIT FORM ---
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (activeInkubasi) {
+      alert("Anda masih memiliki pengajuan inkubasi yang sedang berjalan!");
+      return;
+    }
+
     if (!fileDokumen) {
       alert("Wajib mengunggah file dokumen proposal!");
       return;
@@ -38,7 +170,24 @@ const FormInkubasi = () => {
       data.append("deskripsi", formData.deskripsi);
       data.append("file_dokumen", fileDokumen);
 
-      const res = await API.post("/tenant/pengajuan", data, {
+      const payloadAnggota = [
+        {
+          nama_anggota: ketua.nama,
+          user_code: ketua.user_code,
+          id_user: ketua.id_user,
+          peran: "Ketua",
+        },
+        ...anggotaList.map((item) => ({
+          nama_anggota: item.nama_anggota,
+          user_code: item.user_code,
+          id_user: item.id_user,
+          peran: "Anggota",
+        })),
+      ];
+
+      data.append("anggota", JSON.stringify(payloadAnggota));
+
+      const res = await API.post("/pengajuan-inkubasi", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -49,7 +198,11 @@ const FormInkubasi = () => {
           kategori_bisnis: "IoT & Smart Grid",
           deskripsi: "",
         });
+        setKetua({ nama: "", user_code: "", id_user: null, status: null });
+        setAnggotaList([]);
         setFileDokumen(null);
+        // Set state activeInkubasi agar form langsung terkunci setelah submit
+        setActiveInkubasi(res.data.data);
       }
     } catch (error) {
       alert(
@@ -60,39 +213,57 @@ const FormInkubasi = () => {
     }
   };
 
+  if (checkingActive) {
+    return (
+      <div className="max-w-4xl mx-auto md:ml-64 py-12 text-center text-xs text-slate-400 font-poppins">
+        Memeriksa status pengajuan inkubasi...
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6 font-poppins">
+    <div className="max-w-4xl mx-auto space-y-6 font-poppins md:ml-64">
       <div>
         <h2 className="text-xl sm:text-2xl font-bold text-[#092B52]">
-          Form Pengajuan Inkubasi Bisnis
+          Form Pengajuan
         </h2>
         <p className="text-xs sm:text-sm text-slate-500 mt-1">
           Lengkapi formulir dan unggah Pitch Deck/Proposal tim kamu.
         </p>
       </div>
 
-      {/* 📌 Catatan Penting */}
-      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex items-start gap-3.5 text-amber-800 text-xs sm:text-sm">
-        <svg
-          className="w-5 h-5 text-amber-600 shrink-0 mt-0.5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <div>
-          <span className="font-bold block mb-0.5">Catatan Penting Abstrak/Deskripsi:</span>
-          <span>
-            Pastikan deskripsi memuat latar belakang riset/inovasi, solusi teknologis yang ditawarkan, serta potensi komersialisasi produk yang akan dikembangkan.
-          </span>
+      {/* ⚠️ Banner Peringatan jika masih ada inkubasi berjalan */}
+      {activeInkubasi && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-amber-900 space-y-1">
+          <div className="flex items-center gap-2">
+            <svg
+              className="w-5 h-5 text-amber-600 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            <h4 className="font-bold text-sm">
+              Pengajuan Baru Tidak Tersedia
+            </h4>
+          </div>
+          <p className="text-xs leading-relaxed text-amber-800">
+            Kamu saat ini masih memiliki program inkubasi berjalan dengan tim{" "}
+            <strong>"{activeInkubasi.nama_tim}"</strong> (Status:{" "}
+            <span className="font-semibold underline">
+              {activeInkubasi.status_inkubasi || activeInkubasi.status}
+            </span>
+            ). Kamu hanya bisa mengajukan proposal baru setelah seluruh proses
+            inkubasi sebelumnya berstatus <strong>"Selesai"</strong>.
+          </p>
         </div>
-      </div>
+      )}
 
       {/* 📄 Section Download Template */}
       <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -101,7 +272,7 @@ const FormInkubasi = () => {
             Administrasi & Dokumen Persyaratan
           </h3>
           <p className="text-xs text-slate-500 mt-0.5">
-            Unduh dan sesuaikan berkas pengajuan menggunakan format resmi yang telah disediakan.
+            Unduh dan sesuaikan berkas pengajuan menggunakan format resmi
           </p>
         </div>
         <button
@@ -129,30 +300,34 @@ const FormInkubasi = () => {
       {/* 📝 Main Form */}
       <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-100 shadow-sm">
         <form onSubmit={handleSubmit} className="space-y-5">
+          {/* 1. Nama Tim */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-              Nama Tim / Startup <span className="text-rose-500">*</span>
+              Nama Tim <span className="text-rose-500">*</span>
             </label>
             <input
               type="text"
               name="nama_tim"
               required
+              disabled={!!activeInkubasi}
               value={formData.nama_tim}
               onChange={handleChange}
-              placeholder="Contoh: InnovateX Team"
-              className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#188B9E]/50"
+              placeholder="Nama Tim"
+              className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#188B9E]/50 disabled:bg-slate-100 disabled:cursor-not-allowed"
             />
           </div>
 
+          {/* 2. Kategori */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-              Kategori Bisnis <span className="text-rose-500">*</span>
+              Kategori <span className="text-rose-500">*</span>
             </label>
             <select
               name="kategori_bisnis"
+              disabled={!!activeInkubasi}
               value={formData.kategori_bisnis}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#188B9E]/50"
+              className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#188B9E]/50 disabled:bg-slate-100 disabled:cursor-not-allowed"
             >
               <option value="IoT & Smart Grid">IoT & Smart Grid</option>
               <option value="Energi Terbarukan">Energi Terbarukan</option>
@@ -161,6 +336,165 @@ const FormInkubasi = () => {
             </select>
           </div>
 
+          {/* 👑 3. KETUA TIM */}
+          <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-bold text-[#092B52]">
+                Ketua Tim <span className="text-rose-500">*</span>
+              </label>
+              {ketua.status === "loading" && (
+                <span className="text-[11px] text-amber-600 font-medium animate-pulse">
+                  Mencari akun...
+                </span>
+              )}
+              {ketua.status === "success" && (
+                <span className="text-[11px] text-emerald-600 font-medium">
+                  ✓ Akun Ketua Ditemukan
+                </span>
+              )}
+              {ketua.status === "error" && (
+                <span className="text-[11px] text-rose-500 font-medium">
+                  User Code tidak ditemukan
+                </span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <input
+                  type="text"
+                  placeholder="User Code Ketua (cth: USR-001)"
+                  value={ketua.user_code}
+                  required
+                  disabled={!!activeInkubasi}
+                  onChange={(e) => {
+                    const userCode = e.target.value;
+                    setKetua((prev) => ({
+                      ...prev,
+                      user_code: userCode,
+                      ...(userCode.trim()
+                        ? {}
+                        : { status: null, id_user: null }),
+                    }));
+                  }}
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#188B9E]/50 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                />
+              </div>
+              <div>
+                <input
+                  type="text"
+                  placeholder="Nama Ketua (Otomatis terisi)"
+                  value={ketua.nama}
+                  disabled={!!activeInkubasi}
+                  onChange={(e) => setKetua({ ...ketua, nama: e.target.value })}
+                  className={`w-full px-3.5 py-2.5 border rounded-xl text-xs focus:outline-none disabled:bg-slate-100 disabled:cursor-not-allowed ${
+                    ketua.status === "success"
+                      ? "bg-emerald-50 border-emerald-300 text-emerald-900 font-medium"
+                      : "bg-white border-slate-300"
+                  }`}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* 👥 4. ANGGOTA TIM */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-bold text-[#092B52]">
+                Anggota Tim
+              </label>
+              {!activeInkubasi && (
+                <button
+                  type="button"
+                  onClick={handleAddAnggota}
+                  className="inline-flex items-center gap-1 text-xs font-bold text-[#188B9E] hover:text-[#092B52] cursor-pointer"
+                >
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                  Tambah Anggota
+                </button>
+              )}
+            </div>
+
+            {anggotaList.map((item, index) => (
+              <div
+                key={index}
+                className="p-4 rounded-xl border border-slate-200 bg-white space-y-2"
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[11px] font-semibold text-slate-500">
+                    Anggota {index + 1}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {item.status === "loading" && (
+                      <span className="text-[10px] text-amber-600 font-medium animate-pulse">
+                        Mengecek...
+                      </span>
+                    )}
+                    {item.status === "success" && (
+                      <span className="text-[10px] text-emerald-600 font-medium">
+                        ✓ Terverifikasi
+                      </span>
+                    )}
+                    {item.status === "error" && (
+                      <span className="text-[10px] text-rose-500 font-medium">
+                        Code tidak valid
+                      </span>
+                    )}
+                    {!activeInkubasi && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveAnggota(index)}
+                        className="text-rose-500 hover:text-rose-700 text-xs font-semibold cursor-pointer ml-2"
+                      >
+                        Hapus
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    placeholder="User Code Anggota"
+                    value={item.user_code}
+                    disabled={!!activeInkubasi}
+                    onChange={(e) =>
+                      handleAnggotaChange(index, "user_code", e.target.value)
+                    }
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#188B9E]/50 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Nama Anggota (Otomatis terisi)"
+                    value={item.nama_anggota}
+                    disabled={!!activeInkubasi}
+                    onChange={(e) =>
+                      handleAnggotaChange(index, "nama_anggota", e.target.value)
+                    }
+                    className={`w-full px-3.5 py-2.5 border rounded-xl text-xs focus:outline-none disabled:bg-slate-100 disabled:cursor-not-allowed ${
+                      item.status === "success"
+                        ? "bg-emerald-50 border-emerald-300 text-emerald-900 font-medium"
+                        : "bg-white border-slate-300"
+                    }`}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* 5. Deskripsi Inovasi */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               Deskripsi Inovasi <span className="text-rose-500">*</span>
@@ -169,32 +503,41 @@ const FormInkubasi = () => {
               name="deskripsi"
               rows="4"
               required
+              disabled={!!activeInkubasi}
               value={formData.deskripsi}
               onChange={handleChange}
-              placeholder="Jelaskan secara ringkas mengenai inovasi bisnis Anda..."
-              className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#188B9E]/50"
+              placeholder="Jelaskan secara ringkas mengenai inovasi Anda..."
+              className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#188B9E]/50 disabled:bg-slate-100 disabled:cursor-not-allowed"
             />
           </div>
 
+          {/* 6. Upload Dokumen */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-              Upload Dokumen Proposal / Pitch Deck (PDF) <span className="text-rose-500">*</span>
+              Upload Dokumen Proposal / Pitch Deck (PDF){" "}
+              <span className="text-rose-500">*</span>
             </label>
             <input
               type="file"
               accept=".pdf"
               required
+              disabled={!!activeInkubasi}
               onChange={handleFileChange}
-              className="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#188B9E] file:text-white hover:file:bg-[#092B52]"
+              className="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#188B9E] file:text-white hover:file:bg-[#092B52] disabled:bg-slate-100 disabled:cursor-not-allowed"
             />
           </div>
 
+          {/* Submit Button */}
           <button
             type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-[#188B9E] hover:bg-[#092B52] text-white font-bold rounded-xl transition-all shadow-sm text-sm disabled:opacity-50 cursor-pointer"
+            disabled={loading || !!activeInkubasi}
+            className="w-full py-3 bg-[#188B9E] hover:bg-[#092B52] text-white font-bold rounded-xl transition-all shadow-sm text-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
-            {loading ? "Mengunggah Proposal..." : "Kirim Pengajuan Inkubasi"}
+            {loading
+              ? "Mengunggah Proposal..."
+              : activeInkubasi
+              ? "Selesaikan Inkubasi Aktif untuk Mengirim Baru"
+              : "Kirim Pengajuan Inkubasi"}
           </button>
         </form>
       </div>

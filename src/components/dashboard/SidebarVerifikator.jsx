@@ -45,7 +45,7 @@ const SidebarVerifikator = ({ isOpen, onClose }) => {
       )}
 
       <aside
-        className={`fixed md:static top-0 left-0 z-50 w-64 bg-[#188B9E] h-full min-h-screen text-white flex flex-col justify-between font-poppins md:rounded-tr-3xl shrink-0 shadow-lg transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 z-50 w-64 bg-[#188B9E] h-screen text-white flex flex-col justify-between font-poppins md:rounded-tr-3xl shrink-0 shadow-lg transform transition-transform duration-300 ease-in-out overflow-y-auto ${
           isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >

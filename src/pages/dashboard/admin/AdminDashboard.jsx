@@ -9,7 +9,7 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="space-y-6 font-poppins">
+    <div className="space-y-6 font-poppins md:ml-64">
       <div>
         <h2 className="text-xl sm:text-2xl font-bold text-[#092B52]">Overview Dashboard</h2>
         <p className="text-xs sm:text-sm text-slate-500 mt-1">Selamat datang kembali di Admin Panel Science Technopark IT-PLN.</p>

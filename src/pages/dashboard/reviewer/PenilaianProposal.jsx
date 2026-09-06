@@ -16,11 +16,15 @@ const PenilaianProposal = () => {
     catatan_rekomendasi: '',
   });
 
+  // Base URL Dinamis dari .env
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/techno';
+  const FILE_BASE_URL = import.meta.env.VITE_FILE_BASE_URL || 'http://localhost:5000/uploads';
+
   const loadProposals = async () => {
     try {
       setIsLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/reviewer/proposals', {
+      const response = await axios.get(`${API_BASE_URL}/reviewer/proposals`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -40,7 +44,7 @@ const PenilaianProposal = () => {
     const fetchInitialData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/api/reviewer/proposals', {
+        const response = await axios.get(`${API_BASE_URL}/reviewer/proposals`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -59,7 +63,7 @@ const PenilaianProposal = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [API_BASE_URL]);
 
   const handleOpenReview = (proposal) => {
     setSelectedProposal(proposal);
@@ -91,7 +95,7 @@ const PenilaianProposal = () => {
       };
 
       const response = await axios.post(
-        `http://localhost:5000/api/reviewer/evaluasi/${selectedProposal.id}`,
+        `${API_BASE_URL}/reviewer/evaluasi/${selectedProposal.id}`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -107,7 +111,7 @@ const PenilaianProposal = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-poppins md:ml-64">
       <div>
         <h2 className="text-lg font-bold text-[#092B52]">Penilaian Substantif Proposal</h2>
         <p className="text-xs text-slate-400">
@@ -179,9 +183,27 @@ const PenilaianProposal = () => {
               </button>
             </div>
 
-            <div>
-              <p className="text-xs font-bold text-[#092B52]">{selectedProposal.judul_proposal}</p>
-              <p className="text-[11px] text-slate-400">Pengaju: {selectedProposal.nama_pengaju}</p>
+            {/* Informasi Detail & Tombol Akses File PDF */}
+            <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-100 flex flex-wrap justify-between items-center gap-3">
+              <div>
+                <p className="text-xs font-bold text-[#092B52]">{selectedProposal.judul_proposal}</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">Pengaju: {selectedProposal.nama_pengaju}</p>
+              </div>
+              {selectedProposal.file_dokumen ? (
+                <a
+                  href={`${FILE_BASE_URL}/documents/${selectedProposal.file_dokumen}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#092B52] text-white text-[11px] font-medium rounded-lg hover:bg-slate-800 transition"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Lihat PDF
+                </a>
+              ) : (
+                <span className="text-[11px] text-slate-400 italic">Berkas tidak tersedia</span>
+              )}
             </div>
 
             <form onSubmit={handleSubmitEvaluation} className="space-y-4 text-xs">
