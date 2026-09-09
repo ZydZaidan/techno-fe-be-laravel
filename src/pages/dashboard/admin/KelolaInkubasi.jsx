@@ -211,7 +211,7 @@ const KelolaInkubasi = () => {
               Tidak ada data yang sesuai dengan filter yang dipilih.
             </p>
           ) : (
-            <table className="w-full text-left border-collapse min-w-[800px]">
+            <table className="w-full text-left border-collapse min-w-200">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/50 text-[11px] font-semibold text-slate-500 uppercase">
                   <th className="py-3 px-4">Nama Tim / Proposal</th>

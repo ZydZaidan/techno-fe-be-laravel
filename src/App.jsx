@@ -22,14 +22,15 @@ import Inkubasi from "./pages/public/Inkubasi";
 import Inovasi from "./pages/public/Inovasi";
 import HKI from "./pages/public/HKI";
 import Publikasi from "./pages/public/Publikasi";
-import DetailPublikasi from "./pages/public/DetailPublikasi"; // <-- TAMBAHAN IMPORT BARU
+import DetailPublikasi from "./pages/public/DetailPublikasi";
 
 // Admin Pages
 import AdminDashboard from "./pages/dashboard/admin/AdminDashboard";
 import ManajemenUser from "./pages/dashboard/admin/ManajemenUser";
 import KelolaBerita from "./pages/dashboard/admin/KelolaBerita";
 import AuditLog from "./pages/dashboard/admin/AuditLog";
-import KelolaInkubasi from "./pages/dashboard/admin/KelolaInkubasi"; // TAMBAHAN IMPORT BARU
+import KelolaInkubasi from "./pages/dashboard/admin/KelolaInkubasi";
+import KelolaInovasi from "./pages/dashboard/admin/KelolaInovasi"; // TAMBAHAN IMPORT BARU
 
 // User Pages
 import UserDashboard from "./pages/dashboard/user/UserDashboard";
@@ -75,7 +76,8 @@ function App() {
             <Route path="users" element={<ManajemenUser />} />
             <Route path="berita" element={<KelolaBerita />} />
             <Route path="audit-log" element={<AuditLog />} />
-            <Route path="inkubasi" element={<KelolaInkubasi />} /> {/* TAMBAHAN ROUTE BARU */}
+            <Route path="inkubasi" element={<KelolaInkubasi />} />
+            <Route path="inovasi" element={<KelolaInovasi />} /> {/* ROUTE BARU KELOLA INOVASI */}
           </Route>
         </Route>
 

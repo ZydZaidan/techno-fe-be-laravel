@@ -25,12 +25,18 @@ const AuditIcon = ({ className }) => (
   </svg>
 );
 
-// TAMBAHAN ICON BARU UNTUK KELOLA INKUBASI
 const GraduationIcon = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l9-5-9-5-9 5 9 5z" />
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14v7" />
+  </svg>
+);
+
+// ICON BARU UNTUK KELOLA INOVASI
+const LightBulbIcon = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.674M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
   </svg>
 );
 
@@ -49,10 +55,10 @@ const HomeIcon = ({ className }) => (
 const SidebarAdmin = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
 
-  // PENYESUAIAN URUTAN DAN PENAMBAHAN MENU BARU
   const menuItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: DashboardIcon },
-    { name: 'Kelola Inkubasi', path: '/admin/inkubasi', icon: GraduationIcon }, // MENU BARU
+    { name: 'Kelola Inkubasi', path: '/admin/inkubasi', icon: GraduationIcon },
+    { name: 'Kelola Inovasi', path: '/admin/inovasi', icon: LightBulbIcon }, // MENU BARU INOVASI
     { name: 'Manajemen User', path: '/admin/users', icon: UserIcon },
     { name: 'Kelola Berita', path: '/admin/berita', icon: NewsIcon },
     { name: 'Audit Log', path: '/admin/audit-log', icon: AuditIcon },
@@ -66,7 +72,6 @@ const SidebarAdmin = ({ isOpen, onClose }) => {
 
   return (
     <>
-      {/* 1. OVERLAY GELAP (Mobile Only saat sidebar terbuka) */}
       {isOpen && (
         <div
           onClick={onClose}
@@ -74,15 +79,12 @@ const SidebarAdmin = ({ isOpen, onClose }) => {
         />
       )}
 
-      {/* 2. SIDEBAR ASIDE */}
       <aside
         className={`fixed top-0 left-0 z-50 w-64 bg-[#188B9E] h-screen text-white flex flex-col justify-between font-poppins md:rounded-tr-3xl shrink-0 shadow-lg transform transition-transform duration-300 ease-in-out overflow-y-auto ${
           isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
-        {/* BAGIAN ATAS */}
         <div>
-          {/* Header Logo + Close Button Mobile */}
           <div className="p-6 pb-8 flex items-center justify-between">
             <Link to="/" onClick={onClose}>
               <img
@@ -92,7 +94,6 @@ const SidebarAdmin = ({ isOpen, onClose }) => {
               />
             </Link>
 
-            {/* Tombol Close (Mobile Only) */}
             <button
               onClick={onClose}
               className="md:hidden text-white/80 hover:text-white p-1 focus:outline-none"
@@ -103,7 +104,6 @@ const SidebarAdmin = ({ isOpen, onClose }) => {
             </button>
           </div>
 
-          {/* Navigasi Menu Admin */}
           <nav className="px-4 space-y-3">
             {menuItems.map((item) => {
               const IconComponent = item.icon;
@@ -111,7 +111,7 @@ const SidebarAdmin = ({ isOpen, onClose }) => {
                 <NavLink
                   key={item.path}
                   to={item.path}
-                  onClick={onClose} // Otomatis tutup sidebar saat menu diklik di HP
+                  onClick={onClose}
                   className={({ isActive }) =>
                     `flex items-center gap-3.5 px-5 py-3 rounded-full text-xs font-medium transition-all duration-200 ${
                       isActive
@@ -128,7 +128,6 @@ const SidebarAdmin = ({ isOpen, onClose }) => {
           </nav>
         </div>
 
-        {/* BAGIAN BAWAH: BUTTON HOME & LOGOUT */}
         <div className="p-6 space-y-2">
           <Link
             to="/"

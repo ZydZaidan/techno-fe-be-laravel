@@ -143,7 +143,7 @@ const KelolaBerita = () => {
                         {item.judul}
                         {Boolean(item.is_highlight) && (
                           <span className="bg-amber-100 text-amber-700 text-[9px] px-2 py-0.5 rounded-full font-bold">
-                            ⭐ Highlight
+                            Highlight
                           </span>
                         )}
                       </div>
@@ -159,14 +159,14 @@ const KelolaBerita = () => {
                         {item.status_publikasi}
                       </span>
                     </td>
-                    <td className="p-4 text-center space-x-1.5">
+                    <td className="p-4 align-middle text-center">
+                      <div className="flex items-center justify-center gap-1.5 h-full">
                       <button
                         onClick={() => window.open(`/publikasi/${item.id}`, '_blank')}
                         className="px-2.5 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-600 rounded-lg text-[11px] font-medium transition-colors inline-flex items-center gap-1"
                         title="Preview Berita"
                       >
                         <EyeIcon className="w-3.5 h-3.5" />
-                        Preview
                       </button>
                       <button
                         onClick={() => handleOpenModal(item)}
@@ -180,6 +180,7 @@ const KelolaBerita = () => {
                       >
                         Hapus
                       </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -255,7 +256,7 @@ const KelolaBerita = () => {
                   className="w-4 h-4 text-[#188B9E] rounded focus:ring-[#188B9E]"
                 />
                 <label htmlFor="is_highlight" className="font-semibold text-slate-700 cursor-pointer">
-                  ⭐ Jadikan Berita Utama (Highlight Paling Atas)
+                  Jadikan Berita Utama 
                 </label>
               </div>
 

@@ -1,10 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import API from "../../services/api";
 import { Link } from "react-router-dom";
-
-
-// Definisi Kategori
-const categories = ["Semua", "Software", "Energi", "Manufaktur", "Pertanian", "Lainnya"];
 
 const Inovasi = () => {
   const [inovasiData, setInovasiData] = useState([]);
@@ -29,6 +25,17 @@ const Inovasi = () => {
 
     fetchInovasi();
   }, []);
+
+  // Ambil daftar kategori unik secara dinamis berdasarkan data yang ada di DB
+  const dynamicCategories = useMemo(() => {
+    const categoriesSet = new Set();
+    inovasiData.forEach((item) => {
+      if (item.kategori && item.kategori.trim() !== "") {
+        categoriesSet.add(item.kategori.trim());
+      }
+    });
+    return ["Semua", ...Array.from(categoriesSet)];
+  }, [inovasiData]);
 
   // Filter berdasarkan data dari DB
   const filteredInovasi = inovasiData.filter((item) => {
@@ -68,102 +75,87 @@ const Inovasi = () => {
             </svg>
           </div>
 
-          {/* Filter Badges */}
-          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
-                  activeCategory === cat
-                    ? "bg-[#FFC82C] text-slate-900 shadow-sm"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+          {/* Dropdown Filter Kategori Dinamis */}
+          <div className="relative w-full sm:w-60">
+            <select
+              value={activeCategory}
+              onChange={(e) => setActiveCategory(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-4 text-xs md:text-sm text-slate-700 font-medium focus:outline-none focus:border-cyan-500 transition-colors appearance-none cursor-pointer"
+            >
+              {dynamicCategories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat === "Semua" ? "Semua Kategori" : cat}
+                </option>
+              ))}
+            </select>
+            <svg
+              className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
           </div>
 
         </div>
       </section>
 
-      {/* ================= GRID CARDS INOVASI ================= */}
-      <section className="layout-container pb-24">
+      {/* ================= GRID CARDS INOVASI (POSTER OVERLAY STYLE) ================= */}
+      <section className="layout-container px-6 mx-auto w-full pb-24">
         {loading ? (
           <div className="text-center py-16">
             <p className="text-slate-500 text-sm font-medium animate-pulse">Memuat data inovasi...</p>
           </div>
         ) : filteredInovasi.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredInovasi.map((item) => (
-              <div
+              <Link
                 key={item.id}
-                className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-md transition-shadow duration-300 flex flex-col"
+                to={`/inovasi/${item.id}`}
+                className="group relative h-[420px] rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-end bg-slate-800"
               >
-                {/* Image */}
-                <div className="relative w-full h-48 bg-slate-100 overflow-hidden">
-                  <img
-                    src={item.gambar_url || "https://placehold.co/600x400?text=No+Image"}
-                    alt={item.judul}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+                {/* Image Background Full */}
+                <img
+                  src={item.gambar_url || "https://placehold.co/600x800?text=No+Image"}
+                  alt={item.judul}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
 
-                {/* Content */}
-                <div className="p-6 flex flex-col grow justify-between">
-                  <div>
-                    {/* Badge Category */}
-                    <span className="inline-block text-[11px] font-semibold text-cyan-700 bg-cyan-50 px-3 py-1 rounded-full mb-3">
-                      {item.kategori || "Umum"}
+                {/* Dark Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0c1e35]/95 via-[#0c1e35]/60 to-transparent"></div>
+
+                {/* Content Overlay */}
+                <div className="relative z-10 p-6 flex flex-col justify-end">
+                  {/* Badge Category */}
+                  <div className="mb-3">
+                    <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-black bg-[#22d3ee] px-3 py-1 rounded-md shadow-sm">
+                      {item.kategori || "INOVASI"}
                     </span>
-
-                    {/* Title */}
-                    <h3 className="font-readex text-lg font-bold text-[#1c3250] mb-2 leading-snug">
-                      {item.judul}
-                    </h3>
-
-                    {/* Desc */}
-                    <p className="text-slate-500 text-xs leading-relaxed mb-4 line-clamp-3">
-                      {item.deskripsi}
-                    </p>
-
-                    {/* Author / Tim */}
-                    <div className="flex items-center gap-1.5 text-slate-400 text-[11px] mb-6">
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      <span>{item.pengembang || "Tim Inovator"}</span>
-                    </div>
                   </div>
 
-                  {/* Footer Actions */}
-                  <div className="flex items-center justify-between pt-2">
-                    <Link
-                      to={`/inovasi/${item.id}`}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[#1c3250] hover:text-cyan-600 transition-colors group"
-                    >
-                      Detail
-                      <svg
-                        className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                    </Link>
+                  {/* Title */}
+                  <h3 className="font-readex text-lg font-bold text-white mb-2 leading-snug group-hover:text-cyan-300 transition-colors line-clamp-2">
+                    {item.judul}
+                  </h3>
 
-                    <button className="px-4 py-2 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors">
-                      Kolaborasi
-                    </button>
-                  </div>
+                  {/* Desc */}
+                  <p className="text-slate-300 text-xs leading-relaxed line-clamp-2 mb-3">
+                    {item.deskripsi}
+                  </p>
+
+                  {/* Pengembang */}
+                  {item.pengembang && (
+                    <span className="text-[11px] text-slate-400 font-medium">
+                      Oleh: {item.pengembang}
+                    </span>
+                  )}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (
-          <div className="text-center py-16">
+          <div className="text-center py-16 bg-white rounded-3xl border border-slate-100 shadow-sm">
             <p className="text-slate-400 text-sm">Tidak ada inovasi yang ditemukan.</p>
           </div>
         )}
