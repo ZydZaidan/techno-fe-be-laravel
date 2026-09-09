@@ -170,22 +170,14 @@ const FormInkubasi = () => {
       data.append("deskripsi", formData.deskripsi);
       data.append("file_dokumen", fileDokumen);
 
-      const payloadAnggota = [
-        {
-          nama_anggota: ketua.nama,
-          user_code: ketua.user_code,
-          id_user: ketua.id_user,
-          peran: "Ketua",
-        },
-        ...anggotaList.map((item) => ({
-          nama_anggota: item.nama_anggota,
-          user_code: item.user_code,
-          id_user: item.id_user,
-          peran: "Anggota",
-        })),
-      ];
+     const payloadAnggota = anggotaList.map((item) => ({
+  nama_anggota: item.nama_anggota,
+  user_code: item.user_code,
+  id_user: item.id_user,
+  peran: "Anggota",
+}));
 
-      data.append("anggota", JSON.stringify(payloadAnggota));
+data.append("anggota", JSON.stringify(payloadAnggota));
 
       const res = await API.post("/pengajuan-inkubasi", data, {
         headers: { "Content-Type": "multipart/form-data" },

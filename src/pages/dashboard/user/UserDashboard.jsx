@@ -30,7 +30,6 @@ const UserDashboard = () => {
     );
 
   const pengajuan = dashboardData?.pengajuanTerbaru;
-  const logbookStats = dashboardData?.logbookStats;
 
   // Helper badge warna berdasarkan status inkubasi
   const renderStatusBadge = (status) => {
@@ -57,43 +56,15 @@ const UserDashboard = () => {
       <div>
         <h2 className="text-lg font-bold text-[#092B52]">Dashboard Tenant</h2>
         <p className="text-xs text-slate-400">
-          Pantau progres inkubasi aktif dan metrik logbook mentoring kamu.
+          Pantau status progres kegiatan inkubasi aktif dan hasil evaluasi proposal kamu.
         </p>
       </div>
 
-      {/* Metrik Logbook + Count Revisi Proposal */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-          <p className="text-xs font-medium text-slate-400">Total Logbook</p>
-          <h3 className="text-2xl font-bold text-[#092B52] mt-1">
-            {logbookStats ? logbookStats.total : 0}
-          </h3>
-        </div>
-        <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-          <p className="text-xs font-medium text-slate-400">Logbook Disetujui</p>
-          <h3 className="text-2xl font-bold text-emerald-600 mt-1">
-            {logbookStats ? logbookStats.approved : 0}
-          </h3>
-        </div>
-        <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-          <p className="text-xs font-medium text-slate-400">Logbook Menunggu</p>
-          <h3 className="text-2xl font-bold text-amber-500 mt-1">
-            {logbookStats ? logbookStats.pending : 0}
-          </h3>
-        </div>
-        <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-          <p className="text-xs font-medium text-slate-400">Revisi Proposal</p>
-          <h3 className="text-2xl font-bold text-rose-500 mt-1">
-            {dashboardData?.revisiProposalCount ?? dashboardData?.revisiProposal ?? (pengajuan?.status_inkubasi === "Revisi" ? 1 : 0)}
-          </h3>
-        </div>
-      </div>
-
-      {/* Program Inkubasi Terbaru */}
+      {/* Program Inkubasi Utama */}
       <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
         <div className="flex justify-between items-center">
           <h3 className="text-sm font-bold text-[#092B52]">
-            Kegiatan Inkubasi Terbaru
+            Kegiatan Inkubasi
           </h3>
           {pengajuan && (
             <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded-md font-mono">
@@ -103,19 +74,22 @@ const UserDashboard = () => {
         </div>
 
         {!pengajuan ? (
-          <div className="p-6 text-center border border-dashed border-slate-200 rounded-xl">
-            <p className="text-xs text-slate-400">
+          <div className="p-8 text-center border border-dashed border-slate-200 rounded-xl space-y-2">
+            <p className="text-xs text-slate-500 font-medium">
               Kamu belum mendaftar atau mengikuti kegiatan inkubasi aktif saat ini.
+            </p>
+            <p className="text-[11px] text-slate-400">
+              Silakan ajukan proposal inkubasi baru untuk mulai menggunakan layanan program.
             </p>
           </div>
         ) : (
           <div className="p-4 border border-slate-100 bg-slate-50/50 rounded-xl space-y-3 text-xs">
-            <div className="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100">
+            <div className="flex justify-between items-center bg-white p-3.5 rounded-xl border border-slate-100 shadow-2-[#00000005]">
               <div>
-                <p className="font-semibold text-[#092B52]">
+                <p className="font-semibold text-[#092B52] text-sm">
                   {pengajuan.nama_tim}
                 </p>
-                <p className="text-slate-400">{pengajuan.kategori_bisnis}</p>
+                <p className="text-slate-400 mt-0.5">{pengajuan.kategori_bisnis}</p>
               </div>
               <span
                 className={`px-3 py-1 rounded-full text-[10px] font-semibold ${renderStatusBadge(
@@ -158,7 +132,7 @@ const UserDashboard = () => {
                     <div>
                       <span className="text-slate-400 block">Total Skor</span>
                       <strong className="text-[#188B9E]">
-                        {pengajuan.total_skor}
+                        {Number(pengajuan.total_skor).toFixed(1)}
                       </strong>
                     </div>
                   </div>

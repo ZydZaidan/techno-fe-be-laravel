@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import API from "../../../services/api";
 
 const VerifikasiInkubasi = () => {
   const [pengajuanList, setPengajuanList] = useState([]);
@@ -12,36 +13,19 @@ const VerifikasiInkubasi = () => {
   const [catatanVerifikator, setCatatanVerifikator] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const token = localStorage.getItem("token");
-
-  // Fetch Data otomatis saat mount / token berubah
   useEffect(() => {
     let isMounted = true;
 
     const getData = async () => {
       try {
-        // 1. Fetch List Pengajuan
-        const resPengajuan = await fetch(
-          "http://localhost:5000/api/techno/verifikator/pengajuan",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-        const dataPengajuan = await resPengajuan.json();
-
-        // 2. Fetch List Reviewer
-        const resReviewer = await fetch(
-          "http://localhost:5000/api/techno/verifikator/reviewers",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-        const dataReviewer = await resReviewer.json();
+        const [resPengajuan, resReviewer] = await Promise.all([
+          API.get("/verifikator/pengajuan"),
+          API.get("/verifikator/reviewers"),
+        ]);
 
         if (isMounted) {
-          // KOREKSI 1: Cek dataPengajuan.success (bukan status)
-          if (dataPengajuan.success) setPengajuanList(dataPengajuan.data || []);
-          if (dataReviewer.success) setReviewerList(dataReviewer.data || []);
+          if (resPengajuan.data?.success) setPengajuanList(resPengajuan.data.data || []);
+          if (resReviewer.data?.success) setReviewerList(resReviewer.data.data || []);
         }
       } catch (err) {
         console.error("Error fetching data verifikator:", err);
@@ -55,26 +39,18 @@ const VerifikasiInkubasi = () => {
     return () => {
       isMounted = false;
     };
-  }, [token]);
+  }, []);
 
-  // Refetch data
   const refetchData = async () => {
     setLoading(true);
     try {
       const [resPengajuan, resReviewer] = await Promise.all([
-        fetch("http://localhost:5000/api/techno/verifikator/pengajuan", {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        fetch("http://localhost:5000/api/techno/verifikator/reviewers", {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
+        API.get("/verifikator/pengajuan"),
+        API.get("/verifikator/reviewers"),
       ]);
 
-      const dataPengajuan = await resPengajuan.json();
-      const dataReviewer = await resReviewer.json();
-
-      if (dataPengajuan.success) setPengajuanList(dataPengajuan.data || []);
-      if (dataReviewer.success) setReviewerList(dataReviewer.data || []);
+      if (resPengajuan.data?.success) setPengajuanList(resPengajuan.data.data || []);
+      if (resReviewer.data?.success) setReviewerList(resReviewer.data.data || []);
     } catch (err) {
       console.error("Error re-fetching data:", err);
     } finally {
@@ -98,34 +74,22 @@ const VerifikasiInkubasi = () => {
     setIsSubmitting(true);
 
     try {
-      // KOREKSI 2: Pakai selectedItem.id (sesuai backend p.id)
-      const res = await fetch(
-        `http://localhost:5000/api/techno/verifikator/pengajuan/${selectedItem.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            status_verifikasi: statusVerifikasi,
-            id_reviewer: idReviewer || null,
-            catatan_verifikator: catatanVerifikator,
-          }),
-        },
-      );
+      const res = await API.put(`/verifikator/pengajuan/${selectedItem.id}`, {
+        status_verifikasi: statusVerifikasi,
+        id_reviewer: idReviewer || null,
+        catatan_verifikator: catatanVerifikator,
+      });
 
-      const data = await res.json();
-      if (res.ok && data.success) {
+      if (res.data?.success) {
         alert("Verifikasi berhasil diperbarui!");
         handleCloseModal();
         refetchData();
       } else {
-        alert(data.message || "Gagal memperbarui verifikasi.");
+        alert(res.data?.message || "Gagal memperbarui verifikasi.");
       }
     } catch (err) {
       console.error("Error updating verification:", err);
-      alert("Terjadi kesalahan koneksi backend.");
+      alert(err.response?.data?.message || "Terjadi kesalahan koneksi backend.");
     } finally {
       setIsSubmitting(false);
     }
@@ -136,7 +100,7 @@ const VerifikasiInkubasi = () => {
       case "Lolos":
         return (
           <span className="px-3 py-1 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700">
-            Lolos
+            Lolos Verifikasi
           </span>
         );
       case "Revisi":
@@ -168,7 +132,7 @@ const VerifikasiInkubasi = () => {
         </h2>
         <p className="text-xs sm:text-sm text-slate-500 mt-1">
           Daftar seluruh proposal pengajuan inkubasi yang perlu dilakukan
-          verifikasi berkas.
+          verifikasi berkas dan penunjukan reviewer.
         </p>
       </div>
 
@@ -181,7 +145,7 @@ const VerifikasiInkubasi = () => {
                 <th className="p-4">Tim</th>
                 <th className="p-4">Kategori</th>
                 <th className="p-4">Dokumen</th>
-                <th className="p-4">Status</th>
+                <th className="p-4">Status Administrasi</th>
                 <th className="p-4">Reviewer</th>
                 <th className="p-4 text-center">Aksi</th>
               </tr>
@@ -208,7 +172,7 @@ const VerifikasiInkubasi = () => {
               ) : (
                 pengajuanList.map((item) => (
                   <tr
-                    key={item.id} // KOREKSI 3: item.id (bukan item.id_pengajuan)
+                    key={item.id}
                     className="hover:bg-slate-50/50 transition-colors"
                   >
                     <td className="p-4 font-bold text-[#092B52]">
@@ -262,7 +226,7 @@ const VerifikasiInkubasi = () => {
         </div>
       </div>
 
-      {/* MODAL VERIFIKASI & PLOTTING */}
+      {/* MODAL VERIFIKASI */}
       {selectedItem && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-xl font-poppins animate-in fade-in zoom-in-95">
@@ -291,24 +255,22 @@ const VerifikasiInkubasi = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              {/* Status Verifikasi */}
               <div>
                 <label className="block text-xs font-semibold text-[#092B52] mb-2">
-                  Status Verifikasi
+                  Status Verifikasi Administrasi
                 </label>
                 <select
                   value={statusVerifikasi}
                   onChange={(e) => setStatusVerifikasi(e.target.value)}
                   className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-[#188B9E]"
                 >
-                  <option value="Pending">Pending</option>
-                  <option value="Revisi">Revisi </option>
-                  <option value="Lolos">Lolos </option>
-                  <option value="Ditolak">Ditolak</option>
+                  <option value="Pending">Pending (Sedang Diproses)</option>
+                  <option value="Revisi">Revisi Berkas</option>
+                  <option value="Lolos">Lolos Verifikasi Administrasi</option>
+                  <option value="Ditolak">Ditolak Administrasi</option>
                 </select>
               </div>
 
-              {/* Plot Reviewer */}
               <div>
                 <label className="block text-xs font-semibold text-[#092B52] mb-2">
                   Pilih Reviewer Submisi
@@ -320,7 +282,6 @@ const VerifikasiInkubasi = () => {
                 >
                   <option value="">-- Belum Dipilih / Kosongkan --</option>
                   {reviewerList.map((rev) => (
-                    // KOREKSI 4: rev.id (bukan rev.id_user)
                     <option key={rev.id} value={rev.id}>
                       {rev.nama} ({rev.user_code})
                     </option>
@@ -328,16 +289,15 @@ const VerifikasiInkubasi = () => {
                 </select>
               </div>
 
-              {/* Catatan Verifikator */}
               <div>
                 <label className="block text-xs font-semibold text-[#092B52] mb-2">
-                  Catatan
+                  Catatan Verifikator
                 </label>
                 <textarea
                   rows="3"
                   value={catatanVerifikator}
                   onChange={(e) => setCatatanVerifikator(e.target.value)}
-                  placeholder="Masukkan catatan pendukung atau instruksi revisi..."
+                  placeholder="Masukkan instruksi revisi atau alasan penolakan berkas..."
                   className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:border-[#188B9E]"
                 />
               </div>

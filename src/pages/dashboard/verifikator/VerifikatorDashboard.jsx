@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import API from '../../../services/api'; // Sesuaikan relative path ke file api.js kamu
 
 const VerifikatorDashboard = () => {
   const [stats, setStats] = useState({
@@ -7,6 +8,8 @@ const VerifikatorDashboard = () => {
     pending: 0,
     lolos: 0,
     revisi: 0,
+    prosesInkubasi: 0,
+    selesai: 0,
     ditolak: 0,
   });
   const [loading, setLoading] = useState(true);
@@ -14,19 +17,17 @@ const VerifikatorDashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:5000/api/techno/verifikator/pengajuan', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const data = await res.json();
+        const res = await API.get('/verifikator/pengajuan');
         
-        if (data.status === 'success') {
-          const list = data.data || [];
+        if (res.data && res.data.success) {
+          const list = res.data.data || [];
           setStats({
             total: list.length,
             pending: list.filter(item => item.status_verifikasi === 'Pending').length,
             lolos: list.filter(item => item.status_verifikasi === 'Lolos').length,
             revisi: list.filter(item => item.status_verifikasi === 'Revisi').length,
+            prosesInkubasi: list.filter(item => item.status_verifikasi === 'Proses Inkubasi').length,
+            selesai: list.filter(item => item.status_verifikasi === 'Selesai').length,
             ditolak: list.filter(item => item.status_verifikasi === 'Ditolak').length,
           });
         }
@@ -43,8 +44,8 @@ const VerifikatorDashboard = () => {
   const statCards = [
     { title: 'Total Pengajuan', value: stats.total, desc: 'Semua usulan inkubasi', color: 'bg-blue-500' },
     { title: 'Pending Verifikasi', value: stats.pending, desc: 'Perlu segera diverifikasi', color: 'bg-amber-500' },
-    { title: 'Lolos Verifikasi', value: stats.lolos, desc: 'Siap direview reviewer', color: 'bg-emerald-500' },
-    { title: 'Perlu Revisi', value: stats.revisi, desc: 'Dikembalikan ke pengusul', color: 'bg-indigo-500' },
+    { title: 'Proses Inkubasi', value: stats.prosesInkubasi, desc: 'Sedang berjalan', color: 'bg-sky-500' },
+    { title: 'Program Selesai', value: stats.selesai, desc: 'Telah menyelesaikan tahapan', color: 'bg-indigo-500' },
   ];
 
   return (

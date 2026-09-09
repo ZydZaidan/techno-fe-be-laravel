@@ -1,6 +1,12 @@
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 
 // ================= SVG ICONS =================
+const DashboardIcon = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+  </svg>
+);
+
 const UserIcon = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -13,16 +19,18 @@ const NewsIcon = ({ className }) => (
   </svg>
 );
 
-
 const AuditIcon = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 );
 
-const DashboardIcon = ({ className }) => (
+// TAMBAHAN ICON BARU UNTUK KELOLA INKUBASI
+const GraduationIcon = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l9-5-9-5-9 5 9 5z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14v7" />
   </svg>
 );
 
@@ -41,11 +49,13 @@ const HomeIcon = ({ className }) => (
 const SidebarAdmin = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
 
+  // PENYESUAIAN URUTAN DAN PENAMBAHAN MENU BARU
   const menuItems = [
+    { name: 'Dashboard', path: '/admin/dashboard', icon: DashboardIcon },
+    { name: 'Kelola Inkubasi', path: '/admin/inkubasi', icon: GraduationIcon }, // MENU BARU
     { name: 'Manajemen User', path: '/admin/users', icon: UserIcon },
     { name: 'Kelola Berita', path: '/admin/berita', icon: NewsIcon },
     { name: 'Audit Log', path: '/admin/audit-log', icon: AuditIcon },
-    { name: 'Dashboard', path: '/admin/dashboard', icon: DashboardIcon },
   ];
 
   const handleLogout = () => {
@@ -137,7 +147,6 @@ const SidebarAdmin = ({ isOpen, onClose }) => {
             <span>Logout</span>
           </button>
         </div>
-
       </aside>
     </>
   );
