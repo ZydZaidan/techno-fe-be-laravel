@@ -50,20 +50,20 @@ const RocketIcon = ({ className }) => (
 // DATA TIM
 const teamMembers = [
   {
-    name: "Pak Haris",
-    role: "Direktur Technopark",
+    name: "Dr. Ir. Abdul Haris, S.Kom., M.Kom., IPM.",
+    role: "Manajer BPM ITPLN",
     photo: pakHaris,
     email: "haris@itpln.ac.id",
   },
   {
-    name: "Pak Hengki",
-    role: "Spesialis HKI",
+    name: "Hengki Sikumbang, SE., MMSI.",
+    role: "Analisis",
     photo: pakHengki,
     email: "hengki@itpln.ac.id",
   },
   {
-    name: "Kak Chacha",
-    role: "Kemitraan Industri",
+    name: "Salsabila Tsamrotul Qolbi, S.T.",
+    role: "Staff",
     photo: kakChacha,
     email: "chacha@itpln.ac.id",
   },

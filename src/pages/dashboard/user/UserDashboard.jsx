@@ -52,9 +52,9 @@ const UserDashboard = () => {
   };
 
   return (
-    <div className="space-y-6 md:ml-64 font-poppins">
+    <div className="space-y-6 md:ml-64 font-poppins pt-8 px-4 md:px-8 pb-16 bg-[#F9FAFB] min-h-screen">
       <div>
-        <h2 className="text-lg font-bold text-[#092B52]">Dashboard Tenant</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-[#092B52]">Dashboard Tenant</h2>
         <p className="text-xs text-slate-400">
           Pantau status progres kegiatan inkubasi aktif dan hasil evaluasi proposal kamu.
         </p>

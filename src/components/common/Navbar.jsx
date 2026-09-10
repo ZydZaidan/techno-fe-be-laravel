@@ -6,11 +6,14 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
-  // State User dari sessionStorage
-  const [user, setUser] = useState(() => {
-    const savedUser = sessionStorage.getItem("user");
+  // Helper untuk mengambil data user dari localStorage atau sessionStorage
+  const getSavedUser = () => {
+    const savedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
-  });
+  };
+
+  // State User mendukung localStorage & sessionStorage
+  const [user, setUser] = useState(getSavedUser);
 
   const dropdownRef = useRef(null);
   const location = useLocation();
@@ -22,18 +25,36 @@ const Navbar = () => {
     setIsProfileDropdownOpen(false);
   };
 
-  // Sync state user saat perpindahan halaman atau event storage trigger
+  // Helper untuk mendapatkan URL foto profil (Foto Upload / Inisial Nama)
+  const getAvatarUrl = (userData) => {
+    if (!userData) return "";
+
+    const photo = userData.foto_profil || userData.avatar || userData.photo;
+    if (photo && photo.trim() !== "") {
+      return photo;
+    }
+
+    const name = userData.nama || userData.name || "User";
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      name
+    )}&background=092B52&color=FBB03B&bold=true&size=128`;
+  };
+
+  // Sync state user saat perpindahan halaman atau custom event (authChange & storage)
   useEffect(() => {
     const checkUserStorage = () => {
-      const savedUser = sessionStorage.getItem("user");
-      setUser(savedUser ? JSON.parse(savedUser) : null);
+      setUser(getSavedUser());
     };
 
     checkUserStorage();
 
-    // Listen event storage (berguna saat baru selesai login)
     window.addEventListener("storage", checkUserStorage);
-    return () => window.removeEventListener("storage", checkUserStorage);
+    window.addEventListener("authChange", checkUserStorage);
+
+    return () => {
+      window.removeEventListener("storage", checkUserStorage);
+      window.removeEventListener("authChange", checkUserStorage);
+    };
   }, [location.pathname]);
 
   useEffect(() => {
@@ -59,7 +80,10 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Logout bersihkan kedua storage
   const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("user");
     setUser(null);
@@ -69,8 +93,8 @@ const Navbar = () => {
   const navBg = isMobileMenuOpen
     ? "bg-[#092B52] text-white shadow-none"
     : isHome && !isScrolled
-      ? "bg-transparent border-transparent text-white shadow-none"
-      : "bg-custom-blue border-b-2 border-custom-yellow text-white shadow-md";
+    ? "bg-transparent border-transparent text-white shadow-none"
+    : "bg-custom-blue border-b-2 border-custom-yellow text-white shadow-md";
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -90,10 +114,13 @@ const Navbar = () => {
     if (role === "admin" || role === "administrator") return "/admin/dashboard";
     if (role === "verifikator") return "/verifikator/dashboard";
     if (role === "reviewer") return "/reviewer/dashboard";
-    if (role === "tenant" || role === "user" || role === "pengusul")
-      return "/user/dashboard";
+    return "/user/dashboard";
+  };
 
-    return "/user/dashboard"; // Default fallback jika user sudah login
+  // Navigasi Settings (Standalone Route)
+  const getSettingsPath = () => {
+    if (!user) return "/login";
+    return "/settings";
   };
 
   return (
@@ -152,15 +179,12 @@ const Navbar = () => {
                   onClick={() =>
                     setIsProfileDropdownOpen(!isProfileDropdownOpen)
                   }
-                  className="flex items-center gap-2 focus:outline-none group"
+                  className="flex items-center gap-2 focus:outline-none group cursor-pointer"
                 >
                   <div className="w-10 h-10 rounded-full border-2 border-custom-yellow overflow-hidden bg-slate-200 transition-transform group-hover:scale-105 shadow-sm">
                     <img
-                      src={
-                        user.avatar ||
-                        `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.nama || user.name}`
-                      }
-                      alt={user.nama || user.name}
+                      src={getAvatarUrl(user)}
+                      alt={user.nama || user.name || "User"}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -199,7 +223,7 @@ const Navbar = () => {
                     </Link>
 
                     <Link
-                      to="/settings"
+                      to={getSettingsPath()}
                       onClick={closeAllMenus}
                       className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-custom-blue transition-colors"
                     >
@@ -229,7 +253,7 @@ const Navbar = () => {
 
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors text-left"
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors text-left cursor-pointer"
                     >
                       <svg
                         className="w-4 h-4 text-rose-500"
@@ -268,7 +292,7 @@ const Navbar = () => {
 
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 rounded-lg text-white hover:bg-white/10 focus:outline-none transition-colors"
+            className="p-2 rounded-lg text-white hover:bg-white/10 focus:outline-none transition-colors cursor-pointer"
           >
             {isMobileMenuOpen ? (
               <svg
@@ -331,11 +355,8 @@ const Navbar = () => {
               <div className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10">
                 <div className="w-10 h-10 rounded-full border border-custom-yellow overflow-hidden bg-slate-200 shrink-0">
                   <img
-                    src={
-                      user.avatar ||
-                      `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.nama || user.name}`
-                    }
-                    alt={user.nama || user.name}
+                    src={getAvatarUrl(user)}
+                    alt={user.nama || user.name || "User"}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -371,25 +392,52 @@ const Navbar = () => {
                   Dashboard
                 </Link>
 
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-2.5 text-xs font-semibold text-rose-400 hover:text-rose-300 pt-2 transition-colors text-left"
+                <Link
+                  to={getSettingsPath()}
+                  onClick={closeAllMenus}
+                  className="flex items-center gap-2.5 text-xs font-medium text-slate-200 hover:text-custom-yellow py-1.5 transition-colors"
                 >
                   <svg
-                        className="w-4 h-4 text-rose-500"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 16 16"
-                      >
-                        <path
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M4 8h11m0 0-4-4m4 4-4 4m-5 3H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h3"
-                        />
-                      </svg>
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  Settings
+                </Link>
+
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2.5 text-xs font-semibold text-rose-400 hover:text-rose-300 pt-2 transition-colors text-left cursor-pointer"
+                >
+                  <svg
+                    className="w-4 h-4 text-rose-500"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M4 8h11m0 0-4-4m4 4-4 4m-5 3H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h3"
+                    />
+                  </svg>
                   Logout
                 </button>
               </div>

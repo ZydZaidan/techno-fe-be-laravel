@@ -1,6 +1,4 @@
-import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import API from "../../services/api";
 
 // Data Statis untuk Counter & Cards Fasilitasi
 const statsData = [
@@ -18,32 +16,6 @@ const fasilitasiData = [
 ];
 
 const HKI = () => {
-  const [direktoriData, setDirektoriData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  useEffect(() => {
-    const fetchHKI = async () => {
-      try {
-        const response = await API.get("/hki");
-        if (response.data.success) {
-          setDirektoriData(response.data.data);
-        }
-      } catch (error) {
-        console.error("Gagal mengambil data HKI:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchHKI();
-  }, []);
-
-  // Filter berdasarkan judul dari DB
-  const filteredDirektori = direktoriData.filter((item) =>
-    item.judul?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
     <div className="min-h-screen bg-white font-poppins text-[#092B52] pt-28 pb-16">
       
@@ -143,106 +115,13 @@ const HKI = () => {
                   href="#"
                   className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-600 hover:text-sky-700 transition-colors"
                 >
-                  <span>Selengkapnya</span>
+                  {/* <span>Selengkapnya</span>
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
+                  </svg> */}
                 </a>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ================= DIREKTORI PUBLIK HKI ================= */}
-      <section className="py-4">
-        <div className="layout-container">
-          {/* Header Section & Search */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-            <div className="text-left">
-              <h2 className="font-readex text-xl md:text-2xl font-bold text-[#092B52] mb-1">
-                Direktori Publik HKI
-              </h2>
-              <p className="text-slate-500 text-xs md:text-sm">
-                Daftar kekayaan intelektual yang telah difasilitasi.
-              </p>
-            </div>
-
-            <div className="relative w-full sm:w-72">
-              <input
-                type="text"
-                placeholder="Cari paten/ciptaan..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-9 pr-4 text-xs text-slate-700 focus:outline-none focus:border-cyan-500 transition-colors"
-              />
-              <svg
-                className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
-
-          {/* Table Direktori */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-8">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-100">
-                  <tr>
-                    <th className="py-4 px-6 w-16 text-center">No</th>
-                    <th className="py-4 px-6">Judul Ciptaan / Paten</th>
-                    <th className="py-4 px-6 text-center">Jenis HKI</th>
-                    <th className="py-4 px-6 text-center">Tahun</th>
-                    <th className="py-4 px-6 text-center">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 text-slate-700">
-                  {loading ? (
-                    <tr>
-                      <td colSpan="5" className="py-8 text-center text-slate-500 font-medium animate-pulse">
-                        Memuat data direktori...
-                      </td>
-                    </tr>
-                  ) : filteredDirektori.length > 0 ? (
-                    filteredDirektori.map((row, index) => (
-                      <tr key={row.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="py-4 px-6 text-center font-medium text-slate-400">{index + 1}</td>
-                        <td className="py-4 px-6 font-semibold text-[#092B52]">{row.judul}</td>
-                        <td className="py-4 px-6 text-center">
-                          <span className="inline-block text-[10px] font-bold px-3 py-1 rounded-full bg-cyan-50 text-cyan-700">
-                            {row.jenis_hki || "HKI"}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-center text-slate-500 font-medium">{row.tahun || "-"}</td>
-                        <td className="py-4 px-6 text-center">
-                          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            {row.status || "Terdaftar"}
-                          </span>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="5" className="py-8 text-center text-slate-400">
-                        Data HKI tidak ditemukan.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Button Lihat Semua Direktori */}
-          <div className="text-center">
-            <button className="px-6 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition-colors shadow-xs cursor-pointer">
-              Lihat Semua Direktori
-            </button>
           </div>
         </div>
       </section>

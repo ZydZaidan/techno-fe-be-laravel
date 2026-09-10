@@ -8,7 +8,6 @@ const Home = () => {
   const [startX, setStartX] = useState(0);
   const [scrollLeftState, setScrollLeftState] = useState(0);
 
-  // 🔴 STATE UNTUK DATA DINAMIS
   const [latestNews, setLatestNews] = useState([]);
   const [isLoadingNews, setIsLoadingNews] = useState(true);
 

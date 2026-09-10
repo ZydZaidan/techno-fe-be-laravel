@@ -12,6 +12,7 @@ const Login = () => {
     email: "",
     password: "",
   });
+  const [rememberMe, setRememberMe] = useState(true); // Default true agar persistent
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
@@ -25,71 +26,74 @@ const Login = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrorMsg("");
-    setLoading(true);
+  e.preventDefault();
+  setErrorMsg("");
+  setLoading(true);
 
-    try {
-      const response = await API.post("/auth/login", {
-        email: formData.email,
-        password: formData.password,
-      });
+  try {
+    const response = await API.post("/auth/login", {
+      email: formData.email,
+      password: formData.password,
+    });
 
-      if (response.data.success) {
-        const { token, user } = response.data;
+    if (response.data.success) {
+      const { token, user } = response.data;
 
-        sessionStorage.setItem("token", token);
-        sessionStorage.setItem("user", JSON.stringify(user));
+      const storage = rememberMe ? localStorage : sessionStorage;
 
-        window.dispatchEvent(new Event("storage"));
-        window.dispatchEvent(new Event("authChange"));
+      // Hapus data lama agar bersih
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("user");
 
-        const userRole = user.role;
-        const isAdminOrStaff = [
-          "administrator",
-          "admin",
-          "verifikator",
-          "reviewer",
-        ].includes(userRole);
+      // Simpan ke storage pilihan
+      storage.setItem("token", token);
+      storage.setItem("user", JSON.stringify(user));
 
-        if (from && from.includes("/user") && isAdminOrStaff) {
-          alert(
-            "Login berhasil! Namun akun Admin/Staff tidak dapat mengakses form pengajuan tenant. Anda dialihkan ke Dashboard Admin."
-          );
+      window.dispatchEvent(new Event("storage"));
+      window.dispatchEvent(new Event("authChange"));
 
-          if (userRole === "admin" || userRole === "administrator") {
-            navigate("/admin/dashboard");
-          } else if (userRole === "verifikator") {
-            navigate("/verifikator/dashboard");
-          } else if (userRole === "reviewer") {
-            navigate("/reviewer/dashboard");
-          }
-          return;
+      const userRole = user.role?.toLowerCase();
+
+      // Mapping Dashboard berdasarkan Role
+      const getDashboardRoute = (role) => {
+        switch (role) {
+          case "admin":
+          case "administrator":
+            return "/admin/dashboard";
+          case "verifikator":
+            return "/verifikator/dashboard";
+          case "reviewer":
+            return "/reviewer/dashboard";
+          case "user":
+          case "tenant":
+            return "/user/dashboard";
+          default:
+            return "/";
         }
+      };
 
-        if (from) {
-          navigate(from);
-        } else {
-          if (isAdminOrStaff) {
-            if (userRole === "admin" || userRole === "administrator")
-              navigate("/admin/dashboard");
-            else if (userRole === "verifikator")
-              navigate("/verifikator/dashboard");
-            else if (userRole === "reviewer")
-              navigate("/reviewer/dashboard");
-          } else {
-            navigate("/");
-          }
-        }
+      const defaultDashboard = getDashboardRoute(userRole);
+
+      // Jika mencoba akses form pengajuan tenant tapi login sebagai Admin/Staff
+      if (from && from.includes("/user") && userRole !== "user" && userRole !== "tenant") {
+        alert("Login berhasil! Akun Admin/Staff dialihkan ke Dashboard masing-masing.");
+        navigate(defaultDashboard, { replace: true });
+        return;
       }
-    } catch (err) {
-      setErrorMsg(
-        err.response?.data?.message || "Gagal masuk. Periksa koneksi backend!"
-      );
-    } finally {
-      setLoading(false);
+
+      // Navigasi ke halaman tujuan awal (jika ada) atau ke dashboard sesuai role
+      navigate(from || defaultDashboard, { replace: true });
     }
-  };
+  } catch (err) {
+    setErrorMsg(
+      err.response?.data?.message || "Gagal masuk. Periksa koneksi backend!"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen w-full flex font-poppins bg-white">
@@ -97,7 +101,7 @@ const Login = () => {
       <div className="hidden lg:flex lg:w-1/2 relative bg-[#0d3b66] justify-center items-center overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-tr from-[#004e92] via-[#000428]/80 to-[#004e92]/90 z-10 opacity-90" />
         <img
-          src="https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1000&auto=format&fit=crop"
+          src="/src/assets/img/hero-img.svg"
           alt="Technopark IT-PLN"
           className="absolute inset-0 w-full h-full object-cover"
         />
@@ -116,7 +120,7 @@ const Login = () => {
         {/* BUTTON KEMBALI */}
         <button
           onClick={() => navigate("/")}
-          className="absolute top-6 left-6 sm:top-8 sm:left-8 flex items-center gap-2 text-slate-500 hover:text-[#1c3250] text-sm font-medium transition-colors"
+          className="absolute top-6 left-6 sm:top-8 sm:left-8 flex items-center gap-2 text-slate-500 hover:text-[#1c3250] text-sm font-medium transition-colors cursor-pointer"
         >
           <svg
             className="w-5 h-5"
@@ -185,11 +189,10 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none p-1"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none p-1 cursor-pointer"
                   tabIndex={-1}
                 >
                   {showPassword ? (
-                    /* Icon Mata Terbuka */
                     <svg
                       className="w-5 h-5"
                       fill="none"
@@ -210,7 +213,6 @@ const Login = () => {
                       />
                     </svg>
                   ) : (
-                    /* Icon Mata Tertutup / Dicoret */
                     <svg
                       className="w-5 h-5"
                       fill="none"
@@ -227,6 +229,21 @@ const Login = () => {
                   )}
                 </button>
               </div>
+            </div>
+
+            {/* CHECKBOX INGAT SAYA / REMEMBER ME */}
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded text-[#092B52] border-slate-300 focus:ring-[#092B52] cursor-pointer"
+                />
+                <span className="text-xs font-medium text-slate-600">
+                  Ingat Saya
+                </span>
+              </label>
             </div>
 
             <button

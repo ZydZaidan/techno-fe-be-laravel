@@ -24,13 +24,16 @@ import HKI from "./pages/public/HKI";
 import Publikasi from "./pages/public/Publikasi";
 import DetailPublikasi from "./pages/public/DetailPublikasi";
 
+// Universal Settings Page (STANDALONE PAGE)
+import Settings from "./pages/Settings";
+
 // Admin Pages
 import AdminDashboard from "./pages/dashboard/admin/AdminDashboard";
 import ManajemenUser from "./pages/dashboard/admin/ManajemenUser";
 import KelolaBerita from "./pages/dashboard/admin/KelolaBerita";
 import AuditLog from "./pages/dashboard/admin/AuditLog";
 import KelolaInkubasi from "./pages/dashboard/admin/KelolaInkubasi";
-import KelolaInovasi from "./pages/dashboard/admin/KelolaInovasi"; // TAMBAHAN IMPORT BARU
+import KelolaInovasi from "./pages/dashboard/admin/KelolaInovasi";
 
 // User Pages
 import UserDashboard from "./pages/dashboard/user/UserDashboard";
@@ -67,7 +70,25 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* 3. HALAMAN DASHBOARD ADMIN */}
+        {/* 3. UNIVERSAL SETTINGS PAGE (STANDALONE & TERPROTEKSI UNTUK SEMUA ROLE) */}
+        <Route
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "administrator",
+                "admin",
+                "user",
+                "tenant",
+                "verifikator",
+                "reviewer",
+              ]}
+            />
+          }
+        >
+          <Route path="/settings" element={<Settings />} />
+        </Route>
+
+        {/* 4. HALAMAN DASHBOARD ADMIN */}
         <Route
           element={<ProtectedRoute allowedRoles={["administrator", "admin"]} />}
         >
@@ -77,11 +98,11 @@ function App() {
             <Route path="berita" element={<KelolaBerita />} />
             <Route path="audit-log" element={<AuditLog />} />
             <Route path="inkubasi" element={<KelolaInkubasi />} />
-            <Route path="inovasi" element={<KelolaInovasi />} /> {/* ROUTE BARU KELOLA INOVASI */}
+            <Route path="inovasi" element={<KelolaInovasi />} />
           </Route>
         </Route>
 
-        {/* 4. HALAMAN DASHBOARD TENANT / USER */}
+        {/* 5. HALAMAN DASHBOARD TENANT / USER */}
         <Route element={<ProtectedRoute allowedRoles={["user", "tenant"]} />}>
           <Route path="/user" element={<UserLayout />}>
             <Route path="dashboard" element={<UserDashboard />} />
@@ -91,7 +112,7 @@ function App() {
           </Route>
         </Route>
 
-        {/* 5. HALAMAN DASHBOARD VERIFIKATOR */}
+        {/* 6. HALAMAN DASHBOARD VERIFIKATOR */}
         <Route
           element={
             <ProtectedRoute allowedRoles={["verifikator", "administrator"]} />
@@ -103,7 +124,7 @@ function App() {
           </Route>
         </Route>
 
-        {/* 6. HALAMAN DASHBOARD REVIEWER */}
+        {/* 7. HALAMAN DASHBOARD REVIEWER */}
         <Route
           element={
             <ProtectedRoute allowedRoles={["reviewer", "administrator"]} />

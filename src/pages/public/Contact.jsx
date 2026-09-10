@@ -22,15 +22,15 @@ const PhoneIcon = ({ className }) => (
   </svg>
 );
 
-const ShareIcon = ({ className }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <circle cx="18" cy="5" r="3" />
-    <circle cx="6" cy="12" r="3" />
-    <circle cx="18" cy="19" r="3" />
-    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-  </svg>
-);
+// const ShareIcon = ({ className }) => (
+//   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+//     <circle cx="18" cy="5" r="3" />
+//     <circle cx="6" cy="12" r="3" />
+//     <circle cx="18" cy="19" r="3" />
+//     <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+//     <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+//   </svg>
+// );
 
 const InstagramIcon = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -57,7 +57,7 @@ const SendIcon = ({ className }) => (
 const contactInfo = {
   address: "Menara PLN, Jl. Lingkar Luar Barat Duri Kosambi, Cengkareng, Jakarta Barat 11750",
   email: "bpm@itpln.ac.id",
-  phone: "021-5440342",
+  phone: "(021) 5440342 / 2210 ",
 };
 
 const mapsQuery = encodeURIComponent(
@@ -166,23 +166,27 @@ const Contact = () => {
               <div className="mt-8 pt-6 border-t border-slate-100">
                 <p className="text-xs font-bold text-[#092B52] mb-3">Media Sosial</p>
                 <div className="flex items-center gap-2.5">
-                  <a
+                  {/* <a
                     href="#"
                     aria-label="Bagikan"
                     className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-600 hover:bg-[#092B52] hover:text-white transition-colors"
                   >
                     <ShareIcon className="h-4 w-4" />
-                  </a>
+                  </a> */}
                   <a
-                    href="#"
+                    href="https://www.instagram.com/bpm.itpln/"
                     aria-label="Instagram"
+                    target="_blank" 
+                    rel="noopener noreferrer"
                     className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-600 hover:bg-[#092B52] hover:text-white transition-colors"
                   >
                     <InstagramIcon className="h-4 w-4" />
                   </a>
                   <a
-                    href="#"
+                    href="https://www.youtube.com/@BuibItpln"
                     aria-label="YouTube"
+                    target="_blank" 
+                    rel="noopener noreferrer"
                     className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-600 hover:bg-[#092B52] hover:text-white transition-colors"
                   >
                     <YoutubeIcon className="h-4 w-4" />

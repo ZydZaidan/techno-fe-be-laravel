@@ -43,7 +43,7 @@ const ReviewerDashboard = () => {
   }, []);
 
   return (
-    <div className="space-y-6 md:ml-64 font-poppins">
+    <div className="space-y-6 md:ml-64 font-poppins pt-8 px-4 md:px-8 pb-16 bg-[#F9FAFB] min-h-screen">
 
       {/* Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

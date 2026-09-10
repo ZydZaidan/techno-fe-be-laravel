@@ -75,7 +75,7 @@ const ApprovalLogbook = () => {
   };
 
   return (
-    <div className="space-y-6 md:ml-64 font-poppins">
+    <div className="space-y-6 md:ml-64 font-poppins pt-8 px-4 md:px-8 pb-16 bg-[#F9FAFB] min-h-screen">
       <div>
         <h2 className="text-lg font-bold text-[#092B52]">Logbook Mentoring Tenant</h2>
         <p className="text-xs text-slate-400">
