@@ -1,47 +1,44 @@
 import { Link, useNavigate } from "react-router-dom";
 
-
 const Inkubasi = () => {
   const navigate = useNavigate();
 
   // Handler saat tombol "Daftar Sekarang" diklik
-const handleDaftarClick = () => {
-  const userStr = localStorage.getItem("user");
-  
-  if (!userStr) {
-    // Belum login -> arahkan ke login dengan intent form pengajuan
-    navigate("/login", { state: { redirectTo: "/user/inkubasi/pengajuan" } });
-    return;
-  }
+  const handleDaftarClick = () => {
+    const userStr = sessionStorage.getItem("user");
 
-  const user = JSON.parse(userStr);
-  const role = user.role;
+    if (!userStr) {
+      navigate("/login", { state: { redirectTo: "/user/inkubasi/pengajuan" } });
+      return;
+    }
 
-  // Cek apakah rolenya adalah user/tenant
-  if (role === "user" || role === "tenant") {
-    navigate("/user/inkubasi/pengajuan");
-  } else if (role === "admin" || role === "administrator") {
-    alert("Akun Admin tidak dapat mendaftarkan inkubasi tenant. Silakan gunakan akun tenant/user.");
-    navigate("/admin/dashboard");
-  } else if (role === "verifikator") {
-    alert("Akun Verifikator memiliki akses evaluasi, bukan untuk pendaftaran tenant.");
-    navigate("/verifikator/dashboard");
-  } else if (role === "reviewer") {
-    alert("Akun Reviewer bertugas mereview proposal, bukan mendaftar.");
-    navigate("/reviewer/dashboard");
-  } else {
-    alert("Role Anda tidak diizinkan mengakses pendaftaran inkubasi.");
-  }
-};
+    const user = JSON.parse(userStr);
+    const role = user.role;
 
-  // 📦 Data Dummy Tahapan Inkubasi
+    if (role === "user" || role === "tenant") {
+      navigate("/user/inkubasi/pengajuan");
+    } else if (role === "admin" || role === "administrator") {
+      alert("Akun Admin tidak dapat mendaftarkan inkubasi tenant. Silakan gunakan akun tenant/user.");
+      navigate("/admin/dashboard");
+    } else if (role === "verifikator") {
+      alert("Akun Verifikator memiliki akses evaluasi, bukan untuk pendaftaran tenant.");
+      navigate("/verifikator/dashboard");
+    } else if (role === "reviewer") {
+      alert("Akun Reviewer bertugas mereview proposal, bukan mendaftar.");
+      navigate("/reviewer/dashboard");
+    } else {
+      alert("Role Anda tidak diizinkan mengakses pendaftaran inkubasi.");
+    }
+  };
+
+  // Data Tahapan Inkubasi
   const incubationSteps = [
     {
       id: "1",
       number: "1",
       title: "Pra-Inkubasi",
       desc: "Validasi ide bisnis, pembentukan tim yang solid, dan penyusunan model bisnis awal yang terukur.",
-      iconBg: "bg-cyan-50 text-custom-cyan",
+      iconBg: "bg-cyan-50 text-cyan-600",
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -53,7 +50,7 @@ const handleDaftarClick = () => {
       number: "2",
       title: "Inkubasi",
       desc: "Pengembangan MVP, mentoring intensif, legalitas usaha, dan persiapan penetrasi pasar.",
-      iconBg: "bg-cyan-100 text-custom-blue",
+      iconBg: "bg-cyan-100 text-[#092B52]",
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -65,7 +62,7 @@ const handleDaftarClick = () => {
       number: "3",
       title: "Akselerasi",
       desc: "Scaling up bisnis, akses pendanaan lanjutan, ekspansi pasar, dan kemitraan strategis.",
-      iconBg: "bg-custom-blue text-white",
+      iconBg: "bg-[#092B52] text-white",
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -74,43 +71,7 @@ const handleDaftarClick = () => {
     },
   ];
 
-  // 📦 Data Dummy Startup & Tenant
-  const tenants = [
-    {
-      id: 1,
-      name: "VoltGrid Solutions",
-      category: "Energy Tech",
-      batch: "Batch 4",
-      desc: "Platform manajemen efisiensi energi terintegrasi IoT untuk industri.",
-      img: "/src/assets/img/showcase-1.jpg",
-    },
-    {
-      id: 2,
-      name: "AgriSmart AI",
-      category: "AgriTech",
-      batch: "Batch 4",
-      desc: "Aplikasi deteksi hama dan rekomendasi pupuk presisi berbasis AI.",
-      img: "/src/assets/img/showcase-2.jpg",
-    },
-    {
-      id: 3,
-      name: "LearnLoop",
-      category: "EdTech",
-      batch: "Batch 3",
-      desc: "Sistem manajemen pembelajaran gamifikasi untuk perguruan tinggi.",
-      img: "/src/assets/img/showcase-3.jpg",
-    },
-    {
-      id: 4,
-      name: "EcoCharge Grid",
-      category: "CleanTech",
-      batch: "Batch 3",
-      desc: "Jaringan swap baterai motor listrik cerdas tenaga surya.",
-      img: "/src/assets/img/showcase-4.jpg",
-    },
-  ];
-
-  // 📦 Data Dummy Mentor Expert
+  // Data Mentor Expert
   const mentors = [
     {
       id: 1,
@@ -145,37 +106,51 @@ const handleDaftarClick = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-poppins pt-24">
+    <div className="min-h-screen bg-white font-poppins text-[#092B52] pt-28 pb-16 text-left">
+      
+      {/* BREADCRUMB */}
+      <section className="border-b border-gray-100 bg-white py-6">
+        <div className="layout-container">
+          <div className="mb-2 flex items-center gap-1.5 text-xs text-gray-500">
+            <Link to="/" className="hover:underline">Beranda</Link>
+            <span>&gt;</span>
+            <span className="font-semibold text-[#092B52]">Inkubasi</span>
+          </div>
+          <h1 className="font-readex text-3xl md:text-4xl font-extrabold text-[#092B52]">
+            Inkubasi
+          </h1>
+        </div>
+      </section>
 
       {/* 🚀 1. SECTION TAHAPAN INKUBASI */}
-      <section className="w-full bg-[#f8fafc] py-20">
+      <section className="w-full bg-[#f8fafc] py-16 md:py-20">
         <div className="layout-container">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="font-readex text-3xl md:text-4xl font-extrabold text-[#1c3250] mb-3">
+            <h2 className="font-readex text-2xl md:text-3xl font-extrabold text-[#092B52] mb-3">
               Tahapan Inkubasi
             </h2>
-            <div className="w-16 h-1 bg-custom-cyan mx-auto rounded-full"></div>
+            <div className="w-16 h-1 bg-cyan-500 mx-auto rounded-full"></div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {incubationSteps.map((step) => (
               <div
                 key={step.id}
-                className="relative bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-all duration-300 flex flex-col justify-between items-start text-left group overflow-hidden"
+                className="relative bg-white p-8 rounded-3xl shadow-xs border border-slate-100 hover:shadow-md transition-all duration-300 flex flex-col justify-between items-start text-left group overflow-hidden"
               >
                 <span className="absolute top-2 right-6 font-readex text-7xl font-extrabold text-slate-100 select-none group-hover:text-slate-200 transition-colors">
                   {step.number}
                 </span>
 
                 <div className="relative z-10 w-full">
-                  <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-6 shadow-sm ${step.iconBg}`}>
+                  <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-6 shadow-xs ${step.iconBg}`}>
                     {step.icon}
                   </div>
 
-                  <h3 className="font-readex text-xl font-bold text-[#1c3250] mb-3">
+                  <h3 className="font-readex text-xl font-bold text-[#092B52] mb-3">
                     {step.title}
                   </h3>
-                  <p className="text-slate-500 text-sm leading-relaxed">
+                  <p className="text-slate-500 text-xs md:text-sm leading-relaxed">
                     {step.desc}
                   </p>
                 </div>
@@ -185,72 +160,48 @@ const handleDaftarClick = () => {
         </div>
       </section>
 
-      {/* 🚀 2. SECTION STARTUP & TENANT KAMI */}
-      <section className="w-full bg-[#f8fafc] py-20">
+      {/* 🚀 2. SECTION BANNER CTA KE INOVASI (PENGGANTI SHOWCASE) */}
+      <section className="w-full bg-white py-12 border-y border-slate-100">
         <div className="layout-container">
-          <div className="flex justify-between items-end mb-12">
-            <div>
-              <h2 className="font-readex text-3xl md:text-4xl font-extrabold text-[#1c3250] mb-2">
-                Startup & Tenant Kami
-              </h2>
-              <p className="text-slate-500 text-sm md:text-base">
-                Inovasi nyata karya mahasiswa dan alumni technopark.
+          <div className="bg-slate-900 rounded-3xl p-8 md:p-12 text-white flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden shadow-md">
+            
+            {/* Hiasan background visual */}
+            <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div className="max-w-xl text-left z-10">
+              <span className="text-cyan-400 font-bold text-xs uppercase tracking-widest block mb-2">
+                Output Program Inkubasi
+              </span>
+              <h3 className="font-readex text-2xl md:text-3xl font-extrabold text-white mb-3 leading-snug">
+                Penasaran Dengan Produk Hasil Inkubasi Kami?
+              </h3>
+              <p className="text-slate-300 text-xs md:text-sm leading-relaxed">
+                Jelajahi berbagai produk, dApp, startup, dan hasil riset inovatif ciptaan tenant serta alumni program inkubasi technopark.
               </p>
             </div>
 
-            <Link
-              to="/inovasi"
-              className="inline-flex items-center gap-1.5 text-custom-cyan font-semibold hover:text-custom-blue transition-colors text-sm md:text-base group whitespace-nowrap"
-            >
-              Lihat Semua
-              <svg
-                className="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            <div className="z-10 w-full md:w-auto shrink-0">
+              <Link
+                to="/inovasi"
+                className="w-full md:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-cyan-400 hover:bg-cyan-300 text-slate-900 font-bold text-xs md:text-sm rounded-full transition-all duration-300 shadow-sm hover:shadow-cyan-400/20 group"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
-              </svg>
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {tenants.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-md transition-shadow duration-300 flex flex-col group"
-              >
-                <div className="relative w-full h-48 overflow-hidden">
-                  <img
-                    src={item.img}
-                    alt={item.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                Lihat Galeri Inovasi
+                <svg
+                  className="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
                   />
-                  <span className="absolute top-3 right-3 bg-cyan-400 text-slate-900 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
-                    {item.batch}
-                  </span>
-                </div>
+                </svg>
+              </Link>
+            </div>
 
-                <div className="p-6 flex flex-col grow justify-between text-left">
-                  <div>
-                    <h3 className="font-readex text-lg font-bold text-[#1c3250] mb-2 group-hover:text-custom-cyan transition-colors line-clamp-1">
-                      {item.name}
-                    </h3>
-                    <p className="text-slate-500 text-xs leading-relaxed mb-4 line-clamp-2">
-                      {item.desc}
-                    </p>
-                  </div>
-                  <span className="text-[11px] font-semibold text-slate-400">
-                    {item.category}
-                  </span>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -258,12 +209,12 @@ const handleDaftarClick = () => {
       {/* 🚀 3. SECTION JARINGAN MENTOR EXPERT */}
       <section className="w-full bg-[#f8fafc] py-16">
         <div className="layout-container">
-          <div className="bg-linear-to-b from-[#eef7ff] to-[#e4f0fc] rounded-3xl p-10 md:p-14 border border-blue-100/60 shadow-sm text-center">
+          <div className="bg-gradient-to-b from-[#eef7ff] to-[#e4f0fc] rounded-3xl p-8 md:p-12 border border-blue-100/60 shadow-xs text-center">
             <div className="max-w-xl mx-auto mb-12">
-              <h2 className="font-readex text-2xl md:text-3xl font-extrabold text-[#1c3250] mb-2">
+              <h2 className="font-readex text-2xl md:text-3xl font-extrabold text-[#092B52] mb-2">
                 Jaringan Mentor Expert
               </h2>
-              <p className="text-slate-500 text-sm md:text-base">
+              <p className="text-slate-500 text-xs md:text-sm">
                 Didampingi oleh praktisi industri dan akademisi terkemuka.
               </p>
             </div>
@@ -278,10 +229,10 @@ const handleDaftarClick = () => {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <h4 className="font-readex text-sm md:text-base font-bold text-[#1c3250]">
+                  <h4 className="font-readex text-sm md:text-base font-bold text-[#092B52]">
                     {mentor.name}
                   </h4>
-                  <p className="text-xs text-custom-cyan font-medium mt-0.5">
+                  <p className="text-xs text-cyan-600 font-semibold mt-0.5">
                     {mentor.role}
                   </p>
                 </div>
@@ -291,28 +242,28 @@ const handleDaftarClick = () => {
         </div>
       </section>
 
-      {/* 🚀 4. SECTION CTA BANNER */}
-      <section className="w-full bg-[#f8fafc] py-16 mb-12">
+      {/* 🚀 4. SECTION CTA BANNER DAFTAR */}
+      <section className="w-full bg-[#f8fafc] pb-16">
         <div className="layout-container">
-          <div className="relative overflow-hidden rounded-3xl bg-linear-to-r from-cyan-200 via-blue-100 to-teal-100 p-10 md:p-16 border border-cyan-100/50 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-cyan-200 via-blue-100 to-teal-100 p-8 md:p-14 border border-cyan-100/50 shadow-xs flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="max-w-xl text-left">
-              <h2 className="font-readex text-3xl md:text-4xl font-black text-[#0b2447] leading-tight mb-4">
+              <h2 className="font-readex text-2xl md:text-4xl font-extrabold text-[#0b2447] leading-tight mb-3">
                 Punya Ide Bisnis Brilian? Mari Wujudkan Bersama Kami.
               </h2>
-              <p className="text-slate-600 text-sm md:text-base leading-relaxed">
+              <p className="text-slate-600 text-xs md:text-sm leading-relaxed">
                 Pendaftaran Batch 5 telah dibuka. Bergabunglah dengan ekosistem
                 inovasi terbaik.
               </p>
             </div>
 
-            <div className="shrink-0">
+            <div className="shrink-0 w-full md:w-auto">
               <button
                 onClick={handleDaftarClick}
-                className="inline-flex items-center gap-3 px-8 py-4 bg-[#0b2447] text-white font-bold rounded-full hover:bg-custom-blue transition-all duration-300 shadow-md hover:shadow-lg text-sm md:text-base cursor-pointer"
+                className="w-full md:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#0b2447] text-white font-bold rounded-full hover:bg-slate-800 transition-all duration-300 shadow-md hover:shadow-lg text-xs md:text-sm cursor-pointer"
               >
                 Daftar Sekarang
                 <svg
-                  className="w-5 h-5"
+                  className="w-4 h-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

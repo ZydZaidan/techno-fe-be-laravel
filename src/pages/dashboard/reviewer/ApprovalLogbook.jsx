@@ -19,7 +19,7 @@ const ApprovalLogbook = () => {
   const fetchLogbooks = useCallback(async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const response = await axios.get(`${API_BASE_URL}/reviewer/logbook`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -55,7 +55,7 @@ const ApprovalLogbook = () => {
     e.preventDefault();
     try {
       setIsSubmitting(true);
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const response = await axios.put(
         `${API_BASE_URL}/reviewer/logbook/${selectedLogbook.id}`,
         approvalData,

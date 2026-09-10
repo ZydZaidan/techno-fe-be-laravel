@@ -2,7 +2,7 @@ import { useState } from "react";
 
 const HeaderReviewer = ({ onToggleSidebar }) => {
   const [user] = useState(() => {
-    const savedUser = localStorage.getItem("user");
+    const savedUser = sessionStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
 

@@ -1,12 +1,11 @@
-
 import demoday2 from "../../assets/img/demoday-2.jpeg";
 import pakHaris from "../../assets/img/pak-haris.jpeg";
 import pakHengki from "../../assets/img/pak-hengki.jpeg";
 import kakChacha from "../../assets/img/kak-chacha.jpeg";
-import lpgSafeSense from "../../assets/img/lpg.jpeg";
-import smartMcbGuardian from "../../assets/img/smartmcb.jpeg";
-import hematin from "../../assets/img/hematin.jpeg";
-
+// import lpgSafeSense from "../../assets/img/lpg.jpeg";
+// import smartMcbGuardian from "../../assets/img/smartmcb.jpeg";
+// import hematin from "../../assets/img/hematin.jpeg";
+import { Link } from "react-router-dom";
 
 const MailIcon = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -48,7 +47,7 @@ const RocketIcon = ({ className }) => (
   </svg>
 );
 
-// ================= DATA TIM (biar gampang nambah/edit tanpa ubah JSX) =================
+// DATA TIM
 const teamMembers = [
   {
     name: "Pak Haris",
@@ -70,28 +69,26 @@ const teamMembers = [
   },
 ];
 
-// ================= DATA PRODUK INOVASI UNGGULAN =================
-// Sumber: produk hasil pendampingan Inkubasi Bisnis BPM ITPLN
-const facilities = [
-  {
-    title: "LPG-SafeSense",
-    description: "Alat pemantau keamanan dan energi untuk tabung LPG, mendeteksi kebocoran gas secara real-time.",
-    image: lpgSafeSense,
-  },
-  {
-    title: "Smart MCB Guardian",
-    description: "Alat pintar untuk memantau kondisi instalasi listrik serta mendeteksi dan mencegah risiko korsleting sejak dini.",
-    image: smartMcbGuardian,
-  },
-  {
-    title: "HEMATIN",
-    description: "Smart energy saving device untuk memantau dan mengendalikan penggunaan energi listrik secara real-time.",
-    image: hematin,
-  },
-];
+// DATA PRODUK INOVASI UNGGULAN
+// const facilities = [
+//   {
+//     title: "LPG-SafeSense",
+//     description: "Alat pemantau keamanan dan energi untuk tabung LPG, mendeteksi kebocoran gas secara real-time.",
+//     image: lpgSafeSense,
+//   },
+//   {
+//     title: "Smart MCB Guardian",
+//     description: "Alat pintar untuk memantau kondisi instalasi listrik serta mendeteksi dan mencegah risiko korsleting sejak dini.",
+//     image: smartMcbGuardian,
+//   },
+//   {
+//     title: "HEMATIN",
+//     description: "Smart energy saving device untuk memantau dan mengendalikan penggunaan energi listrik secara real-time.",
+//     image: hematin,
+//   },
+// ];
 
-// ================= DATA FOKUS PENGEMBANGAN =================
-// Sumber: 3 pilar Layanan BPM ITPLN (Profil Unit Kerja BPM)
+// DATA FOKUS PENGEMBANGAN
 const focusAreas = [
   {
     title: "Pengabdian Masyarakat",
@@ -121,89 +118,91 @@ const focusAreas = [
 
 const Profil = () => {
   return (
-    <div className="min-h-screen bg-white font-readex text-[#092B52]">
-      {/* ================= NAVBAR ================= */}
-
-      {/* ================= JUDUL / BREADCRUMB ================= */}
-      <section className="border-b border-gray-100 bg-white">
-        <div className="mx-auto max-w-295 px-8 py-6">
-          <div className="mb-1 flex items-center gap-1 text-[10px] text-gray-500">
-            <span>Beranda</span>
+    <div className="min-h-screen bg-white font-poppins text-[#092B52] pt-28 pb-16">
+      
+      {/* BREADCRUMB SECTION */}
+      <section className="border-b border-gray-100 bg-white py-6">
+        <div className="layout-container">
+          <div className="mb-2 flex items-center gap-1.5 text-xs text-gray-500">
+            <Link to="/" className="hover:underline">Beranda</Link>
             <span>&gt;</span>
             <span className="font-semibold text-[#092B52]">Profil</span>
           </div>
 
-          <h1 className="font-poppins text-[25px] font-bold text-[#092B52]">
+          <h1 className="font-readex text-3xl md:text-4xl font-extrabold text-[#092B52]">
             Profil Technopark
           </h1>
         </div>
       </section>
 
-      {/* ================= PROFIL TECHNOPARK ================= */}
-      <section className="bg-white px-8 py-10">
-        <div className="mx-auto grid max-w-295 items-center gap-12 lg:grid-cols-2">
-          {/* GAMBAR */}
-          <div className="mx-auto w-full max-w-[470px] overflow-hidden rounded-xl shadow-sm">
-            <img
-              src={demoday2}
-              alt="Demo Day Technopark"
-              className="h-auto w-full object-contain"
-            />
-          </div>
+      {/* PROFIL TECHNOPARK SECTION */}
+      <section className="bg-white py-14">
+        <div className="layout-container">
+          <div className="grid items-center gap-12 lg:grid-cols-2">
+            
+            {/* GAMBAR */}
+            <div className="mx-auto w-full max-w-[500px] overflow-hidden rounded-2xl shadow-md">
+              <img
+                src={demoday2}
+                alt="Demo Day Technopark"
+                className="h-auto w-full object-cover"
+              />
+            </div>
 
-          {/* DESKRIPSI */}
-          <div>
-            <h2 className="font-poppins mb-3 text-[19px] font-bold text-[#092B52]">
-              Membangun Ekosistem Inovasi
-            </h2>
+            {/* DESKRIPSI */}
+            <div>
+              <h2 className="font-readex text-2xl md:text-3xl font-extrabold text-[#092B52] mb-4">
+                Membangun Ekosistem Inovasi
+              </h2>
 
-            <p className="mb-3 text-[11px] leading-[1.7] text-gray-600">
-              BPM ITPLN adalah unit strategis di bawah Institut Teknologi PLN yang berdedikasi
-              penuh untuk memfasilitasi hilirisasi hasil karya sivitas akademika agar manfaatnya
-              dapat dirasakan langsung oleh masyarakat dan industri. Kehadiran BPM
-              dilatarbelakangi oleh tingginya potensi riset di lingkungan kampus yang
-              membutuhkan wadah pengelolaan terpadu.
-            </p>
+              <p className="mb-4 text-sm md:text-base leading-relaxed text-slate-600">
+                BPM ITPLN adalah unit strategis di bawah Institut Teknologi PLN yang berdedikasi
+                penuh untuk memfasilitasi hilirisasi hasil karya sivitas akademika agar manfaatnya
+                dapat dirasakan langsung oleh masyarakat dan industri. Kehadiran BPM
+                dilatarbelakangi oleh tingginya potensi riset di lingkungan kampus yang
+                membutuhkan wadah pengelolaan terpadu.
+              </p>
 
-            <p className="mb-3 text-[11px] leading-[1.7] text-gray-600">
-              Oleh karena itu, BPM mengambil peran sentral dalam mengawal tiga pilar utama:
-              pelaksanaan program Pengabdian kepada Masyarakat (PKM) yang terukur dan solutif,
-              fasilitasi dan perlindungan Hak Kekayaan Intelektual (HKI) guna mengamankan aset
-              akademik, serta penyediaan layanan Inkubasi Bisnis untuk mendampingi rintisan
-              usaha (startup) agar siap bersaing di pasar. Melalui ketiga pilar ini, kami hadir
-              untuk mengubah gagasan riset menjadi solusi nyata yang memiliki dampak komersial
-              dan sosial positif bagi negeri.
-            </p>
+              <p className="text-sm md:text-base leading-relaxed text-slate-600">
+                Oleh karena itu, BPM mengambil peran sentral dalam mengawal tiga pilar utama:
+                pelaksanaan program Pengabdian kepada Masyarakat (PKM) yang terukur dan solutif,
+                fasilitasi dan perlindungan Hak Kekayaan Intelektual (HKI) guna mengamankan aset
+                akademik, serta penyediaan layanan Inkubasi Bisnis untuk mendampingi rintisan
+                usaha (startup) agar siap bersaing di pasar. Melalui ketiga pilar ini, kami hadir
+                untuk mengubah gagasan riset menjadi solusi nyata yang memiliki dampak komersial
+                dan sosial positif bagi negeri.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ================= FOKUS PENGEMBANGAN ================= */}
-      <section className="bg-[#EEF3FF] px-8 py-12">
-        <div className="mx-auto max-w-295">
-          <div className="mb-9 text-center">
-            <h2 className="font-poppins text-[20px] font-bold text-[#092B52]">
+      {/* FOKUS PENGEMBANGAN SECTION */}
+      <section className="bg-[#EEF3FF] py-20">
+        <div className="layout-container">
+          <div className="mb-12 text-center">
+            <h2 className="font-readex text-2xl md:text-3xl font-extrabold text-[#092B52]">
               Fokus Pengembangan
             </h2>
-            <p className="mx-auto mt-2 max-w-[550px] text-[10px] leading-5 text-gray-600">
+            <p className="mx-auto mt-2 max-w-[600px] text-xs md:text-sm text-slate-600">
               Area strategis yang menjadi pilar utama dalam pengembangan inovasi di Technopark
               IT-PLN.
             </p>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-3">
             {focusAreas.map((area) => (
               <div
                 key={area.title}
-                className={`rounded-xl border-t-[2px] ${area.borderColor} bg-white px-5 py-5 text-center shadow-sm`}
+                className={`rounded-2xl border-t-4 ${area.borderColor} bg-white p-6 shadow-sm hover:shadow-md transition-shadow duration-300`}
               >
-                <div className={`mx-auto mb-4 flex h-9 w-9 items-center justify-center rounded-full ${area.iconBg} ${area.iconColor}`}>
-                  <area.icon className="h-[18px] w-[18px]" />
+                <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-xl ${area.iconBg} ${area.iconColor}`}>
+                  <area.icon className="h-6 w-6" />
                 </div>
-                <h3 className="font-poppins mb-2 text-[16px] font-bold text-[#092B52]">
+                <h3 className="font-readex mb-3 text-lg font-bold text-[#092B52]">
                   {area.title}
                 </h3>
-                <p className="text-left text-[10px] leading-[1.6] text-gray-500" style={{ textAlign: "justify" }}>
+                <p className="text-xs md:text-sm leading-relaxed text-slate-500">
                   {area.description}
                 </p>
               </div>
@@ -212,31 +211,31 @@ const Profil = () => {
         </div>
       </section>
 
-      {/* ================= FASILITAS UNGGULAN ================= */}
-      <section className="bg-white px-8 py-14">
-        <div className="mx-auto max-w-295">
-          <div className="mb-9 text-center">
-            <h2 className="font-poppins text-[20px] font-bold text-[#092B52]">
+      {/* FASILITAS UNGGULAN SECTION */}
+      {/* <section className="bg-white py-20">
+        <div className="layout-container">
+          <div className="mb-12 text-center">
+            <h2 className="font-readex text-2xl md:text-3xl font-extrabold text-[#092B52]">
               Produk Inovasi Unggulan
             </h2>
-            <p className="mx-auto mt-2 max-w-[550px] text-[10px] leading-5 text-gray-600">
+            <p className="mx-auto mt-2 max-w-[600px] text-xs md:text-sm text-slate-600">
               Karya hasil pendampingan Inkubasi Bisnis yang telah tervalidasi dan siap
               dikomersialisasikan.
             </p>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-3">
             {facilities.map((facility) => (
-              <div key={facility.title} className="group relative h-[260px] overflow-hidden rounded-xl shadow-sm">
+              <div key={facility.title} className="group relative h-80 overflow-hidden rounded-2xl shadow-md">
                 <img
                   src={facility.image}
                   alt={facility.title}
-                  className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#092B52]/85 via-[#092B52]/10 to-transparent" />
-                <div className="absolute bottom-4 left-5 right-5 text-white">
-                  <h3 className="font-poppins text-[13px] font-bold">{facility.title}</h3>
-                  <p className="mt-1 text-[10px] leading-[1.5] text-gray-100">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#092B52]/90 via-[#092B52]/30 to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6 text-white">
+                  <h3 className="font-readex text-lg font-bold">{facility.title}</h3>
+                  <p className="mt-2 text-xs md:text-sm leading-relaxed text-slate-200">
                     {facility.description}
                   </p>
                 </div>
@@ -244,45 +243,45 @@ const Profil = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
-      {/* ================= TIM PENGGERAK INOVASI ================= */}
-      <section className="bg-[#EEF3FF] px-8 py-14">
-        <div className="mx-auto max-w-295">
-          <div className="mb-9 text-center">
-            <h2 className="font-poppins text-[20px] font-bold text-[#092B52]">
+      {/* TIM PENGGERAK INOVASI SECTION */}
+      <section className=" py-20">
+        <div className="layout-container">
+          <div className="mb-12 text-center">
+            <h2 className="font-readex text-2xl md:text-3xl font-extrabold text-[#092B52]">
               Tim Penggerak Inovasi
             </h2>
-            <p className="mx-auto mt-2 max-w-[550px] text-[10px] leading-5 text-gray-600">
+            <p className="mx-auto mt-2 max-w-[600px] text-xs md:text-sm text-slate-600">
               Para profesional yang berdedikasi untuk mendukung perjalanan inovasi Anda.
             </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
             {teamMembers.map((member) => (
-              <div key={member.name} className="rounded-xl bg-white px-6 py-7 text-center shadow-sm">
+              <div key={member.name} className="rounded-2xl bg-white p-8 text-center shadow-sm hover:shadow-md transition-shadow duration-300">
                 <img
                   src={member.photo}
                   alt={member.name}
-                  className="mx-auto h-20 w-20 rounded-full object-cover"
+                  className="mx-auto h-24 w-24 rounded-full object-cover shadow-inner"
                 />
-                <h3 className="font-poppins mt-4 text-[13px] font-bold text-[#092B52]">
+                <h3 className="font-readex mt-5 text-lg font-bold text-[#092B52]">
                   {member.name}
                 </h3>
-                <p className="mt-1 text-[10px] text-gray-500">{member.role}</p>
+                <p className="mt-1 text-xs md:text-sm text-slate-500">{member.role}</p>
 
-                <div className="mt-4 flex items-center justify-center gap-2">
+                <div className="mt-6 flex items-center justify-center gap-3">
                   <a
                     href={`mailto:${member.email}`}
-                    className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue transition hover:bg-custom-blue hover:text-white"
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue transition hover:bg-custom-blue hover:text-white"
                   >
-                    <MailIcon className="h-3.5 w-[14px]" />
+                    <MailIcon className="h-4 w-4" />
                   </a>
                   <a
                     href="#"
-                    className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue transition hover:bg-custom-blue hover:text-white"
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue transition hover:bg-custom-blue hover:text-white"
                   >
-                    <LinkIcon className="h-3.5 w-[14px]" />
+                    <LinkIcon className="h-4 w-4" />
                   </a>
                 </div>
               </div>

@@ -19,7 +19,7 @@ const ReviewerDashboard = () => {
 
     const fetchDashboardData = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         const response = await axios.get(`${API_BASE_URL}/reviewer/dashboard`, {
           headers: { Authorization: `Bearer ${token}` },
         });

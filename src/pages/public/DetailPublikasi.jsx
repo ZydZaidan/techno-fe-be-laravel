@@ -1,7 +1,25 @@
-import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import API from '../../services/api';
-import defaultImg from '../../assets/img/itpln.jpeg';
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import API from "../../services/api";
+import defaultImg from "../../assets/img/itpln.jpeg";
+
+const BASE_URL = "http://localhost:5000";
+
+const ArrowLeftIcon = ({ className }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <line x1="19" y1="12" x2="5" y2="12" />
+    <polyline points="12 19 5 12 12 5" />
+  </svg>
+);
+
+const CalendarIcon = ({ className }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <rect x="3" y="4" width="18" height="18" rx="2" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="3" y1="10" x2="21" y2="10" />
+  </svg>
+);
 
 const DetailPublikasi = () => {
   const { id } = useParams();
@@ -16,7 +34,7 @@ const DetailPublikasi = () => {
           setArticle(res.data.data);
         }
       } catch (err) {
-        console.error('Gagal memuat detail artikel:', err);
+        console.error("Gagal memuat detail artikel:", err);
       } finally {
         setIsLoading(false);
       }
@@ -24,30 +42,97 @@ const DetailPublikasi = () => {
     void fetchDetail();
   }, [id]);
 
-  if (isLoading) return <div className="p-10 text-center text-xs text-slate-400">Memuat berita...</div>;
-  if (!article) return <div className="p-10 text-center text-xs text-slate-400">Artikel tidak ditemukan.</div>;
+  const getImageUrl = (url) => {
+    if (!url) return defaultImg;
+    return url.startsWith("http") ? url : `${BASE_URL}${url}`;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white font-poppins pt-28 pb-16 flex items-center justify-center">
+        <p className="text-xs text-slate-400">Memuat berita...</p>
+      </div>
+    );
+  }
+
+  if (!article) {
+    return (
+      <div className="min-h-screen bg-white font-poppins pt-28 pb-16 flex flex-col items-center justify-center gap-4">
+        <p className="text-xs text-slate-400">Artikel tidak ditemukan.</p>
+        <Link
+          to="/publikasi"
+          className="inline-flex items-center gap-2 rounded-xl bg-custom-blue px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90"
+        >
+          <ArrowLeftIcon className="h-3.5 w-3.5" />
+          Kembali ke Publikasi
+        </Link>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-white font-readex text-[#092B52] py-10 px-6">
-      <div className="max-w-3xl mx-auto space-y-6">
-        <Link to="/publikasi" className="text-xs text-custom-blue hover:underline">
-          &larr; Kembali ke Publikasi
-        </Link>
-        <span className="inline-block px-3 py-1 bg-sky-100 text-sky-700 text-xs font-semibold rounded-full">
-          {article.kategori}
-        </span>
-        <h1 className="text-2xl md:text-3xl font-bold font-poppins">{article.judul}</h1>
-        <p className="text-xs text-slate-400">
-          {new Date(article.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-        </p>
-        <img
-          src={article.gambar_url || defaultImg}
-          alt={article.judul}
-          className="w-full h-80 object-cover rounded-2xl shadow-sm"
-        />
-        <div className="text-sm leading-relaxed text-slate-700 whitespace-pre-line pt-4 border-t">
-          {article.konten}
+    <div className="min-h-screen bg-white font-poppins text-[#092B52] pt-28 pb-16 text-left">
+      <div className="layout-container max-w-4xl mx-auto space-y-6">
+        
+        {/* TOMBOL KEMBALI */}
+        <div>
+          <Link
+            to="/publikasi"
+            className="inline-flex items-center gap-2 rounded-xl bg-slate-100 hover:bg-slate-200 px-4 py-2 text-xs font-semibold text-[#092B52] transition-colors"
+          >
+            <ArrowLeftIcon className="h-3.5 w-3.5" />
+            <span>Kembali ke Publikasi</span>
+          </Link>
         </div>
+
+        {/* KATEGORI & HIGHLIGHT BADGE */}
+        <div className="flex items-center gap-2 pt-2">
+          <span className="inline-block px-3 py-1 bg-cyan-50 text-cyan-700 text-xs font-bold rounded-full">
+            {article.kategori || "Berita"}
+          </span>
+          {Boolean(article.is_highlight) && (
+            <span className="inline-block px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">
+              Highlight
+            </span>
+          )}
+        </div>
+
+        {/* JUDUL ARTIKEL */}
+        <h1 className="font-readex text-2xl md:text-4xl font-extrabold leading-snug text-[#092B52]">
+          {article.judul}
+        </h1>
+
+        {/* TANGGAL */}
+        <div className="flex items-center gap-1.5 text-xs text-slate-400">
+          <CalendarIcon className="h-3.5 w-3.5" />
+          <span>
+            {article.created_at
+              ? new Date(article.created_at).toLocaleDateString("id-ID", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })
+              : "-"}
+          </span>
+        </div>
+
+        {/* GAMBAR UTAMA */}
+        <div className="w-full h-72 md:h-105 overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 shadow-xs">
+          <img
+            src={getImageUrl(article.gambar_url)}
+            alt={article.judul}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.target.src = defaultImg;
+            }}
+          />
+        </div>
+
+        {/* ISI ARTIKEL */}
+        <div className="text-sm md:text-base leading-relaxed text-slate-700 whitespace-pre-line pt-6 border-t border-slate-100">
+          {article.isi_artikel || article.konten}
+        </div>
+
       </div>
     </div>
   );

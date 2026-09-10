@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
-
-// ================= IKON CUSTOM (SVG polos, tanpa library tambahan) =================
+// IKON CUSTOM SVG
 const MapPinIcon = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z" />
@@ -54,15 +54,12 @@ const SendIcon = ({ className }) => (
   </svg>
 );
 
-// ================= DATA KONTAK (ubah di sini sesuai kebutuhan) =================
 const contactInfo = {
-  address:
-    "Menara PLN, Jl. Lingkar Luar Barat Duri Kosambi, Cengkareng, Jakarta Barat 11750",
+  address: "Menara PLN, Jl. Lingkar Luar Barat Duri Kosambi, Cengkareng, Jakarta Barat 11750",
   email: "bpm@itpln.ac.id",
   phone: "021-5440342",
 };
 
-// Query lokasi untuk Google Maps embed (real-time, tanpa API key)
 const mapsQuery = encodeURIComponent(
   "Institut Teknologi PLN, Jl. Lingkar Luar Barat Duri Kosambi, Cengkareng, Jakarta Barat 11750"
 );
@@ -76,7 +73,7 @@ const Contact = () => {
     subject: "",
     message: "",
   });
-  const [status, setStatus] = useState(null); // null | "sending" | "sent"
+  const [status, setStatus] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -87,8 +84,6 @@ const Contact = () => {
     e.preventDefault();
     setStatus("sending");
 
-    // TODO: ganti bagian ini dengan pemanggilan API/backend kamu
-    // contoh: fetch("/api/contact", { method: "POST", body: JSON.stringify(form) })
     setTimeout(() => {
       setStatus("sent");
       setForm({ name: "", email: "", subject: "", message: "" });
@@ -96,220 +91,219 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white font-readex text-[#092B52]">
-      {/* ================= JUDUL / BREADCRUMB ================= */}
-      <section className="border-b border-gray-100 bg-white">
-        <div className="mx-auto max-w-295 px-8 py-6">
-          <div className="mb-1 flex items-center gap-1 text-[10px] text-gray-500">
-            <span>Beranda</span>
+    <div className="min-h-screen bg-white font-poppins text-[#092B52] pt-28 pb-16">
+      
+      {/* BREADCRUMB */}
+      <section className="border-b border-gray-100 bg-white py-6 mb-8 text-left">
+        <div className="layout-container">
+          <div className="mb-2 flex items-center gap-1.5 text-xs text-gray-500">
+            <Link to="/" className="hover:underline">Beranda</Link>
             <span>&gt;</span>
             <span className="font-semibold text-[#092B52]">Contact</span>
           </div>
-
-          <h1 className="font-poppins text-[25px] font-bold text-[#092B52]">
+          <h1 className="font-readex text-3xl md:text-4xl font-extrabold text-[#092B52]">
             Contact
           </h1>
         </div>
       </section>
 
-      {/* ================= KONTEN ================= */}
-      <section className="bg-[#F7F9FC] px-8 py-10">
-        <div className="mx-auto grid max-w-295 items-start gap-6 lg:grid-cols-2">
-          {/* ================= INFORMASI KONTAK + MAPS ================= */}
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-            <h2 className="font-poppins mb-5 text-[15px] font-bold text-[#092B52]">
-              Informasi Kontak
-            </h2>
+      {/* MAIN CONTENT */}
+      <section className="py-4 text-left">
+        <div className="layout-container">
+          <div className="grid gap-8 lg:grid-cols-2 items-start">
+            
+            {/* INFORMASI KONTAK & MAPS */}
+            <div className="rounded-2xl bg-white p-6 md:p-8 border border-slate-100 shadow-sm">
+              <h2 className="font-readex text-lg font-bold text-[#092B52] mb-6">
+                Informasi Kontak
+              </h2>
 
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue">
-                  <MapPinIcon className="h-3.5 w-3.5" />
-                </span>
+              <div className="space-y-5">
+                <div className="flex items-start gap-3.5">
+                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600">
+                    <MapPinIcon className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <p className="text-xs font-bold text-[#092B52]">Alamat</p>
+                    <p className="text-xs leading-relaxed text-slate-500 mt-0.5">
+                      {contactInfo.address}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3.5">
+                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600">
+                    <MailIcon className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <p className="text-xs font-bold text-[#092B52]">Email</p>
+                    <a
+                      href={`mailto:${contactInfo.email}`}
+                      className="text-xs leading-relaxed text-slate-500 hover:text-cyan-600 transition-colors mt-0.5 inline-block"
+                    >
+                      {contactInfo.email}
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3.5">
+                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600">
+                    <PhoneIcon className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <p className="text-xs font-bold text-[#092B52]">Telepon</p>
+                    <a
+                      href={`tel:${contactInfo.phone}`}
+                      className="text-xs leading-relaxed text-slate-500 hover:text-cyan-600 transition-colors mt-0.5 inline-block"
+                    >
+                      {contactInfo.phone}
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* MEDIA SOSIAL */}
+              <div className="mt-8 pt-6 border-t border-slate-100">
+                <p className="text-xs font-bold text-[#092B52] mb-3">Media Sosial</p>
+                <div className="flex items-center gap-2.5">
+                  <a
+                    href="#"
+                    aria-label="Bagikan"
+                    className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-600 hover:bg-[#092B52] hover:text-white transition-colors"
+                  >
+                    <ShareIcon className="h-4 w-4" />
+                  </a>
+                  <a
+                    href="#"
+                    aria-label="Instagram"
+                    className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-600 hover:bg-[#092B52] hover:text-white transition-colors"
+                  >
+                    <InstagramIcon className="h-4 w-4" />
+                  </a>
+                  <a
+                    href="#"
+                    aria-label="YouTube"
+                    className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-600 hover:bg-[#092B52] hover:text-white transition-colors"
+                  >
+                    <YoutubeIcon className="h-4 w-4" />
+                  </a>
+                </div>
+              </div>
+
+              {/* MAPS REAL-TIME */}
+              <div className="relative mt-8 h-60 w-full overflow-hidden rounded-xl border border-slate-100">
+                <iframe
+                  title="Lokasi Technopark IT-PLN"
+                  src={mapsEmbedSrc}
+                  className="w-full border-0"
+                  style={{ height: "calc(100% + 45px)", marginTop: "-45px" }}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allowFullScreen
+                />
+                <a
+                  href={mapsLinkSrc}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-[#092B52] shadow-sm hover:bg-slate-50 transition-colors"
+                >
+                  <MapPinIcon className="h-3.5 w-3.5 text-cyan-600" />
+                  Lihat di Google Maps
+                </a>
+              </div>
+            </div>
+
+            {/* FORM KIRIM PESAN */}
+            <div className="rounded-2xl bg-white p-6 md:p-8 border border-slate-100 shadow-sm">
+              <h2 className="font-readex text-lg font-bold text-[#092B52] mb-1">
+                Kirim Pesan
+              </h2>
+              <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+                Silakan isi formulir di bawah ini untuk mengirimkan pertanyaan atau masukan kepada kami.
+              </p>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <p className="text-[10px] font-semibold text-[#092B52]">Alamat</p>
-                  <p className="text-[10px] leading-[1.6] text-gray-500">
-                    {contactInfo.address}
+                  <label htmlFor="name" className="block text-xs font-semibold text-[#092B52] mb-1.5">
+                    Nama Lengkap
+                  </label>
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    required
+                    value={form.name}
+                    onChange={handleChange}
+                    placeholder="Masukkan nama lengkap"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-[#092B52] placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:outline-none transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="block text-xs font-semibold text-[#092B52] mb-1.5">
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="alamat@email.com"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-[#092B52] placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:outline-none transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="subject" className="block text-xs font-semibold text-[#092B52] mb-1.5">
+                    Subjek
+                  </label>
+                  <input
+                    id="subject"
+                    name="subject"
+                    type="text"
+                    required
+                    value={form.subject}
+                    onChange={handleChange}
+                    placeholder="Topik pesan"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-[#092B52] placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:outline-none transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="message" className="block text-xs font-semibold text-[#092B52] mb-1.5">
+                    Pesan / Masukan
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows={5}
+                    required
+                    value={form.message}
+                    onChange={handleChange}
+                    placeholder="Tuliskan pesan Anda di sini..."
+                    className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-[#092B52] placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:outline-none transition-colors"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={status === "sending"}
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-custom-yellow hover:opacity-90 px-5 py-3 text-xs font-bold text-[#092B52] transition shadow-xs disabled:opacity-60 cursor-pointer"
+                >
+                  <SendIcon className="h-3.5 w-3.5" />
+                  {status === "sending" ? "Mengirim..." : "Kirim Pesan"}
+                </button>
+
+                {status === "sent" && (
+                  <p className="text-center text-xs font-semibold text-emerald-600 pt-2">
+                    Pesan berhasil dikirim. Terima kasih!
                   </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue">
-                  <MailIcon className="h-3.5 w-3.5" />
-                </span>
-                <div>
-                  <p className="text-[10px] font-semibold text-[#092B52]">Email</p>
-                  <a
-                    href={`mailto:${contactInfo.email}`}
-                    className="text-[10px] leading-[1.6] text-gray-500 hover:text-custom-blue"
-                  >
-                    {contactInfo.email}
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue">
-                  <PhoneIcon className="h-3.5 w-3.5" />
-                </span>
-                <div>
-                  <p className="text-[10px] font-semibold text-[#092B52]">Telepon</p>
-                  <a
-                    href={`tel:${contactInfo.phone}`}
-                    className="text-[10px] leading-[1.6] text-gray-500 hover:text-custom-blue"
-                  >
-                    {contactInfo.phone}
-                  </a>
-                </div>
-              </div>
+                )}
+              </form>
             </div>
 
-            {/* MEDIA SOSIAL */}
-            <div className="mt-6">
-              <p className="mb-2 text-[10px] font-semibold text-[#092B52]">Media Sosial</p>
-              <div className="flex items-center gap-2">
-                <a
-                  href="#"
-                  aria-label="Bagikan"
-                  className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue transition hover:bg-custom-blue hover:text-white"
-                >
-                  <ShareIcon className="h-3.5 w-3.5" />
-                </a>
-                <a
-                  href="#"
-                  aria-label="Instagram"
-                  className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue transition hover:bg-custom-blue hover:text-white"
-                >
-                  <InstagramIcon className="h-3.5 w-3.5" />
-                </a>
-                <a
-                  href="#"
-                  aria-label="YouTube"
-                  className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue transition hover:bg-custom-blue hover:text-white"
-                >
-                  <YoutubeIcon className="h-3.5 w-3.5" />
-                </a>
-              </div>
-            </div>
-
-            {/* MAPS REAL-TIME (Google Maps embed, tanpa API key) */}
-            {/* Bagian atas iframe di-crop karena Google otomatis menampilkan
-                link "Open in Maps" bawaan di pojok kiri atas — kita pakai
-                tombol "Lihat di Google Maps" kita sendiri di bawah, jadi
-                yang bawaan disembunyikan supaya tidak dobel. */}
-            <div className="relative mt-6 h-55 w-full overflow-hidden rounded-xl">
-              <iframe
-                title="Lokasi Technopark IT-PLN"
-                src={mapsEmbedSrc}
-                className="w-full border-0"
-                style={{ height: "calc(100% + 45px)", marginTop: "-45px" }}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                allowFullScreen
-              />
-              <a
-                href={mapsLinkSrc}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute bottom-3 left-3 flex items-center gap-1 rounded-md bg-white px-3 py-1.5 text-[10px] font-semibold text-[#092B52] shadow-sm transition hover:bg-gray-50"
-              >
-                <MapPinIcon className="h-3 w-3 text-custom-blue" />
-                Lihat di Google Maps
-              </a>
-            </div>
-          </div>
-
-          {/* ================= FORM KIRIM PESAN ================= */}
-          <div className="rounded-xl bg-white p-6 shadow-sm">
-            <h2 className="font-poppins mb-1 text-[15px] font-bold text-[#092B52]">
-              Kirim Pesan
-            </h2>
-            <p className="mb-5 text-[10px] leading-[1.6] text-gray-500">
-              Silakan isi formulir di bawah ini untuk mengirimkan pertanyaan atau
-              masukan kepada kami.
-            </p>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label htmlFor="name" className="mb-1 block text-[10px] font-semibold text-[#092B52]">
-                  Nama Lengkap
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  required
-                  value={form.name}
-                  onChange={handleChange}
-                  placeholder="Masukkan nama lengkap"
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-[11px] text-[#092B52] placeholder:text-gray-400 focus:border-custom-blue focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="email" className="mb-1 block text-[10px] font-semibold text-[#092B52]">
-                  Email
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder="alamat@email.com"
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-[11px] text-[#092B52] placeholder:text-gray-400 focus:border-custom-blue focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="subject" className="mb-1 block text-[10px] font-semibold text-[#092B52]">
-                  Subjek
-                </label>
-                <input
-                  id="subject"
-                  name="subject"
-                  type="text"
-                  required
-                  value={form.subject}
-                  onChange={handleChange}
-                  placeholder="Topik pesan"
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-[11px] text-[#092B52] placeholder:text-gray-400 focus:border-custom-blue focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="message" className="mb-1 block text-[10px] font-semibold text-[#092B52]">
-                  Pesan/Masukan
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={5}
-                  required
-                  value={form.message}
-                  onChange={handleChange}
-                  placeholder="Tuliskan pesan Anda di sini..."
-                  className="w-full resize-none rounded-lg border border-gray-200 px-3 py-2 text-[11px] text-[#092B52] placeholder:text-gray-400 focus:border-custom-blue focus:outline-none"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={status === "sending"}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-custom-yellow px-4 py-2.5 text-[11px] font-semibold text-[#092B52] transition hover:opacity-90 disabled:opacity-60"
-              >
-                <SendIcon className="h-3.5 w-3.5" />
-                {status === "sending" ? "Mengirim..." : "Kirim Pesan"}
-              </button>
-
-              {status === "sent" && (
-                <p className="text-center text-[10px] font-medium text-[#16A77D]">
-                  Pesan berhasil dikirim. Terima kasih!
-                </p>
-              )}
-            </form>
           </div>
         </div>
       </section>

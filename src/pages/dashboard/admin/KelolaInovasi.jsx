@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
+const BASE_URL = 'http://localhost:5000'; // Sesuaikan jika port backend berbeda
+
 const KelolaInovasi = () => {
   const [inovasiList, setInovasiList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -9,19 +11,26 @@ const KelolaInovasi = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
 
-  // State Form Input
+  // State Form Input & File
   const [formData, setFormData] = useState({
     judul: '',
     kategori: '',
     deskripsi: '',
     pengembang: '',
-    gambar_url: ''
   });
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
 
-  // 1. Pindahkan fetchInovasi ke luar useEffect & bungkus dengan useCallback
+  // Helper function untuk format URL gambar
+  const getImageUrl = (url) => {
+    if (!url) return 'https://placehold.co/150x150?text=No+Image';
+    return url.startsWith('http') ? url : `${BASE_URL}${url}`;
+  };
+
+  // 1. Fetch Inovasi
   const fetchInovasi = useCallback(async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/techno/inovasi');
+      const res = await fetch(`${BASE_URL}/api/techno/inovasi`);
       const data = await res.json();
       if (data.success) {
         setInovasiList(data.data);
@@ -33,7 +42,7 @@ const KelolaInovasi = () => {
     }
   }, []);
 
-  // 2. Panggil fetchInovasi saat pertama kali render
+  // 2. Initial Fetch
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       fetchInovasi();
@@ -43,6 +52,7 @@ const KelolaInovasi = () => {
   }, [fetchInovasi]);
 
   const handleOpenModal = (item = null) => {
+    setImageFile(null); // Reset file upload
     if (item) {
       setEditingItem(item);
       setFormData({
@@ -50,8 +60,8 @@ const KelolaInovasi = () => {
         kategori: item.kategori || '',
         deskripsi: item.deskripsi || '',
         pengembang: item.pengembang || '',
-        gambar_url: item.gambar_url || ''
       });
+      setImagePreview(item.gambar_url ? getImageUrl(item.gambar_url) : '');
     } else {
       setEditingItem(null);
       setFormData({
@@ -59,8 +69,8 @@ const KelolaInovasi = () => {
         kategori: '',
         deskripsi: '',
         pengembang: '',
-        gambar_url: ''
       });
+      setImagePreview('');
     }
     setIsModalOpen(true);
   };
@@ -68,6 +78,8 @@ const KelolaInovasi = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingItem(null);
+    setImageFile(null);
+    setImagePreview('');
   };
 
   const handleInputChange = (e) => {
@@ -77,19 +89,39 @@ const KelolaInovasi = () => {
     });
   };
 
+  // Handle pilih file lokal
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Pakai FormData untuk kirim gabungan Teks & File
+    const submitData = new FormData();
+    submitData.append('judul', formData.judul);
+    submitData.append('kategori', formData.kategori);
+    submitData.append('deskripsi', formData.deskripsi);
+    submitData.append('pengembang', formData.pengembang);
+
+    if (imageFile) {
+      submitData.append('gambar', imageFile);
+    }
+
     try {
       const url = editingItem
-        ? `http://localhost:5000/api/techno/inovasi/${editingItem.id}`
-        : 'http://localhost:5000/api/techno/inovasi';
+        ? `${BASE_URL}/api/techno/inovasi/${editingItem.id}`
+        : `${BASE_URL}/api/techno/inovasi`;
 
       const method = editingItem ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
         method: method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: submitData
       });
 
       const data = await res.json();
@@ -105,7 +137,7 @@ const KelolaInovasi = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus data inovasi ini?')) {
       try {
-        const res = await fetch(`http://localhost:5000/api/techno/inovasi/${id}`, {
+        const res = await fetch(`${BASE_URL}/api/techno/inovasi/${id}`, {
           method: 'DELETE'
         });
         const data = await res.json();
@@ -201,7 +233,7 @@ const KelolaInovasi = () => {
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
                         <img
-                          src={item.gambar_url || 'https://via.placeholder.com/150'}
+                          src={getImageUrl(item.gambar_url)}
                           alt={item.judul}
                           className="w-10 h-10 rounded-lg object-cover bg-slate-100 border border-slate-100 shrink-0"
                         />
@@ -252,7 +284,7 @@ const KelolaInovasi = () => {
       {/* Modal Form Tambah / Edit */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-xl shadow-xl overflow-hidden font-poppins">
+          <div className="bg-white rounded-2xl w-full max-w-xl shadow-xl overflow-hidden font-poppins max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
               <h3 className="font-bold text-[#092B52]">
                 {editingItem ? 'Edit Data Inovasi' : 'Tambah Inovasi Baru'}
@@ -307,16 +339,36 @@ const KelolaInovasi = () => {
                 </div>
               </div>
 
+              {/* Upload Gambar & Preview */}
               <div>
-                <label className="block text-slate-700 font-semibold mb-1">URL Gambar</label>
-                <input
-                  type="text"
-                  name="gambar_url"
-                  value={formData.gambar_url}
-                  onChange={handleInputChange}
-                  placeholder="https://..."
-                  className="w-full px-3.5 py-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-1 focus:ring-[#188B9E]"
-                />
+                <label className="block text-slate-700 font-semibold mb-1">Gambar Inovasi</label>
+                <div className="space-y-3">
+                  {imagePreview && (
+                    <div className="relative w-full h-40 rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
+                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImageFile(null);
+                          setImagePreview('');
+                        }}
+                        className="absolute top-2 right-2 bg-rose-500 text-white p-1 rounded-full hover:bg-rose-600 transition shadow-md"
+                        title="Hapus Gambar"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-cyan-50 file:text-[#188B9E] hover:file:bg-cyan-100 cursor-pointer border rounded-xl p-1 bg-slate-50"
+                  />
+                </div>
               </div>
 
               <div>

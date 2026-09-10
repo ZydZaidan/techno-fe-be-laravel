@@ -4,7 +4,7 @@ const HeaderUser = ({ onToggleSidebar }) => {
   const [copied, setCopied] = useState(false);
 
   const [user] = useState(() => {
-    const savedUser = localStorage.getItem("user");
+    const savedUser = sessionStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
 

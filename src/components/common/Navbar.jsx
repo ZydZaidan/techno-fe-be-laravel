@@ -6,9 +6,9 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
-  // State User dari LocalStorage
+  // State User dari sessionStorage
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem("user");
+    const savedUser = sessionStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
@@ -25,7 +25,7 @@ const Navbar = () => {
   // Sync state user saat perpindahan halaman atau event storage trigger
   useEffect(() => {
     const checkUserStorage = () => {
-      const savedUser = localStorage.getItem("user");
+      const savedUser = sessionStorage.getItem("user");
       setUser(savedUser ? JSON.parse(savedUser) : null);
     };
 
@@ -60,8 +60,8 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
     setUser(null);
     closeAllMenus();
   };
@@ -82,16 +82,17 @@ const Navbar = () => {
     { name: "Contact", path: "/contact" },
   ];
 
- // Penentuan Navigasi Dashboard Berdasarkan Role DB
+  // Penentuan Navigasi Dashboard Berdasarkan Role DB
   const getDashboardPath = () => {
     if (!user) return "/login";
     const role = user.role?.toLowerCase();
-    
+
     if (role === "admin" || role === "administrator") return "/admin/dashboard";
     if (role === "verifikator") return "/verifikator/dashboard";
     if (role === "reviewer") return "/reviewer/dashboard";
-    if (role === "tenant" || role === "user" || role === "pengusul") return "/user/dashboard";
-    
+    if (role === "tenant" || role === "user" || role === "pengusul")
+      return "/user/dashboard";
+
     return "/user/dashboard"; // Default fallback jika user sudah login
   };
 
@@ -232,15 +233,17 @@ const Navbar = () => {
                     >
                       <svg
                         className="w-4 h-4 text-rose-500"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
                         fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                        viewBox="0 0 16 16"
                       >
                         <path
+                          stroke="currentColor"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth="2"
-                          d="M17 16l4-4m0 0l-4-4m4-4H7m6 4v1m0 16v-1"
+                          d="M4 8h11m0 0-4-4m4 4-4 4m-5 3H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h3"
                         />
                       </svg>
                       Logout
@@ -268,12 +271,32 @@ const Navbar = () => {
             className="p-2 rounded-lg text-white hover:bg-white/10 focus:outline-none transition-colors"
           >
             {isMobileMenuOpen ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               </svg>
             )}
           </button>
@@ -332,8 +355,18 @@ const Navbar = () => {
                   onClick={closeAllMenus}
                   className="flex items-center gap-2.5 text-xs font-medium text-slate-200 hover:text-custom-yellow py-1.5 transition-colors"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 00-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 00-1 1m-6 0h6" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 00-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 00-1 1m-6 0h6"
+                    />
                   </svg>
                   Dashboard
                 </Link>
@@ -342,9 +375,21 @@ const Navbar = () => {
                   onClick={handleLogout}
                   className="flex items-center gap-2.5 text-xs font-semibold text-rose-400 hover:text-rose-300 pt-2 transition-colors text-left"
                 >
-                  <svg className="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4-4H7m6 4v1m0 16v-1" />
-                  </svg>
+                  <svg
+                        className="w-4 h-4 text-rose-500"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 16 16"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M4 8h11m0 0-4-4m4 4-4 4m-5 3H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h3"
+                        />
+                      </svg>
                   Logout
                 </button>
               </div>

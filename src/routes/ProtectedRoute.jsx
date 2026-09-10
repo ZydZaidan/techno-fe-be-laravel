@@ -1,8 +1,8 @@
 import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = ({ allowedRoles }) => {
-  const token = localStorage.getItem("token");
-  const savedUser = localStorage.getItem("user");
+  const token = sessionStorage.getItem("token");
+  const savedUser = sessionStorage.getItem("user");
   const user = savedUser ? JSON.parse(savedUser) : null;
 
   // 1. Jika belum login (tidak ada token/user), tendang ke /login
