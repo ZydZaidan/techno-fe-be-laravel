@@ -14,22 +14,39 @@ const ReviewerDashboard = () => {
   const [recentAssigned, setRecentAssigned] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Helper untuk mengambil token dari Storage mana pun yang tersedia
+  const getToken = () => {
+    return sessionStorage.getItem('token') || localStorage.getItem('token');
+  };
+
   useEffect(() => {
     let isMounted = true;
 
     const fetchDashboardData = async () => {
       try {
-        const token = sessionStorage.getItem('token');
+        const token = getToken();
+
+        if (!token) {
+          console.error('Token otentikasi tidak ditemukan di sessionStorage maupun localStorage.');
+          if (isMounted) setIsLoading(false);
+          return;
+        }
+
         const response = await axios.get(`${API_BASE_URL}/reviewer/dashboard`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (isMounted && response.data.success) {
-          setStats(response.data.data.stats);
+          setStats(response.data.data.stats || {
+            totalAssigned: 0,
+            needReview: 0,
+            completedReview: 0,
+            totalLogbookPending: 0,
+          });
           setRecentAssigned(response.data.data.recentProposals || []);
         }
       } catch (error) {
-        console.error('Gagal mengambil data dashboard reviewer:', error);
+        console.error('Gagal mengambil data dashboard reviewer:', error.response?.data || error.message);
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -44,7 +61,6 @@ const ReviewerDashboard = () => {
 
   return (
     <div className="space-y-6 md:ml-64 font-poppins pt-8 px-4 md:px-8 pb-16 bg-[#F9FAFB] min-h-screen">
-
       {/* Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">

@@ -44,11 +44,20 @@ const SidebarVerifikator = ({ isOpen, onClose }) => {
     { name: 'Verifikasi Inkubasi', path: '/verifikator/inkubasi', icon: VerifikasiIcon },
   ];
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("user");
-    navigate("/", { replace: true });
-  };
+const handleLogout = () => {
+  // 1. Bersihkan SELURUH storage tempat token/user disimpan
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("user");
+
+  // 2. Trigger event biar komponen UI lain (seperti Header/Navbar) langsung update
+  window.dispatchEvent(new Event("storage"));
+  window.dispatchEvent(new Event("authChange"));
+
+  // 3. Redirect ke Landing Page / Login
+  navigate("/", { replace: true });
+};
 
   return (
     <>

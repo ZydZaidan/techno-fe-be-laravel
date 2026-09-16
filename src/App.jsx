@@ -1,5 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 // Layouts
 import PublicLayout from "./layouts/PublicLayout";
 import AdminLayout from "./layouts/AdminLayout";
@@ -31,7 +30,7 @@ import Settings from "./pages/Settings";
 import AdminDashboard from "./pages/dashboard/admin/AdminDashboard";
 import ManajemenUser from "./pages/dashboard/admin/ManajemenUser";
 import KelolaBerita from "./pages/dashboard/admin/KelolaBerita";
-import AuditLog from "./pages/dashboard/admin/AuditLog";
+// import AuditLog from "./pages/dashboard/admin/AuditLog";
 import KelolaInkubasi from "./pages/dashboard/admin/KelolaInkubasi";
 import KelolaInovasi from "./pages/dashboard/admin/KelolaInovasi";
 
@@ -70,7 +69,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* 3. UNIVERSAL SETTINGS PAGE (STANDALONE & TERPROTEKSI UNTUK SEMUA ROLE) */}
+        {/* 3. UNIVERSAL SETTINGS PAGE */}
         <Route
           element={
             <ProtectedRoute
@@ -93,10 +92,12 @@ function App() {
           element={<ProtectedRoute allowedRoles={["administrator", "admin"]} />}
         >
           <Route path="/admin" element={<AdminLayout />}>
+            {/* Auto redirect dari /admin ke /admin/dashboard */}
+            <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="users" element={<ManajemenUser />} />
             <Route path="berita" element={<KelolaBerita />} />
-            <Route path="audit-log" element={<AuditLog />} />
+            {/* <Route path="audit-log" element={<AuditLog />} /> */}
             <Route path="inkubasi" element={<KelolaInkubasi />} />
             <Route path="inovasi" element={<KelolaInovasi />} />
           </Route>
@@ -105,6 +106,8 @@ function App() {
         {/* 5. HALAMAN DASHBOARD TENANT / USER */}
         <Route element={<ProtectedRoute allowedRoles={["user", "tenant"]} />}>
           <Route path="/user" element={<UserLayout />}>
+            {/* Auto redirect dari /user ke /user/dashboard */}
+            <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<UserDashboard />} />
             <Route path="inkubasi/pengajuan" element={<FormInkubasi />} />
             <Route path="tracking" element={<TrackingStatus />} />
@@ -119,6 +122,8 @@ function App() {
           }
         >
           <Route path="/verifikator" element={<VerifikatorLayout />}>
+            {/* Auto redirect dari /verifikator ke /verifikator/dashboard */}
+            <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<VerifikatorDashboard />} />
             <Route path="inkubasi" element={<VerifikasiInkubasi />} />
           </Route>
@@ -131,11 +136,16 @@ function App() {
           }
         >
           <Route path="/reviewer" element={<ReviewerLayout />}>
+            {/* Auto redirect dari /reviewer ke /reviewer/dashboard */}
+            <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<ReviewerDashboard />} />
             <Route path="penilaian" element={<PenilaianProposal />} />
             <Route path="logbook" element={<ApprovalLogbook />} />
           </Route>
         </Route>
+
+        {/* 8. FALLBACK ROUTE 404 / PAGE NOT FOUND */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

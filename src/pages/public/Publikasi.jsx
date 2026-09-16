@@ -80,7 +80,7 @@ const Publikasi = () => {
             <span className="font-semibold text-[#092B52]">Publikasi</span>
           </div>
           <h1 className="font-readex text-3xl md:text-4xl font-extrabold text-[#092B52]">
-            Berita dan Pengumuman
+            Berita
           </h1>
         </div>
       </section>

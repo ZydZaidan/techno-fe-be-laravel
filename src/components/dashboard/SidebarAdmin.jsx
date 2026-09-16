@@ -19,11 +19,11 @@ const NewsIcon = ({ className }) => (
   </svg>
 );
 
-const AuditIcon = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-);
+// const AuditIcon = ({ className }) => (
+//   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+//   </svg>
+// );
 
 const GraduationIcon = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,14 +73,23 @@ const SidebarAdmin = ({ isOpen, onClose }) => {
     { name: 'Kelola Inovasi', path: '/admin/inovasi', icon: LightBulbIcon }, // MENU BARU INOVASI
     { name: 'Manajemen User', path: '/admin/users', icon: UserIcon },
     { name: 'Kelola Berita', path: '/admin/berita', icon: NewsIcon },
-    { name: 'Audit Log', path: '/admin/audit-log', icon: AuditIcon },
+    // { name: 'Audit Log', path: '/admin/audit-log', icon: AuditIcon },
   ];
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("user");
-    navigate("/", { replace: true });
-  };
+const handleLogout = () => {
+  // 1. Bersihkan SELURUH storage tempat token/user disimpan
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("user");
+
+  // 2. Trigger event biar komponen UI lain (seperti Header/Navbar) langsung update
+  window.dispatchEvent(new Event("storage"));
+  window.dispatchEvent(new Event("authChange"));
+
+  // 3. Redirect ke Landing Page / Login
+  navigate("/", { replace: true });
+};
 
   return (
     <>

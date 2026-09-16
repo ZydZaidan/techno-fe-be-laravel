@@ -1,16 +1,15 @@
 import axios from 'axios';
+import { getStoredToken, clearAuthStorage } from '../utils/authStorage';
 
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api/techno',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api/techno',
   timeout: 10000,
 });
 
-// Interceptor untuk menyisipkan token JWT otomatis
+// Interceptor Request
 API.interceptors.request.use(
   (config) => {
-    // Ambil token dari localStorage ATAU sessionStorage
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    
+    const token = getStoredToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -18,14 +17,13 @@ API.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
-// Tambahkan di api.js kamu
+
+// Interceptor Response
 API.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Jika backend kirim 401 (Unauthorized/Token Expired)
-      localStorage.clear();
-      sessionStorage.clear();
+      clearAuthStorage();
       if (window.location.pathname !== "/login") {
         window.location.href = "/login";
       }
@@ -34,7 +32,6 @@ API.interceptors.response.use(
   }
 );
 
-// Auth & Profile API Services
 export const getProfileAPI = () => API.get('/auth/me');
 export const updateProfileAPI = (data) => API.put('/auth/profile', data);
 export const changePasswordAPI = (data) => API.put('/auth/change-password', data);

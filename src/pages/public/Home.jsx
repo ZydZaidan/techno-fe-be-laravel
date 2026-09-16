@@ -1,7 +1,14 @@
 import { Link } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
 import API from "../../services/api"; // Axios instance
-
+import HeroImg from "../../assets/img/hero-img.svg";
+import aboutImg1 from "../../assets/img/about1.svg";
+import aboutImg2 from "../../assets/img/about2.png";
+import partner1 from "../../assets/img/partner-1.png";
+import partner2 from "../../assets/img/partner-2.png";
+import GroupsIcon from "@mui/icons-material/Groups";
+import RocketLaunchRoundedIcon from "@mui/icons-material/RocketLaunchRounded";
+import CopyrightRoundedIcon from '@mui/icons-material/CopyrightRounded';
 const Home = () => {
   const scrollRef = useRef(null);
   const [isMouseDown, setIsMouseDown] = useState(false);
@@ -21,21 +28,25 @@ const Home = () => {
       return imagePath;
     }
     const baseURL = API.defaults.baseURL || "http://localhost:5000";
-    const cleanBaseURL = baseURL.replace(/\/api\/techno\/?$/, "").replace(/\/api\/?$/, "");
-    return `${cleanBaseURL}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+    const cleanBaseURL = baseURL
+      .replace(/\/api\/techno\/?$/, "")
+      .replace(/\/api\/?$/, "");
+    return `${cleanBaseURL}${imagePath.startsWith("/") ? "" : "/"}${imagePath}`;
   };
 
   // Helper styling badge tag untuk Showcase
   const getTagBg = (tag) => {
     const formattedTag = tag?.toUpperCase() || "";
     if (formattedTag.includes("ALUMNI")) return "bg-amber-400 text-slate-900";
-    if (formattedTag.includes("RESEARCH")) return "bg-emerald-400 text-slate-900";
+    if (formattedTag.includes("RESEARCH"))
+      return "bg-emerald-400 text-slate-900";
     return "bg-cyan-400 text-slate-900"; // Default TENANT
   };
 
   // 🔴 FETCH DATA DARI API
-  useEffect(() => {
+useEffect(() => {
     const fetchData = async () => {
+      // Fetch berita terbaru
       try {
         setIsLoadingNews(true);
         const res = await API.get("/berita?limit=3");
@@ -50,14 +61,20 @@ const Home = () => {
         setIsLoadingNews(false);
       }
 
+      // Fetch showcase inovasi (dibatasi 7 inovasi terbaru)
       try {
         setIsLoadingShowcase(true);
-        const resInovasi = await API.get("/inovasi"); 
+        const resInovasi = await API.get("/inovasi");
+        let rawData = [];
+        
         if (resInovasi.data?.success) {
-          setShowcaseData(resInovasi.data.data);
+          rawData = resInovasi.data.data;
         } else if (Array.isArray(resInovasi.data)) {
-          setShowcaseData(resInovasi.data);
+          rawData = resInovasi.data;
         }
+
+        // Ambil maksimal 7 item terbaru
+        setShowcaseData(rawData.slice(0, 7));
       } catch (error) {
         console.error("Gagal mengambil data showcase inovasi:", error);
       } finally {
@@ -92,18 +109,17 @@ const Home = () => {
   };
 
   const partners = [
-    { id: 1, name: 'Mitra 1', logo: '/src/assets/img/partner-1.png' },
-    { id: 2, name: 'Mitra 2', logo: '/src/assets/img/partner-2.png' },
+    { id: 1, name: "Mitra 1", logo: partner1 },
+    { id: 2, name: "Mitra 2", logo: partner2 },
   ];
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-poppins">
-
       {/* HERO SECTION */}
       <section className="relative w-full min-h-screen flex items-center pt-32 pb-20">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/src/assets/img/hero-img.svg')" }}
+          style={{ backgroundImage: `url(${HeroImg})` }}
         >
           <div className="absolute inset-0 bg-linear-to-r from-[#031B33] via-[#093C5C]/90 to-[#1B799E]/80"></div>
         </div>
@@ -146,12 +162,12 @@ const Home = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="relative w-full h-100 sm:h-125">
               <img
-                src="/src/assets/img/hero-img.svg"
+                src={aboutImg2}
                 alt="Fasilitas Gedung Technopark"
                 className="absolute top-0 left-0 w-3/4 h-75 sm:h-100 object-cover rounded-3xl shadow-lg"
               />
               <img
-                src="/src/assets/img/about1.svg"
+                src={aboutImg1}
                 alt="Tim Diskusi Startup"
                 className="absolute bottom-0 right-0 w-2/3 h-62.5 sm:h-75 object-cover rounded-3xl shadow-2xl border-8 border-white"
               />
@@ -242,11 +258,9 @@ const Home = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow duration-300 flex flex-col justify-between items-start text-left">
               <div>
-                <div className="w-14 h-14 rounded-full bg-cyan-50 flex items-center justify-center mb-6">
-                  <svg className="w-6 h-6 text-custom-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414 1.414m2.828-9.9a9 9 0 0112.728 0M12 12h.01" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
+                 <div className="w-14 h-14 rounded-full bg-cyan-50 flex items-center justify-center mb-6">
+                  {/* MUI Icon diganti di sini */}
+                  <RocketLaunchRoundedIcon className="w-7! h-7! text-custom-cyan" />
                 </div>
                 <h3 className="font-readex text-xl font-bold text-[#1c3250] mb-3">
                   Inkubasi Bisnis
@@ -260,10 +274,9 @@ const Home = () => {
 
             <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow duration-300 flex flex-col justify-between items-start text-left">
               <div>
-                <div className="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center mb-6">
-                  <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 6l3 18h12l3-18H3zm3 0V4a2 2 0 012-2h8a2 2 0 012 2v2" />
-                  </svg>
+                <div className="w-14 h-14 rounded-full bg-cyan-50 flex items-center justify-center mb-6">
+                  {/* MUI Icon diganti di sini */}
+                  <CopyrightRoundedIcon className="w-7! h-7! text-custom-cyan" />
                 </div>
                 <h3 className="font-readex text-xl font-bold text-[#1c3250] mb-3">
                   Fasilitasi HKI
@@ -277,10 +290,9 @@ const Home = () => {
 
             <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow duration-300 flex flex-col justify-between items-start text-left">
               <div>
-                <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mb-6">
-                  <svg className="w-6 h-6 text-[#1c3250]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
+                <div className="w-14 h-14 rounded-full bg-cyan-50 flex items-center justify-center mb-6">
+                  {/* MUI Icon diganti di sini */}
+                  <GroupsIcon className="w-7! h-7! text-custom-cyan" />
                 </div>
                 <h3 className="font-readex text-xl font-bold text-[#1c3250] mb-3">
                   Co-Working Space
@@ -313,8 +325,18 @@ const Home = () => {
               className="inline-flex items-center gap-1.5 text-custom-cyan font-semibold hover:text-custom-blue transition-colors text-sm md:text-base group whitespace-nowrap"
             >
               Lihat Semua
-              <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              <svg
+                className="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
               </svg>
             </Link>
           </div>
@@ -333,19 +355,29 @@ const Home = () => {
             <style>{`.no-scrollbar::-webkit-scrollbar { display: none; }`}</style>
 
             {isLoadingShowcase ? (
-              <div className="w-full text-center py-10 text-slate-400">Memuat showcase inovasi...</div>
+              <div className="w-full text-center py-10 text-slate-400">
+                Memuat showcase inovasi...
+              </div>
             ) : showcaseData.length > 0 ? (
               showcaseData.map((item) => (
-                <div key={item.id} className="relative min-w-70 sm:min-w-[320px] h-110 rounded-3xl overflow-hidden shadow-lg group shrink-0">
+                <div
+                  key={item.id}
+                  className="relative min-w-70 sm:min-w-[320px] h-110 rounded-3xl overflow-hidden shadow-lg group shrink-0"
+                >
                   <img
-                    src={getImageUrl(item.gambar_url || item.img, "/src/assets/img/placeholder.jpg")}
+                    src={getImageUrl(
+                      item.gambar_url || item.img,
+                      "/src/assets/img/placeholder.jpg",
+                    )}
                     alt={item.judul || item.title}
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     draggable="false"
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-[#0b2447] via-[#0b2447]/60 to-transparent"></div>
                   <div className="absolute bottom-0 left-0 right-0 p-7 text-white z-10">
-                    <span className={`inline-block text-[8px] font-bold px-3 py-1 rounded-md tracking-wider mb-3 uppercase ${getTagBg(item.kategori || item.tag)}`}>
+                    <span
+                      className={`inline-block text-[8px] font-bold px-3 py-1 rounded-md tracking-wider mb-3 uppercase ${getTagBg(item.kategori || item.tag)}`}
+                    >
                       {item.kategori || item.tag || "TENANT"}
                     </span>
                     <h3 className="font-readex text-base font-bold text-white mb-2 leading-snug group-hover:text-cyan-300 transition-colors line-clamp-2">
@@ -358,7 +390,9 @@ const Home = () => {
                 </div>
               ))
             ) : (
-              <div className="w-full text-center py-10 text-slate-400">Belum ada inovasi dipublikasikan.</div>
+              <div className="w-full text-center py-10 text-slate-400">
+                Belum ada inovasi dipublikasikan.
+              </div>
             )}
           </div>
         </div>
@@ -378,7 +412,10 @@ const Home = () => {
 
           <div className="flex flex-wrap items-center justify-center gap-6 max-w-5xl mx-auto">
             {partners.map((partner) => (
-              <div key={partner.id} className="flex items-center justify-center mx-12">
+              <div
+                key={partner.id}
+                className="flex items-center justify-center mx-12"
+              >
                 <img
                   src={partner.logo}
                   alt={partner.name}
@@ -408,21 +445,36 @@ const Home = () => {
               className="inline-flex items-center gap-1.5 text-custom-cyan font-semibold hover:text-custom-blue transition-colors text-sm md:text-base group whitespace-nowrap"
             >
               Lihat Semua
-              <svg className="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              <svg
+                className="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
               </svg>
             </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {isLoadingNews ? (
-              <div className="col-span-3 text-center py-10 text-slate-400">Memuat berita terbaru...</div>
+              <div className="col-span-3 text-center py-10 text-slate-400">
+                Memuat berita terbaru...
+              </div>
             ) : latestNews.length > 0 ? (
               latestNews.map((news) => (
                 <div key={news.id} className="flex flex-col group">
                   <div className="relative w-full h-56 rounded-3xl overflow-hidden mb-5 bg-slate-200">
                     <img
-                      src={getImageUrl(news.gambar_url || news.gambar, "/src/assets/img/placeholder.jpg")}
+                      src={getImageUrl(
+                        news.gambar_url || news.gambar,
+                        "/src/assets/img/placeholder.jpg",
+                      )}
                       alt={news.judul}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
@@ -443,15 +495,27 @@ const Home = () => {
                       className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-[#1c3250] hover:text-custom-cyan transition-colors group/btn"
                     >
                       Read More
-                      <svg className="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      <svg
+                        className="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M17 8l4 4m0 0l-4 4m4-4H3"
+                        />
                       </svg>
                     </Link>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="col-span-3 text-center py-10 text-slate-400">Belum ada berita dipublikasikan.</div>
+              <div className="col-span-3 text-center py-10 text-slate-400">
+                Belum ada berita dipublikasikan.
+              </div>
             )}
           </div>
         </div>

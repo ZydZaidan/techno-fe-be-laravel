@@ -141,7 +141,7 @@ const Profil = () => {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             
             {/* GAMBAR */}
-            <div className="mx-auto w-full max-w-[500px] overflow-hidden rounded-2xl shadow-md">
+            <div className="mx-auto w-full max-w-125 overflow-hidden rounded-2xl shadow-md">
               <img
                 src={demoday2}
                 alt="Demo Day Technopark"
@@ -184,7 +184,7 @@ const Profil = () => {
             <h2 className="font-readex text-2xl md:text-3xl font-extrabold text-[#092B52]">
               Fokus Pengembangan
             </h2>
-            <p className="mx-auto mt-2 max-w-[600px] text-xs md:text-sm text-slate-600">
+            <p className="mx-auto mt-2 max-w-150 text-xs md:text-sm text-slate-600">
               Area strategis yang menjadi pilar utama dalam pengembangan inovasi di Technopark
               IT-PLN.
             </p>
@@ -252,7 +252,7 @@ const Profil = () => {
             <h2 className="font-readex text-2xl md:text-3xl font-extrabold text-[#092B52]">
               Tim Penggerak Inovasi
             </h2>
-            <p className="mx-auto mt-2 max-w-[600px] text-xs md:text-sm text-slate-600">
+            <p className="mx-auto mt-2 max-w-150 text-xs md:text-sm text-slate-600">
               Para profesional yang berdedikasi untuk mendukung perjalanan inovasi Anda.
             </p>
           </div>

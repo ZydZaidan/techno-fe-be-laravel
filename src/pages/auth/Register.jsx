@@ -12,7 +12,7 @@ const Register = () => {
     jurusan: "",
     password: "",
     confirmPassword: "",
-    role: "user", // Default Role
+    role: "user", // Locked, publik otomatis bertipe user
   });
 
   const [errorMsg, setErrorMsg] = useState("");
@@ -73,7 +73,7 @@ const Register = () => {
       return;
     }
 
-    if (formData.role === "user" && !formData.jurusan) {
+    if (!formData.jurusan) {
       setErrorMsg("Silakan pilih jurusan Anda!");
       return;
     }
@@ -86,9 +86,9 @@ const Register = () => {
         email: formData.email,
         nim_nidn: formData.nimNidn || null,
         no_hp: formData.noHp || null,
-        jurusan: formData.role === "user" ? formData.jurusan : null,
+        jurusan: formData.jurusan,
         password: formData.password,
-        role: formData.role,
+        role: "user",
       });
 
       if (response.data.success) {
@@ -113,6 +113,9 @@ const Register = () => {
           <h2 className="font-readex text-3xl font-extrabold text-[#1c3250]">
             Buat Akun Baru
           </h2>
+          <p className="text-xs text-slate-500 mt-1">
+            Pendaftaran khusus User / Tenant Pengusul
+          </p>
         </div>
 
         {/* Alert Error jika register gagal */}
@@ -124,23 +127,6 @@ const Register = () => {
 
         {/* Form Inputs */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Select Role */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-              Daftar Sebagai
-            </label>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-custom-cyan/50 focus:border-custom-cyan transition-all"
-            >
-              <option value="user">User / Tenant Pengusul</option>
-              <option value="verifikator">Verifikator</option>
-              <option value="reviewer">Reviewer / Mentor</option>
-            </select>
-          </div>
-
           {/* Input Nama Lengkap */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">
@@ -210,74 +196,72 @@ const Register = () => {
             />
           </div>
 
-          {/* Dropdown Jurusan - Hanya Muncul untuk Role 'user' */}
-          {formData.role === "user" && (
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Jurusan / Program Studi
-              </label>
-              <select
-                name="jurusan"
-                required
-                value={formData.jurusan}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-custom-cyan/50 focus:border-custom-cyan transition-all"
-              >
-                <option value="">-- Pilih Jurusan --</option>
-                <optgroup label="Fakultas Ketenagalistrikan dan Energi Terbarukan (FKET)">
-                  <option value="S1 Teknik Elektro">S1 Teknik Elektro</option>
-                  <option value="S1 Teknik Tenaga Listrik">
-                    S1 Teknik Tenaga Listrik
-                  </option>
-                  <option value="S1 Teknik Sistem Energi">
-                    S1 Teknik Sistem Energi
-                  </option>
-                  <option value="D3 Teknologi Listrik">
-                    D3 Teknologi Listrik
-                  </option>
-                </optgroup>
+          {/* Dropdown Jurusan */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+              Jurusan / Program Studi
+            </label>
+            <select
+              name="jurusan"
+              required
+              value={formData.jurusan}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-custom-cyan/50 focus:border-custom-cyan transition-all"
+            >
+              <option value="">-- Pilih Jurusan --</option>
+              <optgroup label="Fakultas Ketenagalistrikan dan Energi Terbarukan (FKET)">
+                <option value="S1 Teknik Elektro">S1 Teknik Elektro</option>
+                <option value="S1 Teknik Tenaga Listrik">
+                  S1 Teknik Tenaga Listrik
+                </option>
+                <option value="S1 Teknik Sistem Energi">
+                  S1 Teknik Sistem Energi
+                </option>
+                <option value="D3 Teknologi Listrik">
+                  D3 Teknologi Listrik
+                </option>
+              </optgroup>
 
-                <optgroup label="Fakultas Telematika Energi (FTE)">
-                  <option value="S1 Teknik Informatika">
-                    S1 Teknik Informatika
-                  </option>
-                  <option value="S1 Sistem Informasi">
-                    S1 Sistem Informasi
-                  </option>
-                  <option value="S1 Sains Data">S1 Sains Data</option>
-                </optgroup>
+              <optgroup label="Fakultas Telematika Energi (FTE)">
+                <option value="S1 Teknik Informatika">
+                  S1 Teknik Informatika
+                </option>
+                <option value="S1 Sistem Informasi">
+                  S1 Sistem Informasi
+                </option>
+                <option value="S1 Sains Data">S1 Sains Data</option>
+              </optgroup>
 
-                <optgroup label="Fakultas Teknologi dan Bisnis Energi (FTBE)">
-                  <option value="S1 Teknik Mesin">S1 Teknik Mesin</option>
-                  <option value="S1 Teknik Sipil">S1 Teknik Sipil</option>
-                  <option value="S1 Teknik Industri">S1 Teknik Industri</option>
-                  <option value="S1 Kewirausahaan / Bisnis Energi">
-                    S1 Kewirausahaan / Bisnis Energi
-                  </option>
-                  <option value="D3 Teknik Mesin">D3 Teknik Mesin</option>
-                </optgroup>
+              <optgroup label="Fakultas Teknologi dan Bisnis Energi (FTBE)">
+                <option value="S1 Teknik Mesin">S1 Teknik Mesin</option>
+                <option value="S1 Teknik Sipil">S1 Teknik Sipil</option>
+                <option value="S1 Teknik Industri">S1 Teknik Industri</option>
+                <option value="S1 Kewirausahaan / Bisnis Energi">
+                  S1 Kewirausahaan / Bisnis Energi
+                </option>
+                <option value="D3 Teknik Mesin">D3 Teknik Mesin</option>
+              </optgroup>
 
-                <optgroup label="Fakultas Teknologi Infrastruktur dan Kewilayahan (FTIK)">
-                  <option value="S1 Geografi">S1 Geografi</option>
-                  <option value="S1 Teknik Lingkungan">
-                    S1 Teknik Lingkungan
-                  </option>
-                  <option value="D4 Teknik Rekayasa Pengelolaan & Pemeliharaan Bangunan Sipil">
-                    D4 Teknik Rekayasa Pengelolaan & Pemeliharaan Bangunan
-                    Sipil
-                  </option>
-                </optgroup>
+              <optgroup label="Fakultas Teknologi Infrastruktur dan Kewilayahan (FTIK)">
+                <option value="S1 Geografi">S1 Geografi</option>
+                <option value="S1 Teknik Lingkungan">
+                  S1 Teknik Lingkungan
+                </option>
+                <option value="D4 Teknik Rekayasa Pengelolaan & Pemeliharaan Bangunan Sipil">
+                  D4 Teknik Rekayasa Pengelolaan & Pemeliharaan Bangunan
+                  Sipil
+                </option>
+              </optgroup>
 
-                <optgroup label="Lainnya">
-                  <option value="Umum / Luar Kampus">
-                    Umum / Luar Kampus
-                  </option>
-                </optgroup>
-              </select>
-            </div>
-          )}
+              <optgroup label="Lainnya">
+                <option value="Umum / Luar Kampus">
+                  Umum / Luar Kampus
+                </option>
+              </optgroup>
+            </select>
+          </div>
 
-          {/* Input Password dengan Toggle Mata */}
+          {/* Input Password */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               Password
@@ -336,10 +320,9 @@ const Register = () => {
               </button>
             </div>
 
-            {/* Checklist Validasi Kriteria Password */}
+            {/* Checklist Validasi Password */}
             {(isPasswordFocused || formData.password.length > 0) && (
               <div className="mt-3.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1.5 transition-all">
-                {/* Dynamic Warning Jumlah Karakter */}
                 {formData.password.length > 0 && formData.password.length < 8 && (
                   <p className="text-red-500 font-medium text-[11px] mb-1">
                     ⚠️ Password masih kurang (minimal 8 karakter)
@@ -395,7 +378,7 @@ const Register = () => {
             )}
           </div>
 
-          {/* Input Konfirmasi Password dengan Toggle Mata */}
+          {/* Input Konfirmasi Password */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               Konfirmasi Password
@@ -453,7 +436,6 @@ const Register = () => {
               </button>
             </div>
 
-            {/* Peringatan Realtime Konfirmasi Password */}
             {formData.confirmPassword.length > 0 &&
               formData.password !== formData.confirmPassword && (
                 <p className="text-[11px] text-red-500 mt-1 font-medium">

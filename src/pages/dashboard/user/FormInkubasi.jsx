@@ -6,6 +6,8 @@ const FormInkubasi = () => {
   const [checkingActive, setCheckingActive] = useState(true);
   const [activeInkubasi, setActiveInkubasi] = useState(null);
 
+  const [isFormOpen, setIsFormOpen] = useState(true);
+  
   // Form utama
   const [formData, setFormData] = useState({
     nama_tim: "",
@@ -27,27 +29,35 @@ const FormInkubasi = () => {
 
   // --- CEK STATUS INKUBASI AKTIF SAAT LOAD ---
   useEffect(() => {
-    const checkActiveInkubasi = async () => {
+    const checkFormAndActiveStatus = async () => {
       try {
+        // 1. Cek Pendaftaran Buka/Tutup dari Admin
+        const statusRes = await API.get("/pengajuan-inkubasi/form-status");
+        if (statusRes.data?.success) {
+          // Ambil is_active dengan fallback aman (jika bernilai boolean atau string 'true')
+          const statusValue = statusRes.data?.data?.is_active ?? statusRes.data?.is_active;
+          setIsFormOpen(statusValue === true || statusValue === 'true' || statusValue === 1);
+        }
+
+        // 2. Cek Pengajuan Aktif milik User
         const res = await API.get("/pengajuan-inkubasi/dashboard");
-        if (res.data.success && res.data.data.pengajuanTerbaru) {
+        if (res.data?.success && res.data?.data?.pengajuanTerbaru) {
           const pengajuan = res.data.data.pengajuanTerbaru;
-          // Jika status BUKAN 'Selesai', simpan data pengajuan untuk mengunci form
           if (pengajuan.status_inkubasi !== "Selesai") {
             setActiveInkubasi(pengajuan);
           }
         }
       } catch (error) {
-        console.error("Gagal mengecek status inkubasi aktif:", error);
+        console.error("Gagal mengecek status pendaftaran/inkubasi:", error);
       } finally {
         setCheckingActive(false);
       }
     };
 
-    checkActiveInkubasi();
+    checkFormAndActiveStatus();
   }, []);
 
-  // --- HANDLER INPUT UTAMA ---
+  // Handler input utama
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -62,9 +72,7 @@ const FormInkubasi = () => {
 
   // --- OTOMATISASI KETUA TIM (Auto-Check via User Code) ---
   useEffect(() => {
-    if (!ketua.user_code.trim()) {
-      return;
-    }
+    if (!ketua.user_code.trim()) return;
 
     const timer = setTimeout(async () => {
       setKetua((prev) => ({ ...prev, status: "loading" }));
@@ -79,7 +87,7 @@ const FormInkubasi = () => {
       } catch {
         setKetua((prev) => ({ ...prev, status: "error", id_user: null }));
       }
-    }, 500); // Debounce 500ms
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [ketua.user_code]);
@@ -107,7 +115,6 @@ const FormInkubasi = () => {
     setAnggotaList(list);
   };
 
-  // Auto-Check User Code Anggota
   const checkAnggotaCode = async (index, code) => {
     if (!code.trim()) return;
 
@@ -134,7 +141,6 @@ const FormInkubasi = () => {
     }
   };
 
-  // Effect Debounce untuk setiap Anggota
   useEffect(() => {
     const timers = anggotaList.map((item, index) => {
       if (item.user_code && item.status === "loading") {
@@ -152,6 +158,10 @@ const FormInkubasi = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!isFormOpen) {
+      alert("Pendaftaran inkubasi saat ini sedang ditutup oleh Admin!");
+      return;
+    }
     if (activeInkubasi) {
       alert("Anda masih memiliki pengajuan inkubasi yang sedang berjalan!");
       return;
@@ -170,14 +180,14 @@ const FormInkubasi = () => {
       data.append("deskripsi", formData.deskripsi);
       data.append("file_dokumen", fileDokumen);
 
-     const payloadAnggota = anggotaList.map((item) => ({
-  nama_anggota: item.nama_anggota,
-  user_code: item.user_code,
-  id_user: item.id_user,
-  peran: "Anggota",
-}));
+      const payloadAnggota = anggotaList.map((item) => ({
+        nama_anggota: item.nama_anggota,
+        user_code: item.user_code,
+        id_user: item.id_user,
+        peran: "Anggota",
+      }));
 
-data.append("anggota", JSON.stringify(payloadAnggota));
+      data.append("anggota", JSON.stringify(payloadAnggota));
 
       const res = await API.post("/pengajuan-inkubasi", data, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -193,7 +203,6 @@ data.append("anggota", JSON.stringify(payloadAnggota));
         setKetua({ nama: "", user_code: "", id_user: null, status: null });
         setAnggotaList([]);
         setFileDokumen(null);
-        // Set state activeInkubasi agar form langsung terkunci setelah submit
         setActiveInkubasi(res.data.data);
       }
     } catch (error) {
@@ -213,6 +222,8 @@ data.append("anggota", JSON.stringify(payloadAnggota));
     );
   }
 
+  const isFormDisabled = !isFormOpen || !!activeInkubasi;
+
   return (
     <div className="space-y-6 md:ml-64 font-poppins pt-8 px-4 md:px-8 pb-16 bg-[#F9FAFB] min-h-screen">
       <div>
@@ -224,35 +235,32 @@ data.append("anggota", JSON.stringify(payloadAnggota));
         </p>
       </div>
 
-      {/* ⚠️ Banner Peringatan jika masih ada inkubasi berjalan */}
-      {activeInkubasi && (
+      {/* 🛑 BANNER 1: Pendaftaran Ditutup oleh Admin */}
+      {!isFormOpen && (
+        <div className="bg-rose-50 border border-rose-200 rounded-2xl p-5 text-rose-900 space-y-1">
+          <div className="flex items-center gap-2">
+            <svg className="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h4 className="font-bold text-sm">Pendaftaran Inkubasi Ditutup</h4>
+          </div>
+          <p className="text-xs leading-relaxed text-rose-800">
+            Saat ini penerimaan proposal inkubasi sedang ditutup. Silakan tunggu pembukaan batch berikutnya.
+          </p>
+        </div>
+      )}
+
+      {/* ⚠️ BANNER 2: Peringatan Inkubasi Berjalan */}
+      {isFormOpen && activeInkubasi && (
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-amber-900 space-y-1">
           <div className="flex items-center gap-2">
-            <svg
-              className="w-5 h-5 text-amber-600 shrink-0"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
+            <svg className="w-5 h-5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <h4 className="font-bold text-sm">
-              Pengajuan Baru Tidak Tersedia
-            </h4>
+            <h4 className="font-bold text-sm">Pengajuan Baru Tidak Tersedia</h4>
           </div>
           <p className="text-xs leading-relaxed text-amber-800">
-            Kamu saat ini masih memiliki program inkubasi berjalan dengan tim{" "}
-            <strong>"{activeInkubasi.nama_tim}"</strong> (Status:{" "}
-            <span className="font-semibold underline">
-              {activeInkubasi.status_inkubasi || activeInkubasi.status}
-            </span>
-            ). Kamu hanya bisa mengajukan proposal baru setelah seluruh proses
-            inkubasi sebelumnya berstatus <strong>"Selesai"</strong>.
+            Kamu saat ini masih memiliki program inkubasi berjalan dengan tim <strong>"{activeInkubasi.nama_tim}"</strong>.
           </p>
         </div>
       )}
@@ -272,18 +280,8 @@ data.append("anggota", JSON.stringify(payloadAnggota));
           onClick={handleDownloadTemplate}
           className="inline-flex items-center gap-2 px-4 py-2.5 bg-sky-50 text-[#188B9E] hover:bg-[#188B9E] hover:text-white font-bold text-xs rounded-xl transition-all border border-sky-100 shadow-xs shrink-0 cursor-pointer"
         >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-            />
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
           Download Template
         </button>
@@ -301,7 +299,7 @@ data.append("anggota", JSON.stringify(payloadAnggota));
               type="text"
               name="nama_tim"
               required
-              disabled={!!activeInkubasi}
+              disabled={isFormDisabled}
               value={formData.nama_tim}
               onChange={handleChange}
               placeholder="Nama Tim"
@@ -316,7 +314,7 @@ data.append("anggota", JSON.stringify(payloadAnggota));
             </label>
             <select
               name="kategori_bisnis"
-              disabled={!!activeInkubasi}
+              disabled={isFormDisabled}
               value={formData.kategori_bisnis}
               onChange={handleChange}
               className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#188B9E]/50 disabled:bg-slate-100 disabled:cursor-not-allowed"
@@ -358,15 +356,13 @@ data.append("anggota", JSON.stringify(payloadAnggota));
                   placeholder="User Code Ketua (cth: USR-001)"
                   value={ketua.user_code}
                   required
-                  disabled={!!activeInkubasi}
+                  disabled={isFormDisabled}
                   onChange={(e) => {
                     const userCode = e.target.value;
                     setKetua((prev) => ({
                       ...prev,
                       user_code: userCode,
-                      ...(userCode.trim()
-                        ? {}
-                        : { status: null, id_user: null }),
+                      ...(userCode.trim() ? {} : { status: null, id_user: null }),
                     }));
                   }}
                   className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#188B9E]/50 disabled:bg-slate-100 disabled:cursor-not-allowed"
@@ -377,7 +373,7 @@ data.append("anggota", JSON.stringify(payloadAnggota));
                   type="text"
                   placeholder="Nama Ketua (Otomatis terisi)"
                   value={ketua.nama}
-                  disabled={!!activeInkubasi}
+                  disabled={isFormDisabled}
                   onChange={(e) => setKetua({ ...ketua, nama: e.target.value })}
                   className={`w-full px-3.5 py-2.5 border rounded-xl text-xs focus:outline-none disabled:bg-slate-100 disabled:cursor-not-allowed ${
                     ketua.status === "success"
@@ -395,24 +391,14 @@ data.append("anggota", JSON.stringify(payloadAnggota));
               <label className="block text-xs font-bold text-[#092B52]">
                 Anggota Tim
               </label>
-              {!activeInkubasi && (
+              {!isFormDisabled && (
                 <button
                   type="button"
                   onClick={handleAddAnggota}
                   className="inline-flex items-center gap-1 text-xs font-bold text-[#188B9E] hover:text-[#092B52] cursor-pointer"
                 >
-                  <svg
-                    className="w-3.5 h-3.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 4v16m8-8H4"
-                    />
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                   </svg>
                   Tambah Anggota
                 </button>
@@ -420,10 +406,7 @@ data.append("anggota", JSON.stringify(payloadAnggota));
             </div>
 
             {anggotaList.map((item, index) => (
-              <div
-                key={index}
-                className="p-4 rounded-xl border border-slate-200 bg-white space-y-2"
-              >
+              <div key={index} className="p-4 rounded-xl border border-slate-200 bg-white space-y-2">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[11px] font-semibold text-slate-500">
                     Anggota {index + 1}
@@ -444,7 +427,7 @@ data.append("anggota", JSON.stringify(payloadAnggota));
                         Code tidak valid
                       </span>
                     )}
-                    {!activeInkubasi && (
+                    {!isFormDisabled && (
                       <button
                         type="button"
                         onClick={() => handleRemoveAnggota(index)}
@@ -461,20 +444,16 @@ data.append("anggota", JSON.stringify(payloadAnggota));
                     type="text"
                     placeholder="User Code Anggota"
                     value={item.user_code}
-                    disabled={!!activeInkubasi}
-                    onChange={(e) =>
-                      handleAnggotaChange(index, "user_code", e.target.value)
-                    }
+                    disabled={isFormDisabled}
+                    onChange={(e) => handleAnggotaChange(index, "user_code", e.target.value)}
                     className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#188B9E]/50 disabled:bg-slate-100 disabled:cursor-not-allowed"
                   />
                   <input
                     type="text"
                     placeholder="Nama Anggota (Otomatis terisi)"
                     value={item.nama_anggota}
-                    disabled={!!activeInkubasi}
-                    onChange={(e) =>
-                      handleAnggotaChange(index, "nama_anggota", e.target.value)
-                    }
+                    disabled={isFormDisabled}
+                    onChange={(e) => handleAnggotaChange(index, "nama_anggota", e.target.value)}
                     className={`w-full px-3.5 py-2.5 border rounded-xl text-xs focus:outline-none disabled:bg-slate-100 disabled:cursor-not-allowed ${
                       item.status === "success"
                         ? "bg-emerald-50 border-emerald-300 text-emerald-900 font-medium"
@@ -495,7 +474,7 @@ data.append("anggota", JSON.stringify(payloadAnggota));
               name="deskripsi"
               rows="4"
               required
-              disabled={!!activeInkubasi}
+              disabled={isFormDisabled}
               value={formData.deskripsi}
               onChange={handleChange}
               placeholder="Jelaskan secara ringkas mengenai inovasi Anda..."
@@ -513,7 +492,7 @@ data.append("anggota", JSON.stringify(payloadAnggota));
               type="file"
               accept=".pdf"
               required
-              disabled={!!activeInkubasi}
+              disabled={isFormDisabled}
               onChange={handleFileChange}
               className="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#188B9E] file:text-white hover:file:bg-[#092B52] disabled:bg-slate-100 disabled:cursor-not-allowed"
             />
@@ -522,11 +501,13 @@ data.append("anggota", JSON.stringify(payloadAnggota));
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={loading || !!activeInkubasi}
+            disabled={loading || isFormDisabled}
             className="w-full py-3 bg-[#188B9E] hover:bg-[#092B52] text-white font-bold rounded-xl transition-all shadow-sm text-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {loading
               ? "Mengunggah Proposal..."
+              : !isFormOpen
+              ? "Pendaftaran Sedang Ditutup"
               : activeInkubasi
               ? "Selesaikan Inkubasi Aktif untuk Mengirim Baru"
               : "Kirim Pengajuan Inkubasi"}

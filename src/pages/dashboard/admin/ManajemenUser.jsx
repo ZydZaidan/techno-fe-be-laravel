@@ -7,6 +7,19 @@ const ManajemenUser = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterRole, setFilterRole] = useState("Semua");
 
+  // State Modal & Form Tambah User
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    nama: "",
+    email: "",
+    password: "",
+    role: "user",
+    nim_nidn: "",
+    jurusan: "",
+    no_hp: "",
+  });
+
   // Fetch daftar seluruh pengguna dari Backend
   const fetchUsers = useCallback(async () => {
     try {
@@ -28,6 +41,40 @@ const ManajemenUser = () => {
     }, 0);
     return () => clearTimeout(timer);
   }, [fetchUsers]);
+
+  // Handle Input Change Form Modal
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Handle Submit Form Tambah User Baru
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const response = await API.post("/admin/users", formData);
+      if (response.data?.success) {
+        alert(response.data.message || "User berhasil dibuat!");
+        setIsModalOpen(false);
+        setFormData({
+          nama: "",
+          email: "",
+          password: "",
+          role: "user",
+          nim_nidn: "",
+          jurusan: "",
+          no_hp: "",
+        });
+        fetchUsers();
+      }
+    } catch (error) {
+      console.error("Gagal membuat user:", error);
+      alert(error.response?.data?.message || "Gagal membuat pengguna baru.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Handle Ubah Role Pengguna
   const handleRoleChange = async (userId, newRole) => {
@@ -97,6 +144,12 @@ const ManajemenUser = () => {
             Kelola hak akses dan peran akun administrator, verifikator, reviewer, dan pengguna.
           </p>
         </div>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="px-4 py-2.5 bg-[#188B9E] hover:bg-[#137181] text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center justify-center gap-2 self-start sm:self-auto"
+        >
+          <span>➕</span> Tambah Pengguna
+        </button>
       </div>
 
       {/* Filter & Control Bar */}
@@ -152,7 +205,7 @@ const ManajemenUser = () => {
               Tidak ada pengguna yang ditemukan.
             </p>
           ) : (
-            <table className="w-full text-left text-xs min-w-[700px]">
+            <table className="w-full text-left text-xs min-w-175">
               <thead className="bg-[#F8FAFC] text-slate-600 font-semibold border-b border-slate-100 uppercase text-[11px]">
                 <tr>
                   <th className="p-4">User Code / Nama</th>
@@ -173,7 +226,6 @@ const ManajemenUser = () => {
                     </td>
                     <td className="p-4 text-slate-600 font-medium">{u.email}</td>
                     <td className="p-4">
-                      {/* Dropdown Change Role langsung */}
                       <select
                         value={u.role || "user"}
                         onChange={(e) => handleRoleChange(u.id, e.target.value)}
@@ -218,6 +270,151 @@ const ManajemenUser = () => {
           )}
         </div>
       </div>
+
+      {/* Modal Tambah User */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="font-bold text-[#092B52] text-base">
+                Tambah Akun Pengguna Baru
+              </h3>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 font-bold text-lg"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateUser} className="p-6 space-y-4 text-xs">
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">
+                  Nama Lengkap *
+                </label>
+                <input
+                  type="text"
+                  name="nama"
+                  required
+                  value={formData.nama}
+                  onChange={handleInputChange}
+                  placeholder="Masukkan nama lengkap"
+                  className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-1 focus:ring-[#188B9E] outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    placeholder="nama@domain.com"
+                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-1 focus:ring-[#188B9E] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Password *
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    required
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    placeholder="Min 8 karakter"
+                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-1 focus:ring-[#188B9E] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Role *
+                  </label>
+                  <select
+                    name="role"
+                    value={formData.role}
+                    onChange={handleInputChange}
+                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-1 focus:ring-[#188B9E] outline-none bg-white"
+                  >
+                    <option value="user">User / Tenant</option>
+                    <option value="verifikator">Verifikator</option>
+                    <option value="reviewer">Reviewer</option>
+                    <option value="administrator">Administrator</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    NIM / NIDN (Opsional)
+                  </label>
+                  <input
+                    type="text"
+                    name="nim_nidn"
+                    value={formData.nim_nidn}
+                    onChange={handleInputChange}
+                    placeholder="Nomor Induk"
+                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-1 focus:ring-[#188B9E] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Jurusan (Opsional)
+                  </label>
+                  <input
+                    type="text"
+                    name="jurusan"
+                    value={formData.jurusan}
+                    onChange={handleInputChange}
+                    placeholder="Contoh: Teknik Informatika"
+                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-1 focus:ring-[#188B9E] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    No. HP (Opsional)
+                  </label>
+                  <input
+                    type="text"
+                    name="no_hp"
+                    value={formData.no_hp}
+                    onChange={handleInputChange}
+                    placeholder="0812..."
+                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-1 focus:ring-[#188B9E] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-4 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 bg-[#188B9E] hover:bg-[#137181] text-white rounded-xl font-semibold transition shadow-sm disabled:opacity-50"
+                >
+                  {isSubmitting ? "Menyimpan..." : "Simpan User"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

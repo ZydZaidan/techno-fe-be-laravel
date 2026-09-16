@@ -6,10 +6,15 @@ const KelolaInkubasi = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // State untuk Toggle Master Pendaftaran Inkubasi (Aktif / Nonaktif)
+  const [isFormActive, setIsFormActive] = useState(true);
+  const [isTogglingSetting, setIsTogglingSetting] = useState(false);
+
   // Filter States
   const [filterBulan, setFilterBulan] = useState("");
   const [filterStatus, setFilterStatus] = useState("Inkubasi"); // Default menampilkan yang sedang berjalan
 
+  // Fetch Data Master List
   const fetchMasterData = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -24,12 +29,68 @@ const KelolaInkubasi = () => {
     }
   }, []);
 
+  // Fetch Status Setting Pengajuan Inkubasi (Buka / Tutup)
+  const fetchInkubasiSetting = useCallback(async () => {
+    try {
+      const res = await API.get("/admin/inkubasi-setting");
+      if (res.data?.success) {
+        // Safe check: membaca is_active / is_open baik dari res.data maupun res.data.data
+        const statusValue =
+          res.data?.is_active ??
+          res.data?.is_open ??
+          res.data?.data?.is_active ??
+          res.data?.data?.is_open;
+
+        setIsFormActive(Boolean(statusValue));
+      }
+    } catch (error) {
+      console.error("Gagal mengambil status pengaturan inkubasi:", error);
+    }
+  }, []);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       void fetchMasterData();
+      void fetchInkubasiSetting();
     }, 0);
     return () => clearTimeout(timer);
-  }, [fetchMasterData]);
+  }, [fetchMasterData, fetchInkubasiSetting]);
+
+  // Handler Toggle Slider Pendaftaran
+  const handleToggleSetting = async () => {
+    const nextState = !isFormActive;
+    const confirmMsg = `Apakah Anda yakin ingin ${
+      nextState ? "MEMBUKA" : "MENUTUP"
+    } pendaftaran pengajuan inkubasi?`;
+
+    if (!window.confirm(confirmMsg)) return;
+
+    setIsTogglingSetting(true);
+    try {
+      // Mengirim payload lengkap (is_active & is_open) agar kompatibel dengan handler backend mana pun
+      const response = await API.put("/admin/inkubasi-setting", {
+        is_active: nextState,
+        is_open: nextState,
+        isOpen: nextState,
+      });
+
+      if (response.data?.success) {
+        setIsFormActive(nextState);
+        alert(
+          `Pendaftaran inkubasi berhasil ${
+            nextState ? "DIBUKA" : "DITUTUP"
+          }.`
+        );
+      }
+    } catch (error) {
+      console.error("Gagal mengupdate status pendaftaran:", error);
+      alert(
+        error.response?.data?.message || "Gagal mengubah status pendaftaran."
+      );
+    } finally {
+      setIsTogglingSetting(false);
+    }
+  };
 
   // Logika Multi-Filter (Bulan & Status)
   const filteredList = useMemo(() => {
@@ -45,7 +106,9 @@ const KelolaInkubasi = () => {
       result = result.filter((item) => {
         if (!item.created_at) return false;
         const date = new Date(item.created_at);
-        const yearMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+        const yearMonth = `${date.getFullYear()}-${String(
+          date.getMonth() + 1
+        ).padStart(2, "0")}`;
         return yearMonth === filterBulan;
       });
     }
@@ -93,7 +156,6 @@ const KelolaInkubasi = () => {
     if (!window.confirm(confirmMsg)) return;
 
     try {
-      // Endpoint BE yang akan kita buat nanti
       const response = await API.put(`/admin/inkubasi/${id}/status`, {
         status: newStatus,
       });
@@ -114,7 +176,6 @@ const KelolaInkubasi = () => {
     if (!window.confirm(confirmMsg)) return;
 
     try {
-      // Endpoint BE yang akan kita buat nanti
       const response = await API.delete(`/admin/inkubasi/${id}`);
 
       if (response.data?.success) {
@@ -129,6 +190,7 @@ const KelolaInkubasi = () => {
 
   return (
     <div className="space-y-6 md:ml-64 font-poppins pt-8 px-4 md:px-8 pb-16 bg-[#F9FAFB] min-h-screen">
+      {/* Header Page & Slider Button Toggle (Pojok Kanan Atas) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-[#092B52]">
@@ -137,6 +199,40 @@ const KelolaInkubasi = () => {
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Pantau seluruh riwayat proposal, ubah status, dan tetapkan kelulusan program inkubasi.
           </p>
+        </div>
+
+        {/* Slider Button Activation Toggle */}
+        <div className="flex items-center gap-3 bg-white p-2.5 px-4 rounded-2xl border border-slate-200/80 shadow-xs shrink-0 self-start sm:self-auto">
+          <div className="flex flex-col text-right">
+            <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">
+              Status Pendaftaran
+            </span>
+            <span
+              className={`text-xs font-bold ${
+                isFormActive ? "text-emerald-600" : "text-rose-500"
+              }`}
+            >
+              {isFormActive ? "Pendaftaran Buka" : "Pendaftaran Ditutup"}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleToggleSetting}
+            disabled={isTogglingSetting}
+            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-50 ${
+              isFormActive ? "bg-[#188B9E]" : "bg-slate-300"
+            }`}
+            role="switch"
+            aria-checked={isFormActive}
+            title={isFormActive ? "Klik untuk menutup pendaftaran" : "Klik untuk membuka pendaftaran"}
+          >
+            <span
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                isFormActive ? "translate-x-5" : "translate-x-0"
+              }`}
+            />
+          </button>
         </div>
       </div>
 
@@ -183,7 +279,7 @@ const KelolaInkubasi = () => {
           </div>
         </div>
 
-        {/* Tombol Bulk Update (Luluskan Semua dalam Filter Aktif) */}
+        {/* Tombol Bulk Update */}
         <button
           onClick={handleSelesaikanSemua}
           disabled={isSubmitting || validForCompletion.length === 0}
@@ -247,7 +343,6 @@ const KelolaInkubasi = () => {
                         : "-"}
                     </td>
                     <td className="py-3.5 px-4">
-                      {/* Dropdown Interaktif Ubah Status Per Baris */}
                       <select
                         value={item.status_inkubasi || "Pending"}
                         onChange={(e) => handleStatusChange(item.id, e.target.value)}
@@ -268,7 +363,6 @@ const KelolaInkubasi = () => {
                       </select>
                     </td>
                     <td className="py-3.5 px-4 text-right">
-                      {/* Tombol Hapus Baris */}
                       <button
                         onClick={() => handleDeleteInkubasi(item.id, item.nama_tim)}
                         className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl text-[11px] font-semibold transition inline-flex items-center gap-1"

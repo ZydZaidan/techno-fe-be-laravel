@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
-
+import TipsAndUpdatesRoundedIcon from "@mui/icons-material/TipsAndUpdatesRounded";
+import PsychologyRoundedIcon from "@mui/icons-material/PsychologyRounded";
+import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded';
 const Inkubasi = () => {
   const navigate = useNavigate();
 
@@ -18,10 +20,14 @@ const Inkubasi = () => {
     if (role === "user" || role === "tenant") {
       navigate("/user/inkubasi/pengajuan");
     } else if (role === "admin" || role === "administrator") {
-      alert("Akun Admin tidak dapat mendaftarkan inkubasi tenant. Silakan gunakan akun tenant/user.");
+      alert(
+        "Akun Admin tidak dapat mendaftarkan inkubasi tenant. Silakan gunakan akun tenant/user.",
+      );
       navigate("/admin/dashboard");
     } else if (role === "verifikator") {
-      alert("Akun Verifikator memiliki akses evaluasi, bukan untuk pendaftaran tenant.");
+      alert(
+        "Akun Verifikator memiliki akses evaluasi, bukan untuk pendaftaran tenant.",
+      );
       navigate("/verifikator/dashboard");
     } else if (role === "reviewer") {
       alert("Akun Reviewer bertugas mereview proposal, bukan mendaftar.");
@@ -39,11 +45,7 @@ const Inkubasi = () => {
       title: "Pra-Inkubasi",
       desc: "Validasi ide bisnis, pembentukan tim yang solid, dan penyusunan model bisnis awal yang terukur.",
       iconBg: "bg-cyan-50 text-cyan-600",
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-        </svg>
-      ),
+      icon: <TipsAndUpdatesRoundedIcon className="w-6! h-6!" />,
     },
     {
       id: "2",
@@ -51,11 +53,7 @@ const Inkubasi = () => {
       title: "Inkubasi",
       desc: "Pengembangan MVP, mentoring intensif, legalitas usaha, dan persiapan penetrasi pasar.",
       iconBg: "bg-cyan-100 text-[#092B52]",
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      ),
+      icon: <PsychologyRoundedIcon className="w-6! h-6!" />,
     },
     {
       id: "3",
@@ -63,11 +61,7 @@ const Inkubasi = () => {
       title: "Akselerasi",
       desc: "Scaling up bisnis, akses pendanaan lanjutan, ekspansi pasar, dan kemitraan strategis.",
       iconBg: "bg-[#092B52] text-white",
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-        </svg>
-      ),
+      icon: <TrendingUpRoundedIcon className="w-6! h-6!" />,
     },
   ];
 
@@ -107,12 +101,13 @@ const Inkubasi = () => {
 
   return (
     <div className="min-h-screen bg-white font-poppins text-[#092B52] pt-28 pb-16 text-left">
-      
       {/* BREADCRUMB */}
       <section className="border-b border-gray-100 bg-white py-6">
         <div className="layout-container">
           <div className="mb-2 flex items-center gap-1.5 text-xs text-gray-500">
-            <Link to="/" className="hover:underline">Beranda</Link>
+            <Link to="/" className="hover:underline">
+              Beranda
+            </Link>
             <span>&gt;</span>
             <span className="font-semibold text-[#092B52]">Inkubasi</span>
           </div>
@@ -143,7 +138,9 @@ const Inkubasi = () => {
                 </span>
 
                 <div className="relative z-10 w-full">
-                  <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-6 shadow-xs ${step.iconBg}`}>
+                  <div
+                    className={`w-14 h-14 rounded-full flex items-center justify-center mb-6 shadow-xs ${step.iconBg}`}
+                  >
                     {step.icon}
                   </div>
 
@@ -164,7 +161,6 @@ const Inkubasi = () => {
       <section className="w-full bg-white py-12 border-y border-slate-100">
         <div className="layout-container">
           <div className="bg-slate-900 rounded-3xl p-8 md:p-12 text-white flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden shadow-md">
-            
             {/* Hiasan background visual */}
             <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -176,7 +172,9 @@ const Inkubasi = () => {
                 Penasaran Dengan Produk Hasil Inkubasi Kami?
               </h3>
               <p className="text-slate-300 text-xs md:text-sm leading-relaxed">
-                Jelajahi berbagai produk, dApp, startup, dan hasil riset inovatif ciptaan tenant serta alumni program inkubasi technopark.
+                Jelajahi berbagai produk, dApp, startup, dan hasil riset
+                inovatif ciptaan tenant serta alumni program inkubasi
+                technopark.
               </p>
             </div>
 
@@ -201,7 +199,6 @@ const Inkubasi = () => {
                 </svg>
               </Link>
             </div>
-
           </div>
         </div>
       </section>
@@ -209,7 +206,7 @@ const Inkubasi = () => {
       {/* 🚀 3. SECTION JARINGAN MENTOR EXPERT */}
       <section className="w-full bg-[#f8fafc] py-16">
         <div className="layout-container">
-          <div className="bg-gradient-to-b from-[#eef7ff] to-[#e4f0fc] rounded-3xl p-8 md:p-12 border border-blue-100/60 shadow-xs text-center">
+          <div className="bg-linear-to-b from-[#eef7ff] to-[#e4f0fc] rounded-3xl p-8 md:p-12 border border-blue-100/60 shadow-xs text-center">
             <div className="max-w-xl mx-auto mb-12">
               <h2 className="font-readex text-2xl md:text-3xl font-extrabold text-[#092B52] mb-2">
                 Jaringan Mentor Expert
@@ -221,7 +218,10 @@ const Inkubasi = () => {
 
             <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
               {mentors.map((mentor) => (
-                <div key={mentor.id} className="flex flex-col items-center group">
+                <div
+                  key={mentor.id}
+                  className="flex flex-col items-center group"
+                >
                   <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-white shadow-md mb-3 bg-white group-hover:scale-105 transition-transform duration-300">
                     <img
                       src={mentor.img}
@@ -245,7 +245,7 @@ const Inkubasi = () => {
       {/* 🚀 4. SECTION CTA BANNER DAFTAR */}
       <section className="w-full bg-[#f8fafc] pb-16">
         <div className="layout-container">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-cyan-200 via-blue-100 to-teal-100 p-8 md:p-14 border border-cyan-100/50 shadow-xs flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="relative overflow-hidden rounded-3xl bg-linear-to-r from-cyan-200 via-blue-100 to-teal-100 p-8 md:p-14 border border-cyan-100/50 shadow-xs flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="max-w-xl text-left">
               <h2 className="font-readex text-2xl md:text-4xl font-extrabold text-[#0b2447] leading-tight mb-3">
                 Punya Ide Bisnis Brilian? Mari Wujudkan Bersama Kami.
@@ -280,7 +280,6 @@ const Inkubasi = () => {
           </div>
         </div>
       </section>
-
     </div>
   );
 };

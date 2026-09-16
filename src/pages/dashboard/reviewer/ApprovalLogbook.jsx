@@ -16,19 +16,31 @@ const ApprovalLogbook = () => {
     catatan_mentor: '',
   });
 
+  // Helper untuk mengambil token dari Storage mana pun yang tersedia
+  const getToken = () => {
+    return sessionStorage.getItem('token') || localStorage.getItem('token');
+  };
+
   const fetchLogbooks = useCallback(async () => {
     try {
       setIsLoading(true);
-      const token = sessionStorage.getItem('token');
+      const token = getToken();
+
+      if (!token) {
+        console.error('Token otentikasi tidak ditemukan di sessionStorage maupun localStorage.');
+        setIsLoading(false);
+        return;
+      }
+
       const response = await axios.get(`${API_BASE_URL}/reviewer/logbook`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.data.success) {
-        setLogbooks(response.data.data);
+        setLogbooks(response.data.data || []);
       }
     } catch (error) {
-      console.error('Gagal mengambil daftar logbook:', error);
+      console.error('Gagal mengambil daftar logbook:', error.response?.data || error.message);
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +67,13 @@ const ApprovalLogbook = () => {
     e.preventDefault();
     try {
       setIsSubmitting(true);
-      const token = sessionStorage.getItem('token');
+      const token = getToken();
+
+      if (!token) {
+        alert('Sesi login telah habis. Silakan login kembali.');
+        return;
+      }
+
       const response = await axios.put(
         `${API_BASE_URL}/reviewer/logbook/${selectedLogbook.id}`,
         approvalData,

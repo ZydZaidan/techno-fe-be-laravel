@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-
+import logoWhite from "../../assets/img/logo-white.svg"; 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -131,10 +131,10 @@ const Navbar = () => {
         {/* LOGO */}
         <Link to="/" onClick={closeAllMenus}>
           <img
-            src="/src/assets/img/logo-white.svg"
-            alt="Logo Technopark"
-            className="h-12 md:h-14 transition-transform hover:scale-105 duration-200"
-          />
+  src={logoWhite}
+  alt="Logo Technopark"
+  className="h-12 md:h-14 transition-transform hover:scale-105 duration-200"
+/>
         </Link>
 
         {/* ================= DESKTOP MENU (MD to UP) ================= */}
