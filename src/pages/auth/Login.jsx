@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import HeroImg from "../../assets/img/hero-img.svg";
 import API from "../../services/api";
 
 const Login = () => {
@@ -101,7 +102,7 @@ const Login = () => {
       <div className="hidden lg:flex lg:w-1/2 relative bg-[#0d3b66] justify-center items-center overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-tr from-[#004e92] via-[#000428]/80 to-[#004e92]/90 z-10 opacity-90" />
         <img
-          src="/src/assets/img/hero-img.svg"
+          src={HeroImg}
           alt="Technopark IT-PLN"
           className="absolute inset-0 w-full h-full object-cover"
         />
