@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import API from "../../services/api";
+import API, { getImageUrl } from "../../services/api";
 import defaultImg from "../../assets/img/itpln.jpeg";
-
-const BASE_URL = "http://localhost:5000";
 
 const ArrowLeftIcon = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -22,13 +20,16 @@ const CalendarIcon = ({ className }) => (
 );
 
 const DetailPublikasi = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // Mengambil ID dari URL (/publikasi/:id)
   const [article, setArticle] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
 
   useEffect(() => {
     const fetchDetail = async () => {
       try {
+        setIsLoading(true);
+        // NEMBAK API GET /berita/:id
         const res = await API.get(`/berita/${id}`);
         if (res.data?.success) {
           setArticle(res.data.data);
@@ -39,13 +40,12 @@ const DetailPublikasi = () => {
         setIsLoading(false);
       }
     };
-    void fetchDetail();
+
+    if (id) {
+      void fetchDetail();
+    }
   }, [id]);
 
-  const getImageUrl = (url) => {
-    if (!url) return defaultImg;
-    return url.startsWith("http") ? url : `${BASE_URL}${url}`;
-  };
 
   if (isLoading) {
     return (
@@ -73,8 +73,6 @@ const DetailPublikasi = () => {
   return (
     <div className="min-h-screen bg-white font-poppins text-[#092B52] pt-28 pb-16 text-left">
       <div className="layout-container max-w-4xl mx-auto space-y-6">
-        
-        {/* TOMBOL KEMBALI */}
         <div>
           <Link
             to="/publikasi"
@@ -85,7 +83,6 @@ const DetailPublikasi = () => {
           </Link>
         </div>
 
-        {/* KATEGORI & HIGHLIGHT BADGE */}
         <div className="flex items-center gap-2 pt-2">
           <span className="inline-block px-3 py-1 bg-cyan-50 text-cyan-700 text-xs font-bold rounded-full">
             {article.kategori || "Berita"}
@@ -97,12 +94,10 @@ const DetailPublikasi = () => {
           )}
         </div>
 
-        {/* JUDUL ARTIKEL */}
         <h1 className="font-readex text-2xl md:text-4xl font-extrabold leading-snug text-[#092B52]">
           {article.judul}
         </h1>
 
-        {/* TANGGAL */}
         <div className="flex items-center gap-1.5 text-xs text-slate-400">
           <CalendarIcon className="h-3.5 w-3.5" />
           <span>
@@ -116,23 +111,18 @@ const DetailPublikasi = () => {
           </span>
         </div>
 
-        {/* GAMBAR UTAMA */}
         <div className="w-full h-72 md:h-105 overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 shadow-xs">
           <img
             src={getImageUrl(article.gambar_url)}
             alt={article.judul}
             className="w-full h-full object-cover"
-            onError={(e) => {
-              e.target.src = defaultImg;
-            }}
+            onError={(e) => { e.target.src = defaultImg; }}
           />
         </div>
 
-        {/* ISI ARTIKEL */}
         <div className="text-sm md:text-base leading-relaxed text-slate-700 whitespace-pre-line pt-6 border-t border-slate-100">
           {article.isi_artikel || article.konten}
         </div>
-
       </div>
     </div>
   );

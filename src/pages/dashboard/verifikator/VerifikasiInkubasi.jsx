@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import API from "../../../services/api";
+import API,{getFileUrl} from "../../../services/api";
 
 const VerifikasiInkubasi = () => {
   const [pengajuanList, setPengajuanList] = useState([]);
@@ -19,8 +19,8 @@ const VerifikasiInkubasi = () => {
     const getData = async () => {
       try {
         const [resPengajuan, resReviewer] = await Promise.all([
-          API.get("/verifikator/pengajuan"),
-          API.get("/verifikator/reviewers"),
+          API.get("/techno/verifikator/pengajuan"),
+          API.get("/techno/verifikator/reviewers"),
         ]);
 
         if (isMounted) {
@@ -45,8 +45,8 @@ const VerifikasiInkubasi = () => {
     setLoading(true);
     try {
       const [resPengajuan, resReviewer] = await Promise.all([
-        API.get("/verifikator/pengajuan"),
-        API.get("/verifikator/reviewers"),
+        API.get("/techno/verifikator/pengajuan"),
+        API.get("/techno/verifikator/reviewers"),
       ]);
 
       if (resPengajuan.data?.success) setPengajuanList(resPengajuan.data.data || []);
@@ -74,7 +74,7 @@ const VerifikasiInkubasi = () => {
     setIsSubmitting(true);
 
     try {
-      const res = await API.put(`/verifikator/pengajuan/${selectedItem.id}`, {
+      const res = await API.put(`/techno/verifikator/pengajuan/${selectedItem.id}`, {
         status_verifikasi: statusVerifikasi,
         id_reviewer: idReviewer || null,
         catatan_verifikator: catatanVerifikator,
@@ -187,7 +187,7 @@ const VerifikasiInkubasi = () => {
                     <td className="p-4">
                       {item.file_dokumen ? (
                         <a
-                          href={`${import.meta.env.VITE_FILE_BASE_URL || "http://localhost:5000"}${item.file_dokumen}`}
+                          href={getFileUrl(item.file_dokumen)}
                           target="_blank"
                           rel="noreferrer"
                           className="inline-flex items-center gap-1.5 text-[#188B9E] hover:underline font-medium"

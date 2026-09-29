@@ -27,35 +27,44 @@ const FormInkubasi = () => {
   const [anggotaList, setAnggotaList] = useState([]);
   const [fileDokumen, setFileDokumen] = useState(null);
 
-  // --- CEK STATUS INKUBASI AKTIF SAAT LOAD ---
-  useEffect(() => {
-    const checkFormAndActiveStatus = async () => {
-      try {
-        // 1. Cek Pendaftaran Buka/Tutup dari Admin
-        const statusRes = await API.get("/pengajuan-inkubasi/form-status");
-        if (statusRes.data?.success) {
-          // Ambil is_active dengan fallback aman (jika bernilai boolean atau string 'true')
-          const statusValue = statusRes.data?.data?.is_active ?? statusRes.data?.is_active;
-          setIsFormOpen(statusValue === true || statusValue === 'true' || statusValue === 1);
-        }
+// --- CEK STATUS INKUBASI AKTIF SAAT LOAD ---
+useEffect(() => {
+  const checkFormAndActiveStatus = async () => {
+    try {
+      // 1. Cek Pendaftaran Buka/Tutup dari Admin
+      const statusRes = await API.get("/techno/inkubasi/form-status");
+      
+      if (statusRes.data?.success) {
+        // Ambil isOpen (dengan fallback ke is_active jika ada perubahan di backend)
+        const statusValue = statusRes.data?.isOpen ?? statusRes.data?.data?.isOpen ?? statusRes.data?.is_active;
 
-        // 2. Cek Pengajuan Aktif milik User
-        const res = await API.get("/pengajuan-inkubasi/dashboard");
-        if (res.data?.success && res.data?.data?.pengajuanTerbaru) {
-          const pengajuan = res.data.data.pengajuanTerbaru;
-          if (pengajuan.status_inkubasi !== "Selesai") {
-            setActiveInkubasi(pengajuan);
-          }
-        }
-      } catch (error) {
-        console.error("Gagal mengecek status pendaftaran/inkubasi:", error);
-      } finally {
-        setCheckingActive(false);
+        // Cek boolean / string / number
+        const openStatus = 
+          statusValue === true || 
+          statusValue === "true" || 
+          statusValue === 1 || 
+          statusValue === "1";
+
+        setIsFormOpen(openStatus);
       }
-    };
 
-    checkFormAndActiveStatus();
-  }, []);
+      // 2. Cek Pengajuan Aktif milik User
+      const res = await API.get("/techno/inkubasi/dashboard");
+      if (res.data?.success && res.data?.data?.pengajuanTerbaru) {
+        const pengajuan = res.data.data.pengajuanTerbaru;
+        if (pengajuan.status_inkubasi !== "Selesai") {
+          setActiveInkubasi(pengajuan);
+        }
+      }
+    } catch (error) {
+      console.error("Gagal mengecek status pendaftaran/inkubasi:", error);
+    } finally {
+      setCheckingActive(false);
+    }
+  };
+
+  checkFormAndActiveStatus();
+}, []);
 
   // Handler input utama
   const handleChange = (e) => {
@@ -189,7 +198,7 @@ const FormInkubasi = () => {
 
       data.append("anggota", JSON.stringify(payloadAnggota));
 
-      const res = await API.post("/pengajuan-inkubasi", data, {
+      const res = await API.post("/techno/inkubasi", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 

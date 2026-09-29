@@ -24,7 +24,7 @@ const ManajemenUser = () => {
   const fetchUsers = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await API.get("/admin/users");
+      const response = await API.get("/techno/admin/users");
       if (response.data?.success) {
         setUsers(response.data.data || []);
       }
@@ -53,7 +53,7 @@ const ManajemenUser = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const response = await API.post("/admin/users", formData);
+      const response = await API.post("/techno/admin/users", formData);
       if (response.data?.success) {
         alert(response.data.message || "User berhasil dibuat!");
         setIsModalOpen(false);
@@ -82,7 +82,7 @@ const ManajemenUser = () => {
     if (!window.confirm(confirmMsg)) return;
 
     try {
-      const response = await API.put(`/admin/users/${userId}/role`, {
+      const response = await API.put(`/techno/admin/users/${userId}/role`, {
         role: newRole,
       });
 
@@ -104,7 +104,7 @@ const ManajemenUser = () => {
     if (!window.confirm(confirmMsg)) return;
 
     try {
-      const response = await API.delete(`/admin/users/${userId}`);
+      const response = await API.delete(`/techno/admin/users/${userId}`);
       if (response.data?.success) {
         alert("Pengguna berhasil dihapus.");
         fetchUsers();

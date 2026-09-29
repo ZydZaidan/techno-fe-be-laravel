@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import API from '../../../services/api';
+// Import API dan helper getImageUrl dari api.js
+import API, { getImageUrl } from '../../../services/api';
 
 const EyeIcon = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -7,8 +8,6 @@ const EyeIcon = ({ className }) => (
     <circle cx="12" cy="12" r="3" />
   </svg>
 );
-
-const BASE_URL = 'http://localhost:5000'; // Sesuaikan jika port backend berbeda
 
 const KelolaBerita = () => {
   const [news, setNews] = useState([]);
@@ -51,25 +50,22 @@ const KelolaBerita = () => {
   }, [fetchBerita]);
 
   const handleOpenModal = (item = null) => {
-    setImageFile(null); // Reset file
+    setImageFile(null); // Reset file upload baru
+
     if (item) {
       setSelectedNews(item);
       setFormData({
         judul: item.judul || '',
         ringkasan: item.ringkasan || '',
         kategori: item.kategori || 'Peresmian',
-        isi_artikel: item.konten || '',
+        isi_artikel: item.konten || item.isi_artikel || '',
         status_publikasi: item.status_publikasi || 'Published',
         is_highlight: Boolean(item.is_highlight),
       });
 
-      // Set preview dari gambar yang sudah ada (jika relative path, tambahkan BASE_URL)
-      if (item.gambar_url) {
-        setImagePreview(
-          item.gambar_url.startsWith('http')
-            ? item.gambar_url
-            : `${BASE_URL}${item.gambar_url}`
-        );
+      // Gunakan getImageUrl universal dari api.js (bebas hardcode localhost)
+      if (item.gambar_url || item.gambar) {
+        setImagePreview(getImageUrl(item.gambar_url || item.gambar));
       } else {
         setImagePreview('');
       }
@@ -105,7 +101,7 @@ const KelolaBerita = () => {
     submitData.append('kategori', formData.kategori);
     submitData.append('isi_artikel', formData.isi_artikel);
     submitData.append('status_publikasi', formData.status_publikasi);
-    submitData.append('is_highlight', formData.is_highlight);
+    submitData.append('is_highlight', formData.is_highlight ? '1' : '0');
 
     if (imageFile) {
       submitData.append('gambar', imageFile);
@@ -117,10 +113,13 @@ const KelolaBerita = () => {
       };
 
       if (selectedNews) {
-        await API.put(`/berita/${selectedNews.id}`, submitData, config);
+        // Trik khas Laravel: jika update FormData (ada file), gunakan POST + _method PUT
+        submitData.append('_method', 'PUT');
+        await API.post(`/berita/${selectedNews.id}`, submitData, config);
       } else {
         await API.post('/berita', submitData, config);
       }
+      
       setIsModalOpen(false);
       void fetchBerita();
     } catch (err) {

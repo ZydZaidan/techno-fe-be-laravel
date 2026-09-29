@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/techno';
-const FILE_BASE_URL = import.meta.env.VITE_FILE_BASE_URL || 'http://localhost:5000/uploads';
+import { 
+  getReviewerLogbookAPI, 
+  updateReviewerLogbookAPI, 
+  getFileUrl 
+} from "../../../services/api"; // Sesuaikan path relative ke file api.js milikmu
 
 const ApprovalLogbook = () => {
   const [logbooks, setLogbooks] = useState([]);
@@ -16,25 +17,11 @@ const ApprovalLogbook = () => {
     catatan_mentor: '',
   });
 
-  // Helper untuk mengambil token dari Storage mana pun yang tersedia
-  const getToken = () => {
-    return sessionStorage.getItem('token') || localStorage.getItem('token');
-  };
-
+  // Fetch daftar logbook menggunakan API Interceptor
   const fetchLogbooks = useCallback(async () => {
     try {
       setIsLoading(true);
-      const token = getToken();
-
-      if (!token) {
-        console.error('Token otentikasi tidak ditemukan di sessionStorage maupun localStorage.');
-        setIsLoading(false);
-        return;
-      }
-
-      const response = await axios.get(`${API_BASE_URL}/reviewer/logbook`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await getReviewerLogbookAPI();
 
       if (response.data.success) {
         setLogbooks(response.data.data || []);
@@ -48,7 +35,7 @@ const ApprovalLogbook = () => {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      void fetchLogbooks();
+      fetchLogbooks();
     }, 0);
 
     return () => clearTimeout(timeoutId);
@@ -63,21 +50,15 @@ const ApprovalLogbook = () => {
     setIsModalOpen(true);
   };
 
+  // Submit hasil approval/catatan mentor
   const handleSubmitApproval = async (e) => {
     e.preventDefault();
     try {
       setIsSubmitting(true);
-      const token = getToken();
-
-      if (!token) {
-        alert('Sesi login telah habis. Silakan login kembali.');
-        return;
-      }
-
-      const response = await axios.put(
-        `${API_BASE_URL}/reviewer/logbook/${selectedLogbook.id}`,
-        approvalData,
-        { headers: { Authorization: `Bearer ${token}` } }
+      
+      const response = await updateReviewerLogbookAPI(
+        selectedLogbook.id, 
+        approvalData
       );
 
       if (response.data.success) {
@@ -91,6 +72,9 @@ const ApprovalLogbook = () => {
       setIsSubmitting(false);
     }
   };
+
+  // Helper untuk mengecek field berkas yang tersedia
+  const getLogbookFile = (item) => item?.file_bukti || item?.file_dokumentasi || item?.file_pdf;
 
   return (
     <div className="space-y-6 md:ml-64 font-poppins pt-8 px-4 md:px-8 pb-16 bg-[#F9FAFB] min-h-screen">
@@ -113,39 +97,60 @@ const ApprovalLogbook = () => {
                 <th className="py-3 px-2">Tanggal</th>
                 <th className="py-3 px-2">Nama Tenant</th>
                 <th className="py-3 px-2">Aktivitas Mentoring</th>
+                <th className="py-3 px-2">Berkas PDF / Bukti</th>
                 <th className="py-3 px-2">Status</th>
                 <th className="py-3 px-2 text-right">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50 text-xs">
-              {logbooks.map((item) => (
-                <tr key={item.id} className="hover:bg-slate-50">
-                  <td className="py-3 px-2 text-slate-500">{item.tanggal_konsultasi}</td>
-                  <td className="py-3 px-2 font-medium text-[#092B52]">{item.nama_tenant}</td>
-                  <td className="py-3 px-2 text-slate-600 max-w-xs truncate">{item.aktivitas_mentoring}</td>
-                  <td className="py-3 px-2">
-                    <span
-                      className={`px-2.5 py-1 rounded-full text-[10px] font-semibold ${
-                        item.status_approval === 'Approved'
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : item.status_approval === 'Rejected'
-                          ? 'bg-rose-100 text-rose-700'
-                          : 'bg-amber-100 text-amber-700'
-                      }`}
-                    >
-                      {item.status_approval || 'Pending'}
-                    </span>
-                  </td>
-                  <td className="py-3 px-2 text-right">
-                    <button
-                      onClick={() => handleOpenModal(item)}
-                      className="px-3 py-1.5 bg-[#188B9E] text-white rounded-full text-[11px] font-medium hover:bg-[#147484] transition"
-                    >
-                      Review
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {logbooks.map((item) => {
+                const filePath = getLogbookFile(item);
+                return (
+                  <tr key={item.id} className="hover:bg-slate-50">
+                    <td className="py-3 px-2 text-slate-500">{item.tanggal_konsultasi}</td>
+                    <td className="py-3 px-2 font-medium text-[#092B52]">{item.nama_tenant}</td>
+                    <td className="py-3 px-2 text-slate-600 max-w-xs truncate">{item.aktivitas_mentoring}</td>
+                    
+                    {/* Column Tambahan untuk Buka PDF langsung dari tabel */}
+                    <td className="py-3 px-2">
+                      {filePath ? (
+                        <a
+                          href={getFileUrl(filePath)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-50 text-red-600 border border-red-100 rounded-lg hover:bg-red-100 font-medium transition"
+                        >
+                          📄 Lihat PDF
+                        </a>
+                      ) : (
+                        <span className="text-slate-400 italic text-[11px]">Tidak ada file</span>
+                      )}
+                    </td>
+
+                    <td className="py-3 px-2">
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-semibold ${
+                          item.status_approval === 'Approved'
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : item.status_approval === 'Rejected'
+                            ? 'bg-rose-100 text-rose-700'
+                            : 'bg-amber-100 text-amber-700'
+                        }`}
+                      >
+                        {item.status_approval || 'Pending'}
+                      </span>
+                    </td>
+                    <td className="py-3 px-2 text-right">
+                      <button
+                        onClick={() => handleOpenModal(item)}
+                        className="px-3 py-1.5 bg-[#188B9E] text-white rounded-full text-[11px] font-medium hover:bg-[#147484] transition"
+                      >
+                        Review
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
@@ -196,18 +201,25 @@ const ApprovalLogbook = () => {
                 </div>
               )}
 
-              {/* Tautan Berkas / Lampiran Dokumentasi */}
-              {selectedLogbook.file_dokumentasi && (
+              {/* Tautan Berkas / Lampiran PDF di Modal */}
+              {getLogbookFile(selectedLogbook) ? (
                 <div className="bg-slate-50 p-3 rounded-xl flex items-center justify-between">
-                  <span className="font-semibold text-[#092B52]">Dokumentasi / Lampiran:</span>
+                  <div>
+                    <span className="font-semibold text-[#092B52] block">Dokumen / Lampiran Logbook:</span>
+                    <span className="text-[10px] text-slate-400">Klik untuk melihat file PDF/Bukti dari tenant</span>
+                  </div>
                   <a
-                    href={`${FILE_BASE_URL}/logbook/${selectedLogbook.file_dokumentasi}`}
+                    href={getFileUrl(getLogbookFile(selectedLogbook))}
                     target="_blank"
                     rel="noreferrer"
-                    className="px-3 py-1 bg-[#092B52] text-white text-[11px] rounded-lg hover:bg-slate-800 transition"
+                    className="px-3 py-1.5 bg-[#092B52] text-white text-[11px] font-medium rounded-lg hover:bg-slate-800 transition flex items-center gap-1"
                   >
-                    Lihat Lampiran
+                    📄 Buka PDF
                   </a>
+                </div>
+              ) : (
+                <div className="bg-slate-50 p-3 rounded-xl text-center text-slate-400 italic">
+                  Tenant tidak melampirkan berkas PDF/Bukti.
                 </div>
               )}
             </div>

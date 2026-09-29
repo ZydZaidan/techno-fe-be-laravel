@@ -8,7 +8,7 @@ const UserDashboard = () => {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const response = await API.get("/pengajuan-inkubasi/dashboard");
+        const response = await API.get("/techno/inkubasi/dashboard");
         if (response.data.success) {
           setDashboardData(response.data.data);
         }

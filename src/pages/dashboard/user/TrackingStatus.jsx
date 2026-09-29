@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import API from "../../../services/api";
+import API,{getFileUrl} from "../../../services/api";
 
 const TrackingStatus = () => {
   const [listInkubasi, setListInkubasi] = useState([]);
@@ -9,7 +9,7 @@ const TrackingStatus = () => {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const res = await API.get("/pengajuan-inkubasi/my");
+        const res = await API.get("/techno/inkubasi/my");
 
         if (res.data.success && res.data.data) {
           const data = Array.isArray(res.data.data) ? res.data.data : [res.data.data];
@@ -135,8 +135,7 @@ const TrackingStatus = () => {
     },
   ];
 
-  const fileBaseUrl =
-    import.meta.env.VITE_FILE_BASE_URL || "http://localhost:5000";
+
 
   // Helper Banner Summary
   const renderBannerStatus = () => {
@@ -226,12 +225,12 @@ const TrackingStatus = () => {
           </div>
 
           {dataInkubasi.file_dokumen && (
-            <a
-              href={`${fileBaseUrl}${dataInkubasi.file_dokumen}`}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-[#092B52] text-xs font-semibold rounded-xl transition"
-            >
+            <a 
+  href={getFileUrl(dataInkubasi.file_dokumen)} 
+  target="_blank" 
+  rel="noopener noreferrer"
+  className="text-[#188B9E] font-semibold hover:underline"
+>
               📄 Lihat Proposal
             </a>
           )}

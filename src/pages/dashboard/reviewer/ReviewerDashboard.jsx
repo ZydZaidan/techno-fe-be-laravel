@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/techno';
+import { getReviewerDashboardAPI } from '../../../services/api';
 
 const ReviewerDashboard = () => {
   const [stats, setStats] = useState({
@@ -14,29 +12,15 @@ const ReviewerDashboard = () => {
   const [recentAssigned, setRecentAssigned] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Helper untuk mengambil token dari Storage mana pun yang tersedia
-  const getToken = () => {
-    return sessionStorage.getItem('token') || localStorage.getItem('token');
-  };
-
   useEffect(() => {
     let isMounted = true;
 
     const fetchDashboardData = async () => {
       try {
-        const token = getToken();
+        // Menggunakan helper API (token dan interceptor ditangani otomatis oleh axios instance)
+        const response = await getReviewerDashboardAPI();
 
-        if (!token) {
-          console.error('Token otentikasi tidak ditemukan di sessionStorage maupun localStorage.');
-          if (isMounted) setIsLoading(false);
-          return;
-        }
-
-        const response = await axios.get(`${API_BASE_URL}/reviewer/dashboard`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (isMounted && response.data.success) {
+        if (isMounted && response.data?.success) {
           setStats(response.data.data.stats || {
             totalAssigned: 0,
             needReview: 0,

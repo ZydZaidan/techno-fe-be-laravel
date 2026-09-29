@@ -17,7 +17,7 @@ const VerifikatorDashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await API.get('/verifikator/pengajuan');
+        const res = await API.get('/techno/verifikator/pengajuan');
         
         if (res.data && res.data.success) {
           const list = res.data.data || [];

@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import API from "../../services/api";
+import API, { getImageUrl } from "../../services/api";
 import defaultImg from "../../assets/img/itpln.jpeg";
-
-const BASE_URL = "http://localhost:5000";
 
 const ArrowRightIcon = ({ className }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -32,13 +30,17 @@ const Publikasi = () => {
   const [articles, setArticles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+
   useEffect(() => {
     const fetchArticles = async () => {
       try {
+        // NEMBAK API GET /berita
         const res = await API.get("/berita");
+        
         if (res.data?.success) {
+          // Filter status (case-insensitive biar aman)
           const published = res.data.data.filter(
-            (item) => item.status_publikasi === "Published"
+            (item) => item.status_publikasi?.toLowerCase() === "published"
           );
           setArticles(published);
         }
@@ -51,10 +53,7 @@ const Publikasi = () => {
     void fetchArticles();
   }, []);
 
-  const getImageUrl = (url) => {
-    if (!url) return defaultImg;
-    return url.startsWith("http") ? url : `${BASE_URL}${url}`;
-  };
+ 
 
   const featured = articles.find((item) => Boolean(item.is_highlight)) || articles[0];
   const listArticles = articles.filter((item) => item.id !== featured?.id);
@@ -70,8 +69,6 @@ const Publikasi = () => {
 
   return (
     <div className="min-h-screen bg-white font-poppins text-[#092B52] pt-28 pb-16">
-      
-      {/* BREADCRUMB */}
       <section className="border-b border-gray-100 bg-white py-6 mb-8">
         <div className="layout-container">
           <div className="mb-2 flex items-center gap-1.5 text-xs text-gray-500">
@@ -79,14 +76,11 @@ const Publikasi = () => {
             <span>&gt;</span>
             <span className="font-semibold text-[#092B52]">Publikasi</span>
           </div>
-          <h1 className="font-readex text-3xl md:text-4xl font-extrabold text-[#092B52]">
-            Berita
-          </h1>
+          <h1 className="font-readex text-3xl md:text-4xl font-extrabold text-[#092B52]">Berita</h1>
         </div>
       </section>
 
-      {/* ARTIKEL UNGGULAN */}
-      <section className=" py-12 mb-12 border-b border-gray-100 bg-white">
+      <section className="py-12 mb-12 border-b border-gray-100 bg-white">
         <div className="layout-container">
           {isLoading ? (
             <p className="text-center text-xs text-slate-400 py-8">Memuat artikel...</p>
@@ -101,11 +95,7 @@ const Publikasi = () => {
                 />
               </div>
               <div className="flex flex-col justify-center p-6 md:p-8 text-left">
-                <span
-                  className={`mb-3 w-fit rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
-                    categoryStyles[featured.kategori] || "bg-slate-100 text-slate-600"
-                  }`}
-                >
+                <span className={`mb-3 w-fit rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${categoryStyles[featured.kategori] || "bg-slate-100 text-slate-600"}`}>
                   {featured.kategori || "Berita"}
                 </span>
 
@@ -122,6 +112,7 @@ const Publikasi = () => {
                   {featured.ringkasan || featured.isi_artikel || featured.konten}
                 </p>
 
+                {/* LINK DINAMIS KE DETAIL */}
                 <Link
                   to={`/publikasi/${featured.id}`}
                   className="flex w-fit items-center gap-2 rounded-xl bg-custom-yellow px-5 py-2.5 text-xs font-bold text-[#092B52] transition hover:opacity-90 shadow-xs"
@@ -137,12 +128,9 @@ const Publikasi = () => {
         </div>
       </section>
 
-      {/* ARTIKEL TERBARU */}
       <section className="py-4">
         <div className="layout-container">
-          <h2 className="font-readex mb-6 text-xl md:text-2xl font-bold text-[#092B52] text-left">
-            Artikel Terbaru
-          </h2>
+          <h2 className="font-readex mb-6 text-xl md:text-2xl font-bold text-[#092B52] text-left">Artikel Terbaru</h2>
 
           <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
             {listArticles.map((article) => (
@@ -159,11 +147,7 @@ const Publikasi = () => {
 
                   <div className="p-5">
                     <div className="mb-3 flex items-center justify-between gap-2">
-                      <span
-                        className={`rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
-                          categoryStyles[article.kategori] || "bg-slate-100 text-slate-600"
-                        }`}
-                      >
+                      <span className={`rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${categoryStyles[article.kategori] || "bg-slate-100 text-slate-600"}`}>
                         {article.kategori || "Berita"}
                       </span>
                       <span className="flex items-center gap-1 text-[10px] text-slate-400">
@@ -183,6 +167,7 @@ const Publikasi = () => {
                 </div>
 
                 <div className="p-5 pt-0">
+                  {/* LINK DINAMIS KE DETAIL */}
                   <Link
                     to={`/publikasi/${article.id}`}
                     className="inline-flex items-center gap-1 text-xs font-semibold text-custom-blue hover:underline"
@@ -196,7 +181,6 @@ const Publikasi = () => {
           </div>
         </div>
       </section>
-
     </div>
   );
 };

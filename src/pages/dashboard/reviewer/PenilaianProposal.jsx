@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import API from "../../../services/api";
+import API, { getFileUrl } from "../../../services/api";
 
 const PenilaianProposal = () => {
   const [proposals, setProposals] = useState([]);
@@ -17,12 +17,9 @@ const PenilaianProposal = () => {
     catatan_rekomendasi: "",
   });
 
-  const FILE_BASE_URL =
-    import.meta.env.VITE_FILE_BASE_URL || "http://localhost:5000";
-
   const loadProposals = useCallback(async () => {
     try {
-      const response = await API.get("/reviewer/proposals");
+      const response = await API.get("/techno/reviewer/proposals");
 
       if (response.data?.success) {
         setProposals(response.data.data || []);
@@ -77,7 +74,7 @@ const PenilaianProposal = () => {
       };
 
       const response = await API.post(
-        `/reviewer/evaluasi/${selectedProposal.id}`,
+        `/techno/reviewer/evaluasi/${selectedProposal.id}`,
         payload
       );
 
@@ -217,7 +214,7 @@ const PenilaianProposal = () => {
               </div>
               {selectedProposal.file_dokumen ? (
                 <a
-                  href={`${FILE_BASE_URL}${selectedProposal.file_dokumen}`}
+                  href={getFileUrl(selectedProposal.file_dokumen)}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#092B52] text-white text-[11px] font-medium rounded-lg hover:bg-slate-800 transition"
@@ -326,15 +323,15 @@ const PenilaianProposal = () => {
                   Catatan Evaluator
                 </label>
                 <textarea
-  rows="3"
-  value={rubrik.catatan_rekomendasi}
-  onChange={(e) =>
-    setRubrik({ ...rubrik, catatan_rekomendasi: e.target.value })
-  }
-  placeholder="Masukkan catatan masukan & alasan penilaian..."
-  className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-1 focus:ring-[#188B9E] outline-none"
-  required
-/>
+                  rows="3"
+                  value={rubrik.catatan_rekomendasi}
+                  onChange={(e) =>
+                    setRubrik({ ...rubrik, catatan_rekomendasi: e.target.value })
+                  }
+                  placeholder="Masukkan catatan masukan & alasan penilaian..."
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-1 focus:ring-[#188B9E] outline-none"
+                  required
+                />
               </div>
 
               <div className="flex justify-end gap-2 pt-2">

@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
+import { 
+  getInovasiAPI, 
+  createInovasiAPI, 
+  updateInovasiAPI, 
+  deleteInovasiAPI 
+} from "../../../services/api"; // Sesuaikan path lokasi file api.js kamu
 
-const BASE_URL = 'http://localhost:5000'; // Sesuaikan jika port backend berbeda
+const BASE_SERVER_URL = 'http://localhost:8000'; // Untuk nampil gambar public Laravel
 
 const KelolaInovasi = () => {
   const [inovasiList, setInovasiList] = useState([]);
@@ -24,16 +30,15 @@ const KelolaInovasi = () => {
   // Helper function untuk format URL gambar
   const getImageUrl = (url) => {
     if (!url) return 'https://placehold.co/150x150?text=No+Image';
-    return url.startsWith('http') ? url : `${BASE_URL}${url}`;
+    return url.startsWith('http') ? url : `${BASE_SERVER_URL}${url}`;
   };
 
-  // 1. Fetch Inovasi
+  // 1. Fetch Inovasi via API.js
   const fetchInovasi = useCallback(async () => {
     try {
-      const res = await fetch(`${BASE_URL}/api/techno/inovasi`);
-      const data = await res.json();
-      if (data.success) {
-        setInovasiList(data.data);
+      const res = await getInovasiAPI();
+      if (res.data.success) {
+        setInovasiList(res.data.data);
       }
     } catch (err) {
       console.error('Error fetch data inovasi:', err);
@@ -44,11 +49,7 @@ const KelolaInovasi = () => {
 
   // 2. Initial Fetch
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      fetchInovasi();
-    }, 0);
-
-    return () => clearTimeout(timeoutId);
+    void Promise.resolve().then(fetchInovasi);
   }, [fetchInovasi]);
 
   const handleOpenModal = (item = null) => {
@@ -89,7 +90,6 @@ const KelolaInovasi = () => {
     });
   };
 
-  // Handle pilih file lokal
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -101,7 +101,6 @@ const KelolaInovasi = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Pakai FormData untuk kirim gabungan Teks & File
     const submitData = new FormData();
     submitData.append('judul', formData.judul);
     submitData.append('kategori', formData.kategori);
@@ -113,22 +112,15 @@ const KelolaInovasi = () => {
     }
 
     try {
-      const url = editingItem
-        ? `${BASE_URL}/api/techno/inovasi/${editingItem.id}`
-        : `${BASE_URL}/api/techno/inovasi`;
-
-      const method = editingItem ? 'PUT' : 'POST';
-
-      const res = await fetch(url, {
-        method: method,
-        body: submitData
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        fetchInovasi();
-        handleCloseModal();
+      if (editingItem) {
+        // Poin 3 Solved: Pakai updateInovasiAPI yang udah ditambah _method=PUT
+        await updateInovasiAPI(editingItem.id, submitData);
+      } else {
+        await createInovasiAPI(submitData);
       }
+      
+      fetchInovasi();
+      handleCloseModal();
     } catch (err) {
       console.error('Error submit inovasi:', err);
     }
@@ -137,11 +129,8 @@ const KelolaInovasi = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus data inovasi ini?')) {
       try {
-        const res = await fetch(`${BASE_URL}/api/techno/inovasi/${id}`, {
-          method: 'DELETE'
-        });
-        const data = await res.json();
-        if (data.success) {
+        const res = await deleteInovasiAPI(id);
+        if (res.data.success) {
           fetchInovasi();
         }
       } catch (err) {

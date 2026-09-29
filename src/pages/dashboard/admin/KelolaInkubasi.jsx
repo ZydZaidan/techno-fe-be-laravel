@@ -18,7 +18,7 @@ const KelolaInkubasi = () => {
   const fetchMasterData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await API.get("/admin/master-inkubasi");
+      const response = await API.get("/techno/admin/master-inkubasi");
       if (response.data?.success) {
         setInkubasiList(response.data.data || []);
       }
@@ -32,7 +32,7 @@ const KelolaInkubasi = () => {
   // Fetch Status Setting Pengajuan Inkubasi (Buka / Tutup)
   const fetchInkubasiSetting = useCallback(async () => {
     try {
-      const res = await API.get("/admin/inkubasi-setting");
+      const res = await API.get("/techno/admin/inkubasi-setting");
       if (res.data?.success) {
         // Safe check: membaca is_active / is_open baik dari res.data maupun res.data.data
         const statusValue =
@@ -68,7 +68,7 @@ const KelolaInkubasi = () => {
     setIsTogglingSetting(true);
     try {
       // Mengirim payload lengkap (is_active & is_open) agar kompatibel dengan handler backend mana pun
-      const response = await API.put("/admin/inkubasi-setting", {
+      const response = await API.put("/techno/admin/inkubasi-setting", {
         is_active: nextState,
         is_open: nextState,
         isOpen: nextState,
@@ -134,7 +134,7 @@ const KelolaInkubasi = () => {
     setIsSubmitting(true);
     try {
       const idsToComplete = validForCompletion.map((item) => item.id);
-      const response = await API.put("/admin/inkubasi/bulk-selesai", {
+      const response = await API.put("/techno/admin/inkubasi/bulk-selesai", {
         ids: idsToComplete,
       });
 
@@ -156,7 +156,7 @@ const KelolaInkubasi = () => {
     if (!window.confirm(confirmMsg)) return;
 
     try {
-      const response = await API.put(`/admin/inkubasi/${id}/status`, {
+      const response = await API.put(`/techno/admin/inkubasi/${id}/status`, {
         status: newStatus,
       });
 
@@ -176,7 +176,7 @@ const KelolaInkubasi = () => {
     if (!window.confirm(confirmMsg)) return;
 
     try {
-      const response = await API.delete(`/admin/inkubasi/${id}`);
+      const response = await API.delete(`/techno/admin/inkubasi/${id}`);
 
       if (response.data?.success) {
         alert("Data pengajuan inkubasi berhasil dihapus.");

@@ -20,7 +20,7 @@ const AdminDashboard = () => {
   const fetchDashboardStats = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await API.get("/admin/stats");
+      const response = await API.get("/techno/admin/stats");
       if (response.data?.success && response.data?.data) {
         setStatsData(response.data.data);
       }

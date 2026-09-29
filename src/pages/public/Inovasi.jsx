@@ -1,8 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import API from "../../services/api";
+import { getInovasiAPI, getImageUrl } from "../../services/api";
 import { Link } from "react-router-dom";
-
-const BASE_URL = "http://localhost:5000"; // Sesuaikan port backend kamu
 
 const Inovasi = () => {
   const [inovasiData, setInovasiData] = useState([]);
@@ -10,11 +8,10 @@ const Inovasi = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("Semua");
 
-  // Fetch Data dari API Backend
   useEffect(() => {
     const fetchInovasi = async () => {
       try {
-        const response = await API.get("/inovasi");
+        const response = await getInovasiAPI();
         if (response.data.success) {
           setInovasiData(response.data.data);
         }
@@ -27,12 +24,6 @@ const Inovasi = () => {
 
     fetchInovasi();
   }, []);
-
-  // Format URL Gambar
-  const getImageUrl = (url) => {
-    if (!url) return "https://placehold.co/600x800?text=No+Image";
-    return url.startsWith("http") ? url : `${BASE_URL}${url}`;
-  };
 
   // Ambil daftar kategori unik secara dinamis berdasarkan data di DB
   const dynamicCategories = useMemo(() => {
