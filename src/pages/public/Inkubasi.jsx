@@ -66,38 +66,38 @@ const Inkubasi = () => {
   ];
 
   // Data Mentor Expert
-  const mentors = [
-    {
-      id: 1,
-      name: "Budi Santoso",
-      role: "VC & Network Funding",
-      img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Budi",
-    },
-    {
-      id: 2,
-      name: "Dian Lestari",
-      role: "Digital Marketing",
-      img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Dian",
-    },
-    {
-      id: 3,
-      name: "Ario Wibowo",
-      role: "Product & Tech",
-      img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ario",
-    },
-    {
-      id: 4,
-      name: "Rudi Hermawan",
-      role: "Legal & Hak Cipta",
-      img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Rudi",
-    },
-    {
-      id: 5,
-      name: "Siti Rahmah",
-      role: "Business Strategy",
-      img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Siti",
-    },
-  ];
+  // const mentors = [
+  //   {
+  //     id: 1,
+  //     name: "Budi Santoso",
+  //     role: "VC & Network Funding",
+  //     img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Budi",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Dian Lestari",
+  //     role: "Digital Marketing",
+  //     img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Dian",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Ario Wibowo",
+  //     role: "Product & Tech",
+  //     img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ario",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Rudi Hermawan",
+  //     role: "Legal & Hak Cipta",
+  //     img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Rudi",
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "Siti Rahmah",
+  //     role: "Business Strategy",
+  //     img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Siti",
+  //   },
+  // ];
 
   return (
     <div className="min-h-screen bg-white font-poppins text-[#092B52] pt-28 pb-16 text-left">
@@ -158,7 +158,7 @@ const Inkubasi = () => {
       </section>
 
       {/* 🚀 2. SECTION BANNER CTA KE INOVASI (PENGGANTI SHOWCASE) */}
-      <section className="w-full bg-white py-12 border-y border-slate-100">
+      <section className="w-full bg-white py-12  border-slate-100">
         <div className="layout-container">
           <div className="bg-slate-900 rounded-3xl p-8 md:p-12 text-white flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden shadow-md">
             {/* Hiasan background visual */}
@@ -204,7 +204,7 @@ const Inkubasi = () => {
       </section>
 
       {/* 🚀 3. SECTION JARINGAN MENTOR EXPERT */}
-      <section className="w-full bg-[#f8fafc] py-16">
+      {/* <section className="w-full bg-[#f8fafc] py-16">
         <div className="layout-container">
           <div className="bg-linear-to-b from-[#eef7ff] to-[#e4f0fc] rounded-3xl p-8 md:p-12 border border-blue-100/60 shadow-xs text-center">
             <div className="max-w-xl mx-auto mb-12">
@@ -240,10 +240,10 @@ const Inkubasi = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* 🚀 4. SECTION CTA BANNER DAFTAR */}
-      <section className="w-full bg-[#f8fafc] pb-16">
+      <section className="w-full bg-[#fffff] pb-16">
         <div className="layout-container">
           <div className="relative overflow-hidden rounded-3xl bg-linear-to-r from-cyan-200 via-blue-100 to-teal-100 p-8 md:p-14 border border-cyan-100/50 shadow-xs flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="max-w-xl text-left">
@@ -251,8 +251,7 @@ const Inkubasi = () => {
                 Punya Ide Bisnis Brilian? Mari Wujudkan Bersama Kami.
               </h2>
               <p className="text-slate-600 text-xs md:text-sm leading-relaxed">
-                Pendaftaran Batch 5 telah dibuka. Bergabunglah dengan ekosistem
-                inovasi terbaik.
+                Bergabunglah dengan ekosistem inovasi terbaik.
               </p>
             </div>
 

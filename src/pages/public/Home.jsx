@@ -128,14 +128,13 @@ useEffect(() => {
         <div className="relative z-10 layout-container w-full">
           <div className="max-w-3xl text-white">
             <h1 className="font-readex text-5xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight">
-              Akselerasi Inovasi, <br />
-              Bangun Bisnis{" "}
+              Akselerasi Teknologi{" "}
               <span className="text-custom-yellow">Masa Depan</span>
             </h1>
             <p className="text-slate-200 text-lg md:text-xl mb-10 leading-relaxed max-w-2xl">
-              Technopark IT-PLN adalah wadah eksperimental dan profesional untuk
-              mencetak technopreneur handal, memfasilitasi HKI, dan
-              mengembangkan inovasi teknologi energi.
+              Technopark IT-PLN adalah pusat pengembangan teknologi dan inovasi yang
+            mendukung lahirnya technopreneur, memfasilitasi HKI, dan menghadirkan
+            solusi energi masa depan.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-5">
@@ -175,22 +174,23 @@ useEffect(() => {
 
             <div className="pl-0 lg:pl-10">
               <h2 className="font-readex text-3xl md:text-4xl font-extrabold text-[#1c3250] mb-3 uppercase tracking-wider">
-                About Our Technopark
+                 Tentang Technopark Kami
               </h2>
               <h3 className="text-lg text-slate-500 mb-6 font-medium">
-                Empowering the Next Generation of Innovators
+                 Mendorong Lahirnya Generasi Inovator Baru
               </h3>
               <p className="text-slate-600 mb-8 leading-relaxed text-[15px]">
-                At Technopark IT-PLN, we believe in the transformative power of
-                innovation and the boundless potential within every individual.
-                Established to foster intellectual curiosity and academic
-                excellence, we create a vibrant ecosystem for startups.
+                 Technopark IT-PLN dibangun untuk mendukung mahasiswa dan peneliti
+              mengembangkan ide menjadi karya nyata. Dari riset di kampus, kami
+              membuka ruang eksperimen, pendampingan bisnis, hingga perlindungan
+              HKI, sehingga inovasi yang lahir di sini bisa terus tumbuh dan
+              memberi dampak.
               </p>
               <Link
                 to="/profil"
                 className="inline-flex items-center gap-2 text-custom-cyan font-semibold hover:text-custom-blue transition-colors group"
               >
-                View Our Program
+                Lihat Profil Lengkap
                 <svg
                   className="w-5 h-5 transform group-hover:translate-x-1 transition-transform"
                   fill="none"
@@ -266,8 +266,8 @@ useEffect(() => {
                   Inkubasi Bisnis
                 </h3>
                 <p className="text-slate-500 text-sm leading-relaxed">
-                  Program intensif bimbingan startup dari tahap ide hingga siap
-                  pasar bersama mentor ahli.
+                   Kami sediakan ruang kerja, pendampingan mentor, hingga perlindungan
+            hukum agar kamu bisa fokus mengembangkan karya.
                 </p>
               </div>
             </div>
@@ -419,7 +419,7 @@ useEffect(() => {
                 <img
                   src={partner.logo}
                   alt={partner.name}
-                  className="max-h-28 w-auto object-contain grayscale hover:grayscale-0 opacity-80 hover:opacity-100 transition-all duration-300"
+                  className="max-h-28 w-auto object-contain "
                 />
               </div>
             ))}

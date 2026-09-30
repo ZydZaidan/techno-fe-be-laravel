@@ -53,19 +53,22 @@ const teamMembers = [
     name: "Dr. Ir. Abdul Haris, S.Kom., M.Kom., IPM.",
     role: "Manajer BPM ITPLN",
     photo: pakHaris,
-    email: "haris@itpln.ac.id",
+    email: "harismwakang@itpln.ac.id",
+    link: "#",
   },
   {
     name: "Hengki Sikumbang, SE., MMSI.",
     role: "Analisis",
     photo: pakHengki,
     email: "hengki@itpln.ac.id",
+    link: "https://www.linkedin.com/in/hengki-sikumbang-330794245/",
   },
   {
     name: "Salsabila Tsamrotul Qolbi, S.T.",
     role: "Staff",
     photo: kakChacha,
-    email: "chacha@itpln.ac.id",
+    email: "user@itpln.ac.id",
+    link: "https://www.linkedin.com/in/salsabila-tsamrotul-qolbi/",
   },
 ];
 
@@ -278,7 +281,9 @@ const Profil = () => {
                     <MailIcon className="h-4 w-4" />
                   </a>
                   <a
-                    href="#"
+                    href={member.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex h-9 w-9 items-center justify-center rounded-full bg-[#D9F0FA] text-custom-blue transition hover:bg-custom-blue hover:text-white"
                   >
                     <LinkIcon className="h-4 w-4" />

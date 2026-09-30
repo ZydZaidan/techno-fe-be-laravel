@@ -13,8 +13,7 @@ const Footer = () => {
               TECHNOPARK
             </h2>
             <p className="text-slate-200 text-sm leading-relaxed max-w-sm">
-              Technopark IT-PLN adalah pusat inovasi dan inkubasi bisnis yang mendedikasikan diri untuk mencetak teknopreneur tangguh di masa depan.
-            </p>
+Ekosistem terintegrasi IT-PLN untuk mengakselerasi inkubasi bisnis, legalitas HKI, dan kontribusi nyata melalui pengabdian masyarakat            </p>
           </div>
 
           {/* Kolom 2: Navigasi Utama (Lebar: 3 grid) */}

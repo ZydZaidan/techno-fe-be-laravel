@@ -1,4 +1,5 @@
 import { NavLink, Link, useNavigate } from 'react-router-dom';
+import logoWhite from "../../assets/img/logo-white.svg"; 
 
 const DashboardIcon = ({ className }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,7 +75,7 @@ const handleLogout = () => {
           <div className="p-6 pb-8 flex items-center justify-between">
             <Link to="/" onClick={onClose}>
               <img
-                src="/src/assets/img/logo-white.svg"
+                src={logoWhite}
                 alt="ITPLN Science Technopark"
                 className="h-12 w-auto object-contain"
               />
