@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
-import API from "../../services/api"; // Axios instance
+import API from "../../services/api";
 import HeroImg from "../../assets/img/hero-img.svg";
 import aboutImg1 from "../../assets/img/about1.svg";
 import aboutImg2 from "../../assets/img/about2.png";
@@ -8,8 +8,54 @@ import partner1 from "../../assets/img/partner-1.png";
 import partner2 from "../../assets/img/partner-2.png";
 import GroupsIcon from "@mui/icons-material/Groups";
 import RocketLaunchRoundedIcon from "@mui/icons-material/RocketLaunchRounded";
-import CopyrightRoundedIcon from '@mui/icons-material/CopyrightRounded';
+import CopyrightRoundedIcon from "@mui/icons-material/CopyrightRounded";
+
+// 1. TARUH DATA SLIDE DI LUAR KOMPONEN (Hemat Memori & Bersih)
+const heroSlides = [
+  {
+    id: 1,
+    titlePrefix: "Akselerasi Teknologi ",
+    titleHighlight: "Masa Depan",
+    description:
+      "Technopark IT-PLN adalah pusat pengembangan teknologi dan inovasi yang mendukung lahirnya technopreneur, memfasilitasi HKI, dan menghadirkan solusi energi masa depan.",
+    image: HeroImg,
+    primaryBtn: { text: "Pelajari Lebih Lanjut", link: "/profil" },
+    secondaryBtn: { text: "Buat Pengajuan", link: "/inkubasi" },
+  },
+  {
+    id: 2,
+    titlePrefix: "Inkubasi Bisnis & ",
+    titleHighlight: "Akselerasi Startup",
+    description:
+      "Mendampingi inovator dari tahap purwarupa (prototype) hingga siap komersialisasi dan terhubung langsung dengan ekosistem industri.",
+    image: aboutImg2,
+    primaryBtn: { text: "Daftar Inkubasi", link: "/inkubasi" },
+    secondaryBtn: { text: "Lihat Program", link: "/profil" },
+  },
+  {
+    id: 3,
+    titlePrefix: "Fasilitasi & Legalitas ",
+    titleHighlight: "Kekayaan Intelektual",
+    description:
+      "Pendampingan resmi pendaftaran Paten dan Hak Cipta (HKI) untuk mengamankan karya riset sivitas akademika agar bernilai komersial.",
+    image: aboutImg1,
+    primaryBtn: { text: "Fasilitasi HKI", link: "/hki" },
+    secondaryBtn: { text: "Hubungi Kami", link: "/contact" },
+  },
+];
+
 const Home = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Auto slide dengan reset otomatis saat user klik dot
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 6500);
+
+    return () => clearTimeout(timer);
+  }, [currentSlide]);
+
   const scrollRef = useRef(null);
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -115,42 +161,72 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-poppins">
-      {/* HERO SECTION */}
-      <section className="relative w-full min-h-screen flex items-center pt-32 pb-20">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${HeroImg})` }}
-        >
-          <div className="absolute inset-0 bg-linear-to-r from-[#031B33] via-[#093C5C]/90 to-[#1B799E]/80"></div>
-        </div>
+      {/* HERO SECTION SLIDER OTOMATIS */}
+      <section className="relative w-full min-h-screen flex items-center pt-32 pb-20 overflow-hidden">
+        
+        {/* BACKGROUND SLIDER DENGAN EFEK CROSSFADE */}
+        {heroSlides.map((slide, index) => (
+          <div
+            key={slide.id}
+            className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out ${
+              index === currentSlide ? "opacity-100 z-0" : "opacity-0 pointer-events-none"
+            }`}
+            style={{ backgroundImage: `url(${slide.image})` }}
+          >
+            {/* OVERLAY GRADIENT */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#031B33] via-[#093C5C]/90 to-[#1B799E]/80"></div>
+          </div>
+        ))}
 
-        {/* Menggunakan layout-container agar konsisten */}
+        {/* KONTEN TEKS & TOMBOL (BERUBAH DINAMIS MENGIKUTI SLIDE) */}
         <div className="relative z-10 layout-container w-full">
           <div className="max-w-3xl text-white">
-            <h1 className="font-readex text-5xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight">
-              Akselerasi Teknologi{" "}
-              <span className="text-custom-yellow">Masa Depan</span>
-            </h1>
-            <p className="text-slate-200 text-lg md:text-xl mb-10 leading-relaxed max-w-2xl">
-              Technopark IT-PLN adalah pusat pengembangan teknologi dan inovasi yang
-            mendukung lahirnya technopreneur, memfasilitasi HKI, dan menghadirkan
-            solusi energi masa depan.
-            </p>
+            
+            {/* Key dipasang ke currentSlide agar ada efek animasi halus saat teks berganti */}
+            <div key={currentSlide} className="transition-all duration-700 ease-out animate-fadeIn">
+              <h1 className="font-readex text-5xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight">
+                {heroSlides[currentSlide].titlePrefix}
+                <span className="text-custom-yellow">
+                  {heroSlides[currentSlide].titleHighlight}
+                </span>
+              </h1>
 
-            <div className="flex flex-col sm:flex-row gap-5">
-              <Link
-                to="/profil"
-                className="px-8 py-3.5 bg-custom-yellow text-slate-900 font-bold rounded-full hover:bg-custom-yellow-light transition-colors text-center"
-              >
-                Pelajari Lebih Lanjut
-              </Link>
-              <Link
-                to="/inkubasi"
-                className="px-8 py-3.5 border-2 border-custom-yellow text-custom-yellow font-bold rounded-full hover:bg-custom-yellow hover:text-slate-900 transition-all duration-300 text-center"
-              >
-                Buat Pengajuan
-              </Link>
+              <p className="text-slate-200 text-lg md:text-xl mb-10 leading-relaxed max-w-2xl min-h-[84px]">
+                {heroSlides[currentSlide].description}
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-5">
+                <Link
+                  to={heroSlides[currentSlide].primaryBtn.link}
+                  className="px-8 py-3.5 bg-custom-yellow text-slate-900 font-bold rounded-full hover:bg-custom-yellow-light transition-colors text-center"
+                >
+                  {heroSlides[currentSlide].primaryBtn.text}
+                </Link>
+                <Link
+                  to={heroSlides[currentSlide].secondaryBtn.link}
+                  className="px-8 py-3.5 border-2 border-custom-yellow text-custom-yellow font-bold rounded-full hover:bg-custom-yellow hover:text-slate-900 transition-all duration-300 text-center"
+                >
+                  {heroSlides[currentSlide].secondaryBtn.text}
+                </Link>
+              </div>
             </div>
+
+            {/* INDIKATOR BULLET / DOTS DI BAWAH HERO */}
+            <div className="flex items-center gap-3 mt-12">
+              {heroSlides.map((_, dotIndex) => (
+                <button
+                  key={dotIndex}
+                  onClick={() => setCurrentSlide(dotIndex)}
+                  className={`h-2.5 rounded-full transition-all duration-300 ${
+                    dotIndex === currentSlide
+                      ? "w-8 bg-custom-yellow"
+                      : "w-2.5 bg-white/40 hover:bg-white/70"
+                  }`}
+                  aria-label={`Pindah ke slide ${dotIndex + 1}`}
+                />
+              ))}
+            </div>
+
           </div>
         </div>
       </section>
